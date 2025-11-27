@@ -1,0 +1,106 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sqlstream"
+version = "0.1.0"
+description = "A lightweight SQL query engine for data exploration with lazy evaluation and intelligent optimizations"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "SQLStream Team"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+# Start with no dependencies (pure Python for Phases 0-2)
+dependencies = []
+
+[project.optional-dependencies]
+# Added as we progress through phases
+parquet = ["pyarrow>=10.0.0"]  # Phase 3
+http = ["httpx>=0.27.0"]  # Phase 6 (modern alternative to requests)
+cli = ["click>=8.0.0", "rich>=13.0.0"]  # Phase 7 (rich for better table formatting)
+bloom = []  # Phase 5 - will implement bloom filter ourselves to avoid dependency
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",  # Modern linter/formatter (replaces black + pylint)
+    "mypy>=0.990",
+]
+
+[project.scripts]
+sqlstream = "sqlstream.cli.main:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["sqlstream"]
+
+# Ruff configuration (modern linter/formatter)
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--cov=sqlstream",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false  # Start lenient, tighten later
+ignore_missing_imports = true
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["sqlstream"]
+omit = ["*/tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

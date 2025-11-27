@@ -1,0 +1,8 @@
+# Production dependencies
+# Start with no dependencies (pure Python for Phases 0-2)
+# Dependencies will be added incrementally as we build features:
+#
+# Phase 3: pyarrow>=10.0.0
+# Phase 5: (bloom filter - implement ourselves)
+# Phase 6: httpx>=0.27.0
+# Phase 7: click>=8.0.0, rich>=13.0.0
