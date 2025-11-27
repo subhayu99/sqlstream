@@ -7,6 +7,7 @@ that implement the query using the Volcano pull-based model.
 
 from typing import Any, Dict, Iterator
 
+from sqlstream.core.planner import QueryPlanner
 from sqlstream.operators.filter import Filter
 from sqlstream.operators.limit import Limit
 from sqlstream.operators.project import Project
@@ -38,7 +39,7 @@ class Executor:
 
     def __init__(self):
         """Initialize executor"""
-        pass
+        self.planner = QueryPlanner()
 
     def execute(
         self, ast: SelectStatement, reader: BaseReader
@@ -60,10 +61,13 @@ class Executor:
             >>> for row in results:
             ...     print(row)
         """
-        # Build operator tree bottom-up
+        # Step 1: Apply optimizations (predicate pushdown, column pruning)
+        self.planner.optimize(ast, reader)
+
+        # Step 2: Build operator tree bottom-up
         plan = self._build_plan(ast, reader)
 
-        # Execute by pulling from root operator
+        # Step 3: Execute by pulling from root operator
         yield from plan
 
     def _build_plan(self, ast: SelectStatement, reader: BaseReader):
@@ -112,13 +116,30 @@ class Executor:
             Human-readable execution plan
 
         Example output:
+            Query Plan:
+            ============
             Limit(10)
               Project(name, age)
                 Filter(age > 25)
                   Scan(CSVReader)
+
+            Optimizations applied:
+              - Predicate pushdown: 1 condition(s)
+              - Column pruning: 2 column(s) selected
         """
+        # Apply optimizations
+        self.planner.optimize(ast, reader)
+
+        # Build plan
         plan = self._build_plan(ast, reader)
-        return self._format_plan(plan)
+
+        # Format output
+        output = ["Query Plan:", "=" * 40]
+        output.append(self._format_plan(plan))
+        output.append("")
+        output.append(self.planner.get_optimization_summary())
+
+        return "\n".join(output)
 
     def _format_plan(self, operator, indent: int = 0) -> str:
         """
