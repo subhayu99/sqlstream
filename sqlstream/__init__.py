@@ -7,7 +7,7 @@ Parquet, and JSON with lazy evaluation and intelligent optimizations.
 
 __version__ = "0.1.0"
 
-# Main API will be populated as we build
-# from sqlstream.core.query import query
+# Main API
+from sqlstream.core.query import query
 
-__all__ = ["__version__"]
+__all__ = ["__version__", "query"]
