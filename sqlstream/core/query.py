@@ -62,8 +62,10 @@ class Query:
 
         if suffix == ".csv":
             return CSVReader(source)
-        # elif suffix == ".parquet":
-        #     return ParquetReader(source)  # Phase 3
+        elif suffix == ".parquet":
+            from sqlstream.readers.parquet_reader import ParquetReader
+
+            return ParquetReader(source)
         # elif suffix in [".json", ".jsonl"]:
         #     return JSONReader(source)  # Future
         else:
@@ -73,7 +75,7 @@ class Query:
             except Exception as e:
                 raise ValueError(
                     f"Unsupported file format: {suffix}. "
-                    f"Supported formats: .csv (more coming soon)"
+                    f"Supported formats: .csv, .parquet"
                 ) from e
 
     def sql(self, query: str) -> "QueryResult":
