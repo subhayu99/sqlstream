@@ -5,6 +5,8 @@ Translates SQL AST directly to pandas DataFrame operations for 10-100x speedup.
 Falls back gracefully if pandas is not available.
 """
 
+from __future__ import annotations
+
 from typing import Any, Dict, Iterator, List, Optional
 
 try:
@@ -212,7 +214,7 @@ class PandasExecutor:
             alias = agg.alias if agg.alias else f"{agg.function.lower()}_{agg.column}"
             result_cols.append(alias)
 
-        # Select columns in order
+        # Try to select columns, use what's available
         available_cols = [c for c in result_cols if c in grouped.columns]
         if available_cols:
             grouped = grouped[available_cols]
