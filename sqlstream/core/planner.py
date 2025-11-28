@@ -67,6 +67,12 @@ class QueryPlanner:
         if not ast.where:
             return
 
+        # Disable predicate pushdown for JOINs - WHERE conditions may reference
+        # columns from either table, and we can't determine which without schema info
+        # TODO: Make this smarter by analyzing which conditions apply to which table
+        if ast.join:
+            return
+
         # Determine which conditions can be pushed down
         pushable = self._extract_pushable_conditions(ast.where.conditions)
 
@@ -193,6 +199,12 @@ class QueryPlanner:
             for agg in ast.aggregates:
                 if agg.column != "*":  # COUNT(*) doesn't need a column
                     needed.add(agg.column)
+
+        # Columns from JOIN conditions (Phase 5)
+        if ast.join:
+            # Need the left join key from the left table
+            needed.add(ast.join.on_left)
+            # Note: right join key is from right table, handled separately
 
         return list(needed)
 

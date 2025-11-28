@@ -68,6 +68,25 @@ class OrderByColumn:
 
 
 @dataclass
+class JoinClause:
+    """
+    Represents a JOIN clause
+
+    Examples:
+        INNER JOIN orders ON customers.id = orders.customer_id
+        LEFT JOIN products ON orders.product_id = products.id
+    """
+
+    right_source: str  # Right table/file name
+    join_type: str  # 'INNER', 'LEFT', 'RIGHT'
+    on_left: str  # Left column in join condition
+    on_right: str  # Right column in join condition
+
+    def __repr__(self) -> str:
+        return f"{self.join_type} JOIN {self.right_source} ON {self.on_left} = {self.on_right}"
+
+
+@dataclass
 class SelectStatement:
     """
     Represents a complete SELECT statement
@@ -78,6 +97,7 @@ class SelectStatement:
         SELECT * FROM data WHERE age > 25 LIMIT 10
         SELECT city, COUNT(*) FROM data GROUP BY city
         SELECT * FROM data ORDER BY age DESC LIMIT 10
+        SELECT * FROM customers INNER JOIN orders ON customers.id = orders.customer_id
     """
 
     columns: List[str]  # ['*'] for all columns, or specific column names
@@ -87,9 +107,7 @@ class SelectStatement:
     order_by: Optional[List[OrderByColumn]] = None
     limit: Optional[int] = None
     aggregates: Optional[List[AggregateFunction]] = None  # Aggregate functions in SELECT
-
-    # To be added in later phases:
-    # join: Optional[JoinClause] = None
+    join: Optional[JoinClause] = None  # JOIN clause
 
     def __repr__(self) -> str:
         parts = [f"SELECT {', '.join(self.columns)}"]
@@ -100,15 +118,8 @@ class SelectStatement:
             parts.append(f"GROUP BY {', '.join(self.group_by)}")
         if self.order_by:
             parts.append(f"ORDER BY {', '.join(str(col) for col in self.order_by)}")
+        if self.join:
+            parts.append(str(self.join))
         if self.limit:
             parts.append(f"LIMIT {self.limit}")
         return " ".join(parts)
-
-
-# These will be added in Phase 5 (JOIN)
-# @dataclass
-# class JoinClause:
-#     right_source: str
-#     join_type: str  # 'INNER', 'LEFT', 'RIGHT'
-#     on_left: str
-#     on_right: str

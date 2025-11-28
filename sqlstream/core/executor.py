@@ -5,11 +5,12 @@ Takes a parsed SQL AST and constructs a tree of operators
 that implement the query using the Volcano pull-based model.
 """
 
-from typing import Any, Dict, Iterator
+from typing import Any, Callable, Dict, Iterator, Optional
 
 from sqlstream.core.planner import QueryPlanner
 from sqlstream.operators.filter import Filter
 from sqlstream.operators.groupby import GroupByOperator
+from sqlstream.operators.join import HashJoinOperator
 from sqlstream.operators.limit import Limit
 from sqlstream.operators.orderby import OrderByOperator
 from sqlstream.operators.project import Project
@@ -44,14 +45,18 @@ class Executor:
         self.planner = QueryPlanner()
 
     def execute(
-        self, ast: SelectStatement, reader: BaseReader
+        self,
+        ast: SelectStatement,
+        reader: BaseReader,
+        reader_factory: Optional[Callable[[str], BaseReader]] = None,
     ) -> Iterator[Dict[str, Any]]:
         """
         Execute query and return iterator over results
 
         Args:
             ast: Parsed SELECT statement
-            reader: Data source reader
+            reader: Data source reader for the main table
+            reader_factory: Optional factory function to create readers for JOIN tables
 
         Returns:
             Iterator over result rows
@@ -67,32 +72,61 @@ class Executor:
         self.planner.optimize(ast, reader)
 
         # Step 2: Build operator tree bottom-up
-        plan = self._build_plan(ast, reader)
+        plan = self._build_plan(ast, reader, reader_factory)
 
         # Step 3: Execute by pulling from root operator
         yield from plan
 
-    def _build_plan(self, ast: SelectStatement, reader: BaseReader):
+    def _build_plan(
+        self,
+        ast: SelectStatement,
+        reader: BaseReader,
+        reader_factory: Optional[Callable[[str], BaseReader]] = None,
+    ):
         """
         Build operator tree from AST
 
         Builds the tree bottom-up in this order:
         1. Scan (always at bottom)
-        2. Filter (if WHERE clause exists)
-        3. GroupBy (if GROUP BY clause exists)
-        4. OrderBy (if ORDER BY clause exists)
-        5. Project (if specific columns selected)
-        6. Limit (if LIMIT clause exists)
+        2. HashJoin (if JOIN clause exists)
+        3. Filter (if WHERE clause exists)
+        4. GroupBy (if GROUP BY clause exists)
+        5. OrderBy (if ORDER BY clause exists)
+        6. Project (if specific columns selected)
+        7. Limit (if LIMIT clause exists)
 
         Args:
             ast: Parsed SELECT statement
-            reader: Data source reader
+            reader: Data source reader for main table
+            reader_factory: Optional factory to create readers for JOIN tables
 
         Returns:
             Root operator of the tree
         """
-        # Start with Scan operator (leaf)
+        # Start with Scan operator for left table (leaf)
         plan = Scan(reader)
+
+        # Add HashJoin if JOIN clause exists
+        if ast.join:
+            if not reader_factory:
+                raise ValueError(
+                    "JOIN requires a reader_factory to create readers for joined tables"
+                )
+
+            # Create reader for right table
+            right_reader = reader_factory(ast.join.right_source)
+
+            # Create scan operator for right table
+            right_scan = Scan(right_reader)
+
+            # Create hash join operator
+            plan = HashJoinOperator(
+                left=plan,
+                right=right_scan,
+                join_type=ast.join.join_type,
+                left_key=ast.join.on_left,
+                right_key=ast.join.on_right,
+            )
 
         # Add Filter if WHERE clause exists
         if ast.where:
@@ -122,13 +156,19 @@ class Executor:
 
         return plan
 
-    def explain(self, ast: SelectStatement, reader: BaseReader) -> str:
+    def explain(
+        self,
+        ast: SelectStatement,
+        reader: BaseReader,
+        reader_factory: Optional[Callable[[str], BaseReader]] = None,
+    ) -> str:
         """
         Explain query execution plan (for debugging)
 
         Args:
             ast: Parsed SELECT statement
             reader: Data source reader
+            reader_factory: Optional factory to create readers for JOIN tables
 
         Returns:
             Human-readable execution plan
@@ -149,7 +189,7 @@ class Executor:
         self.planner.optimize(ast, reader)
 
         # Build plan
-        plan = self._build_plan(ast, reader)
+        plan = self._build_plan(ast, reader, reader_factory)
 
         # Format output
         output = ["Query Plan:", "=" * 40]

@@ -7,6 +7,7 @@ import pytest
 from sqlstream.sql.ast_nodes import (
     AggregateFunction,
     Condition,
+    JoinClause,
     OrderByColumn,
     SelectStatement,
     WhereClause,
@@ -402,3 +403,107 @@ class TestComplexQueriesPhase4:
         assert ast.order_by[0].column == "age"
         assert ast.aggregates is None
         assert ast.group_by is None
+
+
+class TestJoinParsing:
+    """Test JOIN clause parsing (Phase 5)"""
+
+    def test_inner_join_explicit(self):
+        """Test INNER JOIN with explicit keyword"""
+        ast = parse("SELECT * FROM customers INNER JOIN orders ON customers.id = orders.customer_id")
+
+        assert ast.source == "customers"
+        assert ast.join is not None
+        assert isinstance(ast.join, JoinClause)
+        assert ast.join.join_type == "INNER"
+        assert ast.join.right_source == "orders"
+        assert ast.join.on_left == "id"
+        assert ast.join.on_right == "customer_id"
+
+    def test_inner_join_implicit(self):
+        """Test JOIN defaults to INNER JOIN"""
+        ast = parse("SELECT * FROM customers JOIN orders ON id = customer_id")
+
+        assert ast.join is not None
+        assert ast.join.join_type == "INNER"
+        assert ast.join.right_source == "orders"
+        assert ast.join.on_left == "id"
+        assert ast.join.on_right == "customer_id"
+
+    def test_left_join(self):
+        """Test LEFT JOIN"""
+        ast = parse("SELECT * FROM customers LEFT JOIN orders ON customers.id = orders.customer_id")
+
+        assert ast.join is not None
+        assert ast.join.join_type == "LEFT"
+        assert ast.join.right_source == "orders"
+        assert ast.join.on_left == "id"
+        assert ast.join.on_right == "customer_id"
+
+    def test_right_join(self):
+        """Test RIGHT JOIN"""
+        ast = parse("SELECT * FROM customers RIGHT JOIN orders ON customers.id = orders.customer_id")
+
+        assert ast.join is not None
+        assert ast.join.join_type == "RIGHT"
+        assert ast.join.right_source == "orders"
+
+    def test_join_without_table_qualification(self):
+        """Test JOIN with unqualified column names"""
+        ast = parse("SELECT * FROM users JOIN posts ON user_id = id")
+
+        assert ast.join.on_left == "user_id"
+        assert ast.join.on_right == "id"
+
+    def test_join_with_where(self):
+        """Test JOIN combined with WHERE clause"""
+        ast = parse("SELECT * FROM customers JOIN orders ON id = customer_id WHERE total > 100")
+
+        assert ast.join is not None
+        assert ast.where is not None
+        assert len(ast.where.conditions) == 1
+        assert ast.where.conditions[0].column == "total"
+
+    def test_join_with_columns(self):
+        """Test JOIN with specific columns"""
+        ast = parse("SELECT name, amount FROM customers JOIN orders ON id = customer_id")
+
+        assert ast.columns == ["name", "amount"]
+        assert ast.join is not None
+
+    def test_join_with_order_by(self):
+        """Test JOIN with ORDER BY"""
+        ast = parse("SELECT * FROM customers JOIN orders ON id = customer_id ORDER BY amount DESC")
+
+        assert ast.join is not None
+        assert ast.order_by is not None
+        assert ast.order_by[0].column == "amount"
+        assert ast.order_by[0].direction == "DESC"
+
+    def test_join_with_limit(self):
+        """Test JOIN with LIMIT"""
+        ast = parse("SELECT * FROM customers JOIN orders ON id = customer_id LIMIT 10")
+
+        assert ast.join is not None
+        assert ast.limit == 10
+
+    def test_join_full_query(self):
+        """Test JOIN with all clauses"""
+        sql = """
+            SELECT name, total
+            FROM customers
+            INNER JOIN orders ON customers.id = orders.customer_id
+            WHERE total > 100
+            ORDER BY total DESC
+            LIMIT 5
+        """
+        ast = parse(sql)
+
+        assert ast.columns == ["name", "total"]
+        assert ast.source == "customers"
+        assert ast.join is not None
+        assert ast.join.join_type == "INNER"
+        assert ast.join.right_source == "orders"
+        assert ast.where is not None
+        assert ast.order_by is not None
+        assert ast.limit == 5

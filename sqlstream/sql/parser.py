@@ -4,6 +4,7 @@ SQL Parser - Hand-written recursive descent parser
 Parses SQL subset:
 - SELECT column1, column2 FROM source
 - SELECT COUNT(*), SUM(amount) FROM source (aggregates)
+- INNER/LEFT/RIGHT JOIN table ON left_col = right_col
 - WHERE column = value (with AND)
 - GROUP BY column1, column2
 - ORDER BY column1 ASC, column2 DESC
@@ -18,6 +19,7 @@ from typing import List, Optional
 from sqlstream.sql.ast_nodes import (
     AggregateFunction,
     Condition,
+    JoinClause,
     OrderByColumn,
     SelectStatement,
     WhereClause,
@@ -55,6 +57,9 @@ class SQLParser:
         """
         # Replace commas and parens with spaces around them
         sql = re.sub(r"([,()])", r" \1 ", sql)
+
+        # Don't split dots - we'll handle table.column qualification in the parser
+        # This allows file paths like "/path/to/file.csv" to remain intact
 
         # Split on whitespace
         tokens = sql.split()
@@ -115,6 +120,11 @@ class SQLParser:
         self.consume("FROM")
         source = self.consume()
 
+        # Optional JOIN clause
+        join = None
+        if self.current() and self.current().upper() in ("INNER", "LEFT", "RIGHT", "JOIN"):
+            join = self._parse_join()
+
         # Optional WHERE clause
         where = None
         if self.current() and self.current().upper() == "WHERE":
@@ -143,6 +153,7 @@ class SQLParser:
             order_by=order_by,
             limit=limit,
             aggregates=aggregates,
+            join=join,
         )
 
     def _parse_columns(self):
@@ -368,6 +379,70 @@ class SQLParser:
             return limit
         except ValueError:
             raise ParseError(f"LIMIT must be an integer, got '{limit_str}'")
+
+    def _parse_join(self) -> JoinClause:
+        """
+        Parse JOIN clause
+
+        Examples:
+            JOIN orders ON customers.id = orders.customer_id
+            INNER JOIN orders ON customers.id = orders.customer_id
+            LEFT JOIN products ON orders.product_id = products.id
+            RIGHT JOIN users ON orders.user_id = users.id
+        """
+        # Parse join type (INNER/LEFT/RIGHT or just JOIN)
+        current = self.current().upper()
+
+        if current in ("INNER", "LEFT", "RIGHT"):
+            join_type = self.consume().upper()
+            self.consume("JOIN")
+        elif current == "JOIN":
+            self.consume("JOIN")
+            join_type = "INNER"  # Default to INNER JOIN
+        else:
+            raise ParseError(f"Expected JOIN keyword, got '{self.current()}'")
+
+        # Parse right table name
+        right_source = self.consume()
+
+        # Parse ON keyword
+        self.consume("ON")
+
+        # Parse join condition: left.column = right.column
+        # Support both qualified (table.column) and unqualified (column) names
+        left_col_token = self.consume()
+
+        # Check if it's qualified (contains a dot for table.column)
+        if "." in left_col_token:
+            # Split on last dot to handle paths like /tmp/file.csv correctly
+            # table.column -> extract column
+            parts = left_col_token.rsplit(".", 1)
+            left_col = parts[1] if len(parts) == 2 else left_col_token
+        else:
+            left_col = left_col_token
+
+        # Parse equals operator
+        if self.current() != "=":
+            raise ParseError(f"Expected '=' in JOIN condition, got '{self.current()}'")
+        self.consume("=")
+
+        # Parse right column
+        right_col_token = self.consume()
+
+        # Check if it's qualified (contains a dot for table.column)
+        if "." in right_col_token:
+            # Split on last dot to extract column name
+            parts = right_col_token.rsplit(".", 1)
+            right_col = parts[1] if len(parts) == 2 else right_col_token
+        else:
+            right_col = right_col_token
+
+        return JoinClause(
+            right_source=right_source,
+            join_type=join_type,
+            on_left=left_col,
+            on_right=right_col,
+        )
 
 
 def parse(sql: str) -> SelectStatement:

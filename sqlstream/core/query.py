@@ -12,7 +12,7 @@ Example:
 """
 
 from pathlib import Path
-from typing import Any, Dict, Iterator, List
+from typing import Any, Callable, Dict, Iterator, List
 
 from sqlstream.core.executor import Executor
 from sqlstream.readers.base import BaseReader
@@ -96,8 +96,8 @@ class Query:
         # Parse SQL query
         ast = parse(query)
 
-        # Create QueryResult
-        return QueryResult(ast, self.reader)
+        # Create QueryResult with reader factory for JOIN support
+        return QueryResult(ast, self.reader, self._create_reader)
 
     def schema(self) -> Dict[str, str]:
         """
@@ -122,16 +122,20 @@ class QueryResult:
     a lazy iterator over the results.
     """
 
-    def __init__(self, ast, reader: BaseReader):
+    def __init__(
+        self, ast, reader: BaseReader, reader_factory: Callable[[str], BaseReader]
+    ):
         """
         Initialize query result
 
         Args:
             ast: Parsed SQL AST
             reader: Data source reader
+            reader_factory: Factory function to create readers for JOIN tables
         """
         self.ast = ast
         self.reader = reader
+        self.reader_factory = reader_factory
         self.executor = Executor()
 
     def __iter__(self) -> Iterator[Dict[str, Any]]:
@@ -141,7 +145,7 @@ class QueryResult:
         Yields:
             Result rows as dictionaries
         """
-        yield from self.executor.execute(self.ast, self.reader)
+        yield from self.executor.execute(self.ast, self.reader, self.reader_factory)
 
     def to_list(self) -> List[Dict[str, Any]]:
         """
@@ -172,7 +176,7 @@ class QueryResult:
                 Filter(age > 25)
                   Scan(CSVReader)
         """
-        return self.executor.explain(self.ast, self.reader)
+        return self.executor.explain(self.ast, self.reader, self.reader_factory)
 
 
 # Convenience function for top-level API
