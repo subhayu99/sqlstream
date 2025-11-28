@@ -155,8 +155,9 @@ class QueryPlanner:
         Columns are needed if they appear in:
         - SELECT clause
         - WHERE clause
-        - ORDER BY clause (Phase 4)
-        - GROUP BY clause (Phase 4)
+        - GROUP BY clause
+        - ORDER BY clause
+        - Aggregate functions
         - JOIN conditions (Phase 5)
 
         Args:
@@ -178,7 +179,20 @@ class QueryPlanner:
             for condition in ast.where.conditions:
                 needed.add(condition.column)
 
-        # Future: Add columns from ORDER BY, GROUP BY, JOIN
+        # Columns from GROUP BY clause
+        if ast.group_by:
+            needed.update(ast.group_by)
+
+        # Columns from ORDER BY clause
+        if ast.order_by:
+            for order_col in ast.order_by:
+                needed.add(order_col.column)
+
+        # Columns from aggregate functions
+        if ast.aggregates:
+            for agg in ast.aggregates:
+                if agg.column != "*":  # COUNT(*) doesn't need a column
+                    needed.add(agg.column)
 
         return list(needed)
 
