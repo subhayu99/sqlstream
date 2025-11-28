@@ -9,7 +9,9 @@ from typing import Any, Dict, Iterator
 
 from sqlstream.core.planner import QueryPlanner
 from sqlstream.operators.filter import Filter
+from sqlstream.operators.groupby import GroupByOperator
 from sqlstream.operators.limit import Limit
+from sqlstream.operators.orderby import OrderByOperator
 from sqlstream.operators.project import Project
 from sqlstream.operators.scan import Scan
 from sqlstream.readers.base import BaseReader
@@ -77,8 +79,10 @@ class Executor:
         Builds the tree bottom-up in this order:
         1. Scan (always at bottom)
         2. Filter (if WHERE clause exists)
-        3. Project (if specific columns selected)
-        4. Limit (if LIMIT clause exists)
+        3. GroupBy (if GROUP BY clause exists)
+        4. OrderBy (if ORDER BY clause exists)
+        5. Project (if specific columns selected)
+        6. Limit (if LIMIT clause exists)
 
         Args:
             ast: Parsed SELECT statement
@@ -94,9 +98,23 @@ class Executor:
         if ast.where:
             plan = Filter(plan, ast.where.conditions)
 
-        # Add Project if specific columns selected
-        # (Note: even with SELECT *, we add Project for consistency)
-        plan = Project(plan, ast.columns)
+        # Add GroupBy if GROUP BY clause exists
+        # GroupBy performs aggregation and groups rows
+        if ast.group_by:
+            if not ast.aggregates:
+                raise ValueError("GROUP BY requires aggregate functions in SELECT")
+            plan = GroupByOperator(
+                plan, ast.group_by, ast.aggregates, ast.columns
+            )
+
+        # Add OrderBy if ORDER BY clause exists
+        if ast.order_by:
+            plan = OrderByOperator(plan, ast.order_by)
+
+        # Add Project if specific columns selected and no GROUP BY
+        # (GroupBy already handles column selection)
+        if not ast.group_by:
+            plan = Project(plan, ast.columns)
 
         # Add Limit if LIMIT clause exists
         if ast.limit is not None:

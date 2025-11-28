@@ -32,6 +32,42 @@ class WhereClause:
 
 
 @dataclass
+class AggregateFunction:
+    """
+    Represents an aggregate function in SELECT clause
+
+    Examples:
+        COUNT(*), COUNT(id), SUM(amount), AVG(price), MIN(age), MAX(age)
+    """
+
+    function: str  # 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX'
+    column: str  # Column name, or '*' for COUNT(*)
+    alias: Optional[str] = None  # AS alias
+
+    def __repr__(self) -> str:
+        result = f"{self.function}({self.column})"
+        if self.alias:
+            result += f" AS {self.alias}"
+        return result
+
+
+@dataclass
+class OrderByColumn:
+    """
+    Represents a column in ORDER BY clause
+
+    Examples:
+        name ASC, age DESC
+    """
+
+    column: str
+    direction: str = "ASC"  # 'ASC' or 'DESC', default ASC
+
+    def __repr__(self) -> str:
+        return f"{self.column} {self.direction}"
+
+
+@dataclass
 class SelectStatement:
     """
     Represents a complete SELECT statement
@@ -40,16 +76,19 @@ class SelectStatement:
         SELECT * FROM data
         SELECT name, age FROM data WHERE age > 25
         SELECT * FROM data WHERE age > 25 LIMIT 10
+        SELECT city, COUNT(*) FROM data GROUP BY city
+        SELECT * FROM data ORDER BY age DESC LIMIT 10
     """
 
     columns: List[str]  # ['*'] for all columns, or specific column names
     source: str  # Table/file name (FROM clause)
     where: Optional[WhereClause] = None
+    group_by: Optional[List[str]] = None
+    order_by: Optional[List[OrderByColumn]] = None
     limit: Optional[int] = None
+    aggregates: Optional[List[AggregateFunction]] = None  # Aggregate functions in SELECT
 
     # To be added in later phases:
-    # group_by: Optional[List[str]] = None
-    # order_by: Optional[List[OrderByColumn]] = None
     # join: Optional[JoinClause] = None
 
     def __repr__(self) -> str:
@@ -57,16 +96,13 @@ class SelectStatement:
         parts.append(f"FROM {self.source}")
         if self.where:
             parts.append(f"WHERE {self.where}")
+        if self.group_by:
+            parts.append(f"GROUP BY {', '.join(self.group_by)}")
+        if self.order_by:
+            parts.append(f"ORDER BY {', '.join(str(col) for col in self.order_by)}")
         if self.limit:
             parts.append(f"LIMIT {self.limit}")
         return " ".join(parts)
-
-
-# These will be added in Phase 4 (GROUP BY, ORDER BY)
-# @dataclass
-# class OrderByColumn:
-#     column: str
-#     direction: str  # 'ASC' or 'DESC'
 
 
 # These will be added in Phase 5 (JOIN)

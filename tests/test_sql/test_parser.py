@@ -4,7 +4,13 @@ Tests for SQL parser
 
 import pytest
 
-from sqlstream.sql.ast_nodes import Condition, SelectStatement, WhereClause
+from sqlstream.sql.ast_nodes import (
+    AggregateFunction,
+    Condition,
+    OrderByColumn,
+    SelectStatement,
+    WhereClause,
+)
 from sqlstream.sql.parser import ParseError, parse
 
 
@@ -200,3 +206,199 @@ class TestValueParsing:
         """Test unquoted string (treated as identifier)"""
         ast = parse("SELECT * FROM data WHERE name = Alice")
         assert ast.where.conditions[0].value == "Alice"
+
+
+class TestAggregateFunctions:
+    """Test aggregate function parsing"""
+
+    def test_count_star(self):
+        """Test COUNT(*)"""
+        ast = parse("SELECT COUNT(*) FROM data")
+
+        assert ast.aggregates is not None
+        assert len(ast.aggregates) == 1
+
+        agg = ast.aggregates[0]
+        assert agg.function == "COUNT"
+        assert agg.column == "*"
+        assert agg.alias is None
+
+    def test_count_column(self):
+        """Test COUNT(column)"""
+        ast = parse("SELECT COUNT(id) FROM users")
+
+        agg = ast.aggregates[0]
+        assert agg.function == "COUNT"
+        assert agg.column == "id"
+
+    def test_sum_function(self):
+        """Test SUM(column)"""
+        ast = parse("SELECT SUM(amount) FROM transactions")
+
+        agg = ast.aggregates[0]
+        assert agg.function == "SUM"
+        assert agg.column == "amount"
+
+    def test_avg_function(self):
+        """Test AVG(column)"""
+        ast = parse("SELECT AVG(price) FROM products")
+
+        agg = ast.aggregates[0]
+        assert agg.function == "AVG"
+        assert agg.column == "price"
+
+    def test_min_max_functions(self):
+        """Test MIN and MAX functions"""
+        ast_min = parse("SELECT MIN(age) FROM users")
+        assert ast_min.aggregates[0].function == "MIN"
+
+        ast_max = parse("SELECT MAX(age) FROM users")
+        assert ast_max.aggregates[0].function == "MAX"
+
+    def test_aggregate_with_alias(self):
+        """Test COUNT(*) AS total"""
+        ast = parse("SELECT COUNT(*) AS total FROM data")
+
+        agg = ast.aggregates[0]
+        assert agg.function == "COUNT"
+        assert agg.alias == "total"
+        assert "total" in ast.columns
+
+    def test_multiple_aggregates(self):
+        """Test multiple aggregate functions"""
+        ast = parse("SELECT COUNT(*), SUM(amount), AVG(price) FROM data")
+
+        assert len(ast.aggregates) == 3
+        assert ast.aggregates[0].function == "COUNT"
+        assert ast.aggregates[1].function == "SUM"
+        assert ast.aggregates[2].function == "AVG"
+
+    def test_mixed_columns_and_aggregates(self):
+        """Test mixing regular columns with aggregates"""
+        ast = parse("SELECT city, COUNT(*) FROM data")
+
+        assert "city" in ast.columns
+        assert len(ast.aggregates) == 1
+        assert ast.aggregates[0].function == "COUNT"
+
+
+class TestGroupByClause:
+    """Test GROUP BY clause parsing"""
+
+    def test_group_by_single(self):
+        """Test GROUP BY single column"""
+        ast = parse("SELECT city, COUNT(*) FROM data GROUP BY city")
+
+        assert ast.group_by is not None
+        assert ast.group_by == ["city"]
+
+    def test_group_by_multiple(self):
+        """Test GROUP BY multiple columns"""
+        ast = parse("SELECT city, country, COUNT(*) FROM data GROUP BY city, country")
+
+        assert ast.group_by == ["city", "country"]
+
+    def test_group_by_with_where(self):
+        """Test GROUP BY with WHERE clause"""
+        ast = parse("SELECT city, COUNT(*) FROM data WHERE age > 18 GROUP BY city")
+
+        assert ast.where is not None
+        assert ast.group_by == ["city"]
+        assert len(ast.where.conditions) == 1
+
+    def test_group_by_with_order_limit(self):
+        """Test GROUP BY with ORDER BY and LIMIT"""
+        ast = parse(
+            "SELECT city, COUNT(*) FROM data GROUP BY city ORDER BY city LIMIT 10"
+        )
+
+        assert ast.group_by == ["city"]
+        assert ast.order_by is not None
+        assert ast.limit == 10
+
+
+class TestOrderByClause:
+    """Test ORDER BY clause parsing"""
+
+    def test_order_by_single(self):
+        """Test ORDER BY single column"""
+        ast = parse("SELECT * FROM data ORDER BY name")
+
+        assert ast.order_by is not None
+        assert len(ast.order_by) == 1
+        assert ast.order_by[0].column == "name"
+        assert ast.order_by[0].direction == "ASC"  # Default
+
+    def test_order_by_asc(self):
+        """Test ORDER BY column ASC"""
+        ast = parse("SELECT * FROM data ORDER BY name ASC")
+
+        assert ast.order_by[0].column == "name"
+        assert ast.order_by[0].direction == "ASC"
+
+    def test_order_by_desc(self):
+        """Test ORDER BY column DESC"""
+        ast = parse("SELECT * FROM data ORDER BY age DESC")
+
+        assert ast.order_by[0].column == "age"
+        assert ast.order_by[0].direction == "DESC"
+
+    def test_order_by_multiple(self):
+        """Test ORDER BY multiple columns"""
+        ast = parse("SELECT * FROM data ORDER BY city ASC, age DESC")
+
+        assert len(ast.order_by) == 2
+        assert ast.order_by[0].column == "city"
+        assert ast.order_by[0].direction == "ASC"
+        assert ast.order_by[1].column == "age"
+        assert ast.order_by[1].direction == "DESC"
+
+    def test_order_by_with_where(self):
+        """Test ORDER BY with WHERE clause"""
+        ast = parse("SELECT * FROM data WHERE age > 18 ORDER BY name")
+
+        assert ast.where is not None
+        assert ast.order_by is not None
+
+    def test_order_by_with_limit(self):
+        """Test ORDER BY with LIMIT"""
+        ast = parse("SELECT * FROM data ORDER BY age DESC LIMIT 5")
+
+        assert ast.order_by[0].column == "age"
+        assert ast.order_by[0].direction == "DESC"
+        assert ast.limit == 5
+
+
+class TestComplexQueriesPhase4:
+    """Test complex queries with all Phase 4 features"""
+
+    def test_full_aggregation_query(self):
+        """Test complete query with all aggregation features"""
+        sql = """
+            SELECT city, COUNT(*) AS count, AVG(age) AS avg_age
+            FROM users
+            WHERE age > 18
+            GROUP BY city
+            ORDER BY count DESC
+            LIMIT 10
+        """
+        ast = parse(sql)
+
+        # Verify all components
+        assert ast.source == "users"
+        assert ast.where is not None
+        assert ast.group_by == ["city"]
+        assert ast.order_by is not None
+        assert ast.order_by[0].column == "count"
+        assert ast.order_by[0].direction == "DESC"
+        assert ast.limit == 10
+        assert len(ast.aggregates) == 2
+
+    def test_simple_order_by(self):
+        """Test simple ORDER BY without aggregation"""
+        ast = parse("SELECT name, age FROM users ORDER BY age")
+
+        assert ast.columns == ["name", "age"]
+        assert ast.order_by[0].column == "age"
+        assert ast.aggregates is None
+        assert ast.group_by is None
