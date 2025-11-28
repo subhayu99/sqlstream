@@ -12,12 +12,21 @@ Example:
 """
 
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List
+from typing import Any, Callable, Dict, Iterator, List, Literal, Optional
 
 from sqlstream.core.executor import Executor
 from sqlstream.readers.base import BaseReader
 from sqlstream.readers.csv_reader import CSVReader
 from sqlstream.sql.parser import parse
+
+# Try to import pandas executor
+try:
+    from sqlstream.core.pandas_executor import PandasExecutor
+
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    PandasExecutor = None
 
 
 class Query:
@@ -78,12 +87,18 @@ class Query:
                     f"Supported formats: .csv, .parquet"
                 ) from e
 
-    def sql(self, query: str) -> "QueryResult":
+    def sql(
+        self, query: str, backend: Optional[Literal["auto", "pandas", "python"]] = "auto"
+    ) -> "QueryResult":
         """
         Execute SQL query on the data source
 
         Args:
             query: SQL query string
+            backend: Execution backend to use
+                - "auto": Use pandas if available, fallback to python
+                - "pandas": Force pandas backend (raises if not installed)
+                - "python": Force pure Python Volcano model
 
         Returns:
             QueryResult object that can be iterated over
@@ -92,12 +107,15 @@ class Query:
             >>> result = query("data.csv").sql("SELECT * WHERE age > 25")
             >>> for row in result:
             ...     print(row)
+            >>>
+            >>> # Force pandas backend for performance
+            >>> result = query("data.csv").sql("SELECT * WHERE age > 25", backend="pandas")
         """
         # Parse SQL query
         ast = parse(query)
 
         # Create QueryResult with reader factory for JOIN support
-        return QueryResult(ast, self.reader, self._create_reader)
+        return QueryResult(ast, self.reader, self._create_reader, self.source, backend)
 
     def schema(self) -> Dict[str, str]:
         """
@@ -123,7 +141,12 @@ class QueryResult:
     """
 
     def __init__(
-        self, ast, reader: BaseReader, reader_factory: Callable[[str], BaseReader]
+        self,
+        ast,
+        reader: BaseReader,
+        reader_factory: Callable[[str], BaseReader],
+        source: str,
+        backend: str = "auto",
     ):
         """
         Initialize query result
@@ -132,11 +155,41 @@ class QueryResult:
             ast: Parsed SQL AST
             reader: Data source reader
             reader_factory: Factory function to create readers for JOIN tables
+            source: Path to data source file
+            backend: Execution backend ("auto", "pandas", or "python")
         """
         self.ast = ast
         self.reader = reader
         self.reader_factory = reader_factory
-        self.executor = Executor()
+        self.source = source
+        self.backend = backend
+
+        # Select executor based on backend
+        self._select_backend()
+
+    def _select_backend(self):
+        """Select appropriate backend based on configuration"""
+        if self.backend == "pandas":
+            # Force pandas backend
+            if not PANDAS_AVAILABLE:
+                raise ImportError(
+                    "Pandas backend requested but pandas is not installed. "
+                    "Install with: pip install pandas"
+                )
+            self.executor = PandasExecutor()
+            self.use_pandas = True
+        elif self.backend == "python":
+            # Force pure Python backend
+            self.executor = Executor()
+            self.use_pandas = False
+        else:  # auto
+            # Use pandas if available, fallback to Python
+            if PANDAS_AVAILABLE:
+                self.executor = PandasExecutor()
+                self.use_pandas = True
+            else:
+                self.executor = Executor()
+                self.use_pandas = False
 
     def __iter__(self) -> Iterator[Dict[str, Any]]:
         """
@@ -145,7 +198,13 @@ class QueryResult:
         Yields:
             Result rows as dictionaries
         """
-        yield from self.executor.execute(self.ast, self.reader, self.reader_factory)
+        if self.use_pandas:
+            # Pandas executor takes file path directly
+            right_source = self.ast.join.right_source if self.ast.join else None
+            yield from self.executor.execute(self.ast, self.source, right_source)
+        else:
+            # Python executor uses reader objects
+            yield from self.executor.execute(self.ast, self.reader, self.reader_factory)
 
     def to_list(self) -> List[Dict[str, Any]]:
         """
@@ -176,7 +235,12 @@ class QueryResult:
                 Filter(age > 25)
                   Scan(CSVReader)
         """
-        return self.executor.explain(self.ast, self.reader, self.reader_factory)
+        if self.use_pandas:
+            # Pandas executor explain
+            return self.executor.explain(self.ast, self.source)
+        else:
+            # Python executor explain
+            return self.executor.explain(self.ast, self.reader, self.reader_factory)
 
 
 # Convenience function for top-level API

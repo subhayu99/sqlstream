@@ -191,7 +191,7 @@ class TestLeftJoin:
             LEFT JOIN {orders_csv} ON id = customer_id
         """
 
-        results = query(str(customers_csv)).sql(sql).to_list()
+        results = query(str(customers_csv)).sql(sql, backend="python").to_list()
 
         # Should have 3 rows (all customers, even Charlie with no orders)
         assert len(results) == 3
@@ -237,7 +237,7 @@ class TestRightJoin:
             RIGHT JOIN {orders_csv} ON id = customer_id
         """
 
-        results = query(str(customers_csv)).sql(sql).to_list()
+        results = query(str(customers_csv)).sql(sql, backend="python").to_list()
 
         # Should have 3 rows (all orders)
         assert len(results) == 3

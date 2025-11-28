@@ -209,7 +209,7 @@ class TestExplainPlan:
             SELECT name, age
             FROM data
             WHERE city = 'NYC'
-        """).explain()
+        """, backend="python").explain()
 
         # Should show query plan
         assert "Query Plan" in plan
@@ -222,7 +222,7 @@ class TestExplainPlan:
 
     def test_explain_no_optimizations(self, sample_csv):
         """Test explain when no optimizations apply"""
-        plan = query(str(sample_csv)).sql("SELECT * FROM data").explain()
+        plan = query(str(sample_csv)).sql("SELECT * FROM data", backend="python").explain()
 
         # SELECT * has no column pruning, no WHERE has no pushdown
         assert "No optimizations applied" in plan

@@ -293,7 +293,7 @@ class TestExplainPlan:
         """Test that explain shows row group pruning"""
         plan = query(str(age_stratified_parquet)).sql("""
             SELECT name FROM data WHERE age > 50
-        """).explain()
+        """, backend="python").explain()
 
         # Should show optimizations
         assert "Predicate pushdown" in plan

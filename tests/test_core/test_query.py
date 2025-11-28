@@ -169,7 +169,7 @@ class TestExplain:
             FROM data
             WHERE age > 25
             LIMIT 10
-        """).explain()
+        """, backend="python").explain()
 
         assert isinstance(plan, str)
         assert "Limit" in plan
