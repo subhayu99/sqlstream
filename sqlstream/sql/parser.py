@@ -118,7 +118,24 @@ class SQLParser:
 
         # Parse FROM
         self.consume("FROM")
-        source = self.consume()
+        source = self._parse_table_name()
+
+        # Skip optional table alias (e.g., FROM 'file.csv' AS t or FROM 'file.csv' t)
+        if self.current() and self.current().upper() == "AS":
+            self.consume("AS")
+            self.consume()  # Skip alias name
+        elif self.current() and self.current().upper() not in (
+            "WHERE",
+            "GROUP",
+            "ORDER",
+            "LIMIT",
+            "JOIN",
+            "INNER",
+            "LEFT",
+            "RIGHT",
+        ):
+            # If next token is not a keyword, it's likely an alias
+            self.consume()  # Skip alias name
 
         # Optional JOIN clause
         join = None
@@ -310,6 +327,30 @@ class SQLParser:
             # Return as string
             return token
 
+    def _parse_table_name(self) -> str:
+        """
+        Parse a table name (file path), handling quoted and unquoted forms
+
+        Examples:
+            'data.csv' -> data.csv (quotes removed)
+            "data.csv" -> data.csv (quotes removed)
+            '/path/to/file.csv' -> /path/to/file.csv (quotes removed)
+            data.csv -> data.csv (no quotes)
+            data -> data (table alias without extension)
+
+        Returns:
+            Table name/file path with quotes removed if present
+        """
+        token = self.consume()
+
+        # Remove quotes if present (for file paths with spaces or special chars)
+        if (token.startswith("'") and token.endswith("'")) or (
+            token.startswith('"') and token.endswith('"')
+        ):
+            return token[1:-1]
+
+        return token
+
     def _parse_group_by(self) -> List[str]:
         """
         Parse GROUP BY clause
@@ -402,8 +443,16 @@ class SQLParser:
         else:
             raise ParseError(f"Expected JOIN keyword, got '{self.current()}'")
 
-        # Parse right table name
-        right_source = self.consume()
+        # Parse right table name (handle quoted paths)
+        right_source = self._parse_table_name()
+
+        # Skip optional table alias (e.g., JOIN 'file.csv' AS t or JOIN 'file.csv' t)
+        if self.current() and self.current().upper() == "AS":
+            self.consume("AS")
+            self.consume()  # Skip alias name
+        elif self.current() and self.current().upper() not in ("ON", "WHERE", "GROUP", "ORDER", "LIMIT"):
+            # If next token is not a keyword, it's likely an alias
+            self.consume()  # Skip alias name
 
         # Parse ON keyword
         self.consume("ON")

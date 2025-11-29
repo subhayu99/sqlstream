@@ -247,6 +247,95 @@ class QueryResult:
             return self.executor.explain(self.ast, self.reader, self.reader_factory)
 
 
+class QueryInline:
+    """
+    Query builder for inline file path mode
+
+    This class allows SQL queries with file paths embedded directly in the SQL,
+    instead of pre-specifying a source file.
+
+    Example:
+        >>> q = QueryInline()
+        >>> results = q.sql("SELECT * FROM 'data.csv' WHERE age > 25")
+        >>> for row in results:
+        ...     print(row)
+    """
+
+    def __init__(self):
+        """Initialize inline query (no source required)"""
+        pass
+
+    def _create_reader(self, source: str) -> BaseReader:
+        """
+        Auto-detect source type and create appropriate reader
+
+        Args:
+            source: Path to data file or URL
+
+        Returns:
+            Reader instance for the source
+
+        Raises:
+            ValueError: If file format is not supported
+        """
+        # Check if source is HTTP/HTTPS URL
+        if source.startswith(("http://", "https://")):
+            from sqlstream.readers.http_reader import HTTPReader
+
+            return HTTPReader(source)
+
+        path = Path(source)
+
+        # Check file extension to determine format
+        suffix = path.suffix.lower()
+
+        if suffix == ".csv":
+            return CSVReader(source)
+        elif suffix == ".parquet":
+            from sqlstream.readers.parquet_reader import ParquetReader
+
+            return ParquetReader(source)
+        else:
+            # Try CSV as default
+            try:
+                return CSVReader(source)
+            except Exception as e:
+                raise ValueError(
+                    f"Unsupported file format: {suffix}. "
+                    f"Supported formats: .csv, .parquet"
+                ) from e
+
+    def sql(
+        self, query: str, backend: Optional[Literal["auto", "pandas", "python"]] = "auto"
+    ) -> "QueryResult":
+        """
+        Execute SQL query with inline file paths
+
+        The file paths are extracted from the SQL query itself (FROM and JOIN clauses).
+
+        Args:
+            query: SQL query string with inline file paths
+            backend: Execution backend to use
+
+        Returns:
+            QueryResult object that can be iterated over
+
+        Example:
+            >>> q = QueryInline()
+            >>> result = q.sql("SELECT * FROM 'data.csv' WHERE age > 25")
+            >>> # Multi-file JOIN
+            >>> result = q.sql("SELECT x.*, y.name FROM 'left.csv' x JOIN 'right.csv' y ON x.id = y.id")
+        """
+        # Parse SQL query to extract source file paths
+        ast = parse(query)
+
+        # Create reader for the main source
+        reader = self._create_reader(ast.source)
+
+        # Create QueryResult with inline mode (source extracted from AST)
+        return QueryResult(ast, reader, self._create_reader, ast.source, backend)
+
+
 # Convenience function for top-level API
 def query(source: str) -> Query:
     """

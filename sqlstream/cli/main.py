@@ -36,8 +36,8 @@ def cli():
 
 
 @cli.command()
-@click.argument("file", type=str)
-@click.argument("sql", type=str)
+@click.argument("file_or_sql", type=str)
+@click.argument("sql", type=str, required=False)
 @click.option(
     "--format",
     "-f",
@@ -95,8 +95,8 @@ def cli():
     help="Disable auto-detection of interactive mode",
 )
 def query(
-    file: str,
-    sql: str,
+    file_or_sql: str,
+    sql: Optional[str],
     format: str,
     backend: str,
     limit: Optional[int],
@@ -113,8 +113,16 @@ def query(
     Examples:
 
         \b
-        # Query local CSV file
+        # OLD SYNTAX: Query local CSV file (backward compatible)
         $ sqlstream query data.csv "SELECT * FROM data WHERE age > 25"
+
+        \b
+        # NEW SYNTAX: Inline file paths in SQL
+        $ sqlstream query "SELECT * FROM 'data.csv' WHERE age > 25"
+
+        \b
+        # Multi-file JOIN with inline paths
+        $ sqlstream query "SELECT x.*, y.name FROM 'data.csv' x JOIN 'other.csv' y ON x.id = y.id"
 
         \b
         # Query from URL with JSON output
@@ -135,17 +143,34 @@ def query(
     try:
         start_time = time.time()
 
+        # Determine if we're using old syntax (file + sql) or new syntax (just sql)
+        if sql is None:
+            # New syntax: file_or_sql is the SQL query with inline file paths
+            sql_query = file_or_sql
+            file = None
+        else:
+            # Old syntax: file_or_sql is the file, sql is the SQL query
+            file = file_or_sql
+            sql_query = sql
+
         # Create query
-        q = query_fn(file)
+        if file:
+            # Old syntax: single file provided
+            q = query_fn(file)
+        else:
+            # New syntax: extract file from SQL
+            # Use a temporary Query with inline mode
+            from sqlstream.core.query import QueryInline
+            q = QueryInline()
 
         # Execute query or show explain plan
         if explain:
-            result = q.sql(sql, backend=backend)
+            result = q.sql(sql_query, backend=backend)
             output_text = result.explain()
             click.echo(output_text)
         else:
             # Execute query
-            result = q.sql(sql, backend=backend)
+            result = q.sql(sql_query, backend=backend)
             results_list = list(result)
 
             # Apply display limit if specified (doesn't affect query LIMIT)
