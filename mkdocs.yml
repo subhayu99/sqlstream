@@ -1,0 +1,105 @@
+site_name: SQLStream
+site_description: A lightweight SQL query engine for CSV and Parquet files with lazy evaluation and intelligent optimizations
+site_author: SQLStream Team
+site_url: https://subhayu99.github.io/sqlstream
+
+repo_name: subhayu99/sqlstream
+repo_url: https://github.com/subhayu99/sqlstream
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quickstart.md
+      - Core Concepts: getting-started/core-concepts.md
+  - Features:
+      - SQL Support: features/sql-support.md
+      - Data Sources: features/data-sources.md
+      - JOIN Operations: features/joins.md
+      - Aggregations: features/aggregations.md
+      - Pandas Backend: features/pandas-backend.md
+      - Inline File Paths: features/inline-paths.md
+  - CLI Reference:
+      - Overview: cli/overview.md
+      - Query Command: cli/query-command.md
+      - Interactive Mode: cli/interactive-mode.md
+      - Output Formats: cli/output-formats.md
+  - Python API:
+      - Overview: api/overview.md
+      - Query Class: api/query.md
+      - Readers: api/readers.md
+      - Advanced Usage: api/advanced.md
+  - Examples:
+      - Basic Queries: examples/basic-queries.md
+      - JOIN Examples: examples/joins.md
+      - Aggregations: examples/aggregations.md
+      - Real-World Use Cases: examples/real-world.md
+  - Architecture:
+      - Design Overview: architecture/design.md
+      - Volcano Model: architecture/volcano-model.md
+      - Optimizations: architecture/optimizations.md
+  - Contributing: contributing.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/subhayu99/sqlstream
+  version:
+    provider: mike
