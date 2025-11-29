@@ -1,8 +1,10 @@
 """
-Entry point for python -m sqlstream
+SQLStream - Main entry point for CLI
+
+When running as: python -m sqlstream
 """
 
 if __name__ == "__main__":
-    # CLI will be implemented in Phase 7
-    print("SQLStream CLI - Coming soon!")
-    print("This will be the command-line interface for SQLStream")
+    from sqlstream.cli.main import cli
+
+    cli()

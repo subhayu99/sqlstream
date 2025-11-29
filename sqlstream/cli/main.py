@@ -240,30 +240,70 @@ def query(
 
 
 @cli.command()
+@click.argument("file", type=str, required=False)
+@click.option(
+    "--history-file",
+    type=click.Path(),
+    default=None,
+    help="Path to query history file (default: ~/.sqlstream_history)",
+)
+def shell(file: Optional[str], history_file: Optional[str]):
+    """
+    Launch interactive SQL shell
+
+    A full-featured SQL REPL with query editing, results viewing,
+    schema browsing, and query history.
+
+    Examples:
+
+        \\b
+        # Launch empty shell
+        $ sqlstream shell
+
+        \\b
+        # Launch with initial file loaded
+        $ sqlstream shell employees.csv
+
+        \\b
+        # Use custom history file
+        $ sqlstream shell --history-file ~/.my_history
+    """
+    try:
+        from sqlstream.cli.shell import launch_shell
+
+        launch_shell(initial_file=file, history_file=history_file)
+    except ImportError as e:
+        click.echo(
+            f"Error: {e}\\n"
+            "Interactive shell requires textual library.\\n"
+            "Install with: pip install sqlstream[cli]",
+            err=True,
+        )
+        sys.exit(1)
+
+
+@cli.command()
 @click.argument("file", type=str)
 def interactive(file: str):
     """
-    Launch interactive query interface (Coming Soon!)
+    Launch interactive query interface
+
+    DEPRECATED: Use 'sqlstream shell' instead.
 
     This will open a Textual-based TUI for exploring data interactively.
-
-    Install with: pip install sqlstream[interactive]
     """
-    try:
-        # Try to import textual
-        import textual  # noqa: F401
+    click.echo("⚠️  The 'interactive' command is deprecated.", err=True)
+    click.echo("   Use 'sqlstream shell' instead for the full interactive experience.", err=True)
+    click.echo(f"\nLaunching shell with {file}...\n")
 
-        click.echo("Interactive mode is coming soon!")
-        click.echo("This will feature:")
-        click.echo("  - Live query editing")
-        click.echo("  - Interactive result browsing")
-        click.echo("  - Export functionality")
-        click.echo("  - Beautiful TUI powered by Textual")
-        sys.exit(0)
+    try:
+        from sqlstream.cli.shell import launch_shell
+
+        launch_shell(initial_file=file)
     except ImportError:
         click.echo(
-            "Interactive mode requires textual library.\n"
-            "Install with: pip install sqlstream[interactive]",
+            "Interactive shell requires textual library.\n"
+            "Install with: pip install sqlstream[cli]",
             err=True,
         )
         sys.exit(1)

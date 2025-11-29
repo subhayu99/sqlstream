@@ -28,30 +28,33 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-# Added as we progress through phases
-parquet = ["pyarrow>=10.0.0"]  # Phase 3
-pandas = ["pandas>=1.5.0", "pyarrow>=10.0.0"]  # Phase 5.5 (pandas backend + parquet support)
-http = ["httpx>=0.27.0"]  # Phase 6 (modern alternative to requests)
-cli = ["click>=8.0.0", "rich>=13.0.0", "textual>=0.40.0"]  # Phase 7 + 7.5 (textual for interactive mode)
-bloom = []  # Phase 5 - will implement bloom filter ourselves to avoid dependency
+cli = [
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    "textual>=0.40.0",
+]
+interactive = [
+    "textual>=0.40.0",
+    "rich>=13.0.0",
+]
+parquet = ["pyarrow>=10.0.0"]
+pandas = [
+    "pandas>=2.0.0",
+    "pyarrow>=14.0.0",
+]
+http = ["httpx>=0.27.0"]
+bloom = []
 all = [
-    "pandas>=1.5.0",
-    "pyarrow>=10.0.0",
+    "pandas>=2.0.0",
+    "pyarrow>=14.0.0",
     "httpx>=0.27.0",
     "click>=8.0.0",
     "rich>=13.0.0",
     "textual>=0.40.0",
-]  # All optional features
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "ruff>=0.1.0",  # Modern linter/formatter (replaces black + pylint)
-    "mypy>=0.990",
-    "pandas>=1.5.0",  # Include pandas in dev for testing
-    "pyarrow>=10.0.0",
-    "httpx>=0.27.0",  # Include httpx in dev for testing
-    "mkdocs>=1.5.0",  # Documentation
-    "mkdocs-material>=9.0.0",  # Material theme
     "mkdocs-material-extensions>=1.3.0",  # Material extensions
 ]
 
