@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
-from textual.widgets import DataTable, Footer, Header, Static, TextArea
+from textual.widgets import DataTable, Footer, Header, Static, TextArea, Tree
 
 try:
     from sqlstream.core.query import query, QueryInline
@@ -30,6 +30,8 @@ class QueryEditor(TextArea):
         Binding("ctrl+enter", "execute_query", "Execute", priority=True),
         Binding("ctrl+e", "execute_query", "Execute (Alt)", priority=True),
         Binding("ctrl+l", "clear_editor", "Clear", priority=True),
+        Binding("ctrl+up", "history_prev", "Prev Query", priority=True),
+        Binding("ctrl+down", "history_next", "Next Query", priority=True),
     ]
 
     def action_execute_query(self) -> None:
@@ -40,6 +42,14 @@ class QueryEditor(TextArea):
         """Clear the query editor."""
         self.clear()
         self.focus()
+
+    def action_history_prev(self) -> None:
+        """Show previous query from history."""
+        self.app.action_history_prev()
+
+    def action_history_next(self) -> None:
+        """Show next query from history."""
+        self.app.action_history_next()
 
     class ExecuteQuery(TextArea.Changed):
         """Message sent when user wants to execute a query."""
@@ -81,6 +91,25 @@ class ResultsViewer(DataTable):
         self.border_title = "Results"
 
 
+class SchemaBrowser(Tree):
+    """Side panel for browsing files and schemas."""
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__("Data Sources", **kwargs)
+        self.border_title = "Schema"
+        self.show_root = False
+
+    def update_schema(self, files: List[str]) -> None:
+        """Update the schema tree with files."""
+        self.clear()
+        for file in files:
+            # Add file node
+            file_node = self.root.add(Path(file).name, expand=True)
+            # We will load columns lazily or if available
+            # For now just show the file
+            pass
+
+
 class SQLShellApp(App):
     """
     SQLStream Interactive Shell Application.
@@ -92,6 +121,28 @@ class SQLShellApp(App):
     CSS = """
     Screen {
         background: $surface;
+    }
+
+    #main-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    #schema-container {
+        width: 25%;
+        height: 100%;
+        border: solid $primary;
+        background: $panel;
+        display: none;
+    }
+
+    #schema-container.visible {
+        display: block;
+    }
+
+    #right-panel {
+        width: 100%;
+        height: 100%;
     }
 
     #query-container {
@@ -136,7 +187,7 @@ class SQLShellApp(App):
 
     BINDINGS = [
         Binding("f1", "show_help", "Help"),
-        Binding("f2", "toggle_schema", "Schema", show=False),
+        Binding("f2", "toggle_schema", "Schema"),
         Binding("f3", "toggle_history", "History", show=False),
         Binding("f4", "toggle_explain", "Explain", show=False),
         Binding("ctrl+d", "quit", "Exit"),
@@ -163,23 +214,33 @@ class SQLShellApp(App):
         self.history_index = -1
         self.last_results: List[Dict[str, Any]] = []
         self.query_engine = QueryInline()
+        self.loaded_files: List[str] = []
+        if initial_file:
+            self.loaded_files.append(initial_file)
 
     def compose(self) -> ComposeResult:
         """Compose the application layout."""
         yield Header(show_clock=True)
 
-        # Query Editor Container
-        with Container(id="query-container"):
-            yield QueryEditor(
-                id="query-editor",
-                language="sql",
-                theme="monokai",
-                show_line_numbers=True,
-            )
+        with Horizontal(id="main-container"):
+            # Schema Browser (Hidden by default)
+            with Container(id="schema-container"):
+                yield SchemaBrowser(id="schema-browser")
 
-        # Results Viewer Container
-        with Container(id="results-container"):
-            yield ResultsViewer(id="results-viewer")
+            # Main Content
+            with Vertical(id="right-panel"):
+                # Query Editor Container
+                with Container(id="query-container"):
+                    yield QueryEditor(
+                        id="query-editor",
+                        language="sql",
+                        theme="monokai",
+                        show_line_numbers=True,
+                    )
+
+                # Results Viewer Container
+                with Container(id="results-container"):
+                    yield ResultsViewer(id="results-viewer")
 
         # Status Bar
         yield StatusBar(id="status-bar")
@@ -206,6 +267,42 @@ class SQLShellApp(App):
         # Load initial file if provided
         if self.initial_file:
             self._load_initial_file()
+            self._update_schema_browser()
+
+    def action_history_prev(self) -> None:
+        """Navigate to previous query in history."""
+        if not self.query_history:
+            return
+
+        if self.history_index == -1:
+            # Start browsing from end
+            self.history_index = len(self.query_history) - 1
+        elif self.history_index > 0:
+            self.history_index -= 1
+        
+        self._set_editor_text(self.query_history[self.history_index])
+
+    def action_history_next(self) -> None:
+        """Navigate to next query in history."""
+        if not self.query_history or self.history_index == -1:
+            return
+
+        if self.history_index < len(self.query_history) - 1:
+            self.history_index += 1
+            self._set_editor_text(self.query_history[self.history_index])
+        else:
+            # Reset to empty/current
+            self.history_index = -1
+            self._set_editor_text("")
+
+    def _set_editor_text(self, text: str) -> None:
+        """Set text in query editor."""
+        editor = self.query_one(QueryEditor)
+        editor.text = text
+        if text:
+            editor.cursor_location = (len(text.splitlines()) - 1, len(text.splitlines()[-1]))
+        else:
+            editor.cursor_location = (0, 0)
 
     def on_query_editor_execute_query(self, message: QueryEditor.ExecuteQuery) -> None:
         """Handle query execution request."""
@@ -215,10 +312,13 @@ class SQLShellApp(App):
             self._show_status("No query to execute", error=True)
             return
 
-        # Add to history
-        if query_text not in self.query_history:
+        # Add to history if new
+        if not self.query_history or self.query_history[-1] != query_text:
             self.query_history.append(query_text)
             self._save_history()
+        
+        # Reset history index
+        self.history_index = -1
 
         # Execute query
         self._execute_query(query_text)
@@ -330,13 +430,24 @@ class SQLShellApp(App):
         except Exception:
             pass  # Silently ignore history saving errors
 
+    def _update_schema_browser(self) -> None:
+        """Update the schema browser with loaded files."""
+        schema_browser = self.query_one(SchemaBrowser)
+        schema_browser.update_schema(self.loaded_files)
+
     def action_show_help(self) -> None:
         """Show help dialog."""
         self._show_status("Help: Ctrl+Enter=Execute | Ctrl+L=Clear | Ctrl+D=Exit | F2=Schema | F3=History")
 
     def action_toggle_schema(self) -> None:
         """Toggle schema browser panel."""
-        self._show_status("Schema browser - Coming soon!")
+        container = self.query_one("#schema-container")
+        if container.has_class("visible"):
+            container.remove_class("visible")
+            self._show_status("Schema browser hidden")
+        else:
+            container.add_class("visible")
+            self._show_status("Schema browser visible")
 
     def action_toggle_history(self) -> None:
         """Toggle query history panel."""
