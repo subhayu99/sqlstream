@@ -10,13 +10,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from textual import work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import DataTable, Footer, Header, Static, TextArea, Tree
 
 try:
-    from sqlstream.core.query import query, QueryInline
+    from sqlstream.core.query import query, parse, QueryInline
     from sqlstream.core.types import Schema
 except ImportError:
     # Fallback for development
@@ -99,15 +100,25 @@ class SchemaBrowser(Tree):
         self.border_title = "Schema"
         self.show_root = False
 
-    def update_schema(self, files: List[str]) -> None:
-        """Update the schema tree with files."""
+    def show_schemas(self, schemas: Dict[str, Dict[str, str]]) -> None:
+        """Update the schema tree with files and columns."""
         self.clear()
-        for file in files:
+        self.root.expand()
+
+        if not schemas:
+            self.root.add("No files loaded")
+            return
+
+        for filename, schema in schemas.items():
             # Add file node
-            file_node = self.root.add(Path(file).name, expand=True)
-            # We will load columns lazily or if available
-            # For now just show the file
-            pass
+            file_node = self.root.add(Path(filename).name, expand=True)
+
+            # Add columns
+            for col, dtype in schema.items():
+                if col == "Error":
+                    file_node.add(f"[red]Error: {dtype}[/red]")
+                else:
+                    file_node.add(f"[green]{col}[/green]: [dim]{dtype}[/dim]")
 
 
 class SQLShellApp(App):
@@ -279,7 +290,7 @@ class SQLShellApp(App):
             self.history_index = len(self.query_history) - 1
         elif self.history_index > 0:
             self.history_index -= 1
-        
+
         self._set_editor_text(self.query_history[self.history_index])
 
     def action_history_next(self) -> None:
@@ -316,7 +327,7 @@ class SQLShellApp(App):
         if not self.query_history or self.query_history[-1] != query_text:
             self.query_history.append(query_text)
             self._save_history()
-        
+
         # Reset history index
         self.history_index = -1
 
@@ -338,6 +349,17 @@ class SQLShellApp(App):
             # Execute query
             start_time = datetime.now()
             result = self.query_engine.sql(query_text)
+
+            # Update loaded files
+            _parsed = parse(query_text)
+            self.loaded_files.append(_parsed.source)
+            if _parsed.join and _parsed.join.right_source:
+                self.loaded_files.append(_parsed.join.right_source)
+
+            # Update schema browser
+            self._update_schema_browser()
+
+            # Get results
             results = result.to_list()
             execution_time = (datetime.now() - start_time).total_seconds()
 
@@ -430,14 +452,23 @@ class SQLShellApp(App):
         except Exception:
             pass  # Silently ignore history saving errors
 
+    @work(thread=True)
     def _update_schema_browser(self) -> None:
         """Update the schema browser with loaded files."""
-        schema_browser = self.query_one(SchemaBrowser)
-        schema_browser.update_schema(self.loaded_files)
+        schemas = {}
+        for file in self.loaded_files:
+            try:
+                # Use query() to get schema
+                q = query(file)
+                schemas[file] = q.schema().to_dict()
+            except Exception as e:
+                schemas[file] = {"Error": str(e)}
+
+        self.call_from_thread(self.query_one(SchemaBrowser).show_schemas, schemas)
 
     def action_show_help(self) -> None:
         """Show help dialog."""
-        self._show_status("Help: Ctrl+Enter=Execute | Ctrl+L=Clear | Ctrl+D=Exit | F2=Schema | F3=History")
+        self._show_status("Help: Ctrl+Enter=Execute | Ctrl+L=Clear | Ctrl+D=Exit | F2=Schema | F3=History | Ctrl+X=Export")
 
     def action_toggle_schema(self) -> None:
         """Toggle schema browser panel."""
@@ -463,7 +494,21 @@ class SQLShellApp(App):
             self._show_status("No results to export", error=True)
             return
 
-        self._show_status("Export functionality - Coming soon!")
+        # Generate filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"results_{timestamp}.csv"
+
+        try:
+            import csv
+            with open(filename, "w", newline="") as f:
+                if self.last_results:
+                    writer = csv.DictWriter(f, fieldnames=self.last_results[0].keys())
+                    writer.writeheader()
+                    writer.writerows(self.last_results)
+
+            self._show_status(f"Results exported to {filename}")
+        except Exception as e:
+            self._show_status(f"Export failed: {e}", error=True)
 
 
 def launch_shell(initial_file: Optional[str] = None, history_file: Optional[str] = None) -> None:

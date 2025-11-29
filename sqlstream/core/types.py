@@ -296,3 +296,7 @@ class Schema:
                 merged[col_name] = other.columns[col_name]
 
         return Schema(merged)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert schema to dictionary."""
+        return {name: dtype.value for name, dtype in self.columns.items()}

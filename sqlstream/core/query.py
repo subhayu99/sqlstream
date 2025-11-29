@@ -18,6 +18,7 @@ from sqlstream.core.executor import Executor
 from sqlstream.readers.base import BaseReader
 from sqlstream.readers.csv_reader import CSVReader
 from sqlstream.sql.parser import parse
+from sqlstream.core.types import Schema
 
 # Try to import pandas executor
 try:
@@ -121,17 +122,17 @@ class Query:
         # Create QueryResult with reader factory for JOIN support
         return QueryResult(ast, self.reader, self._create_reader, self.source, backend)
 
-    def schema(self) -> Dict[str, str]:
+    def schema(self) -> Optional[Schema]:
         """
         Get schema information for the data source
 
         Returns:
-            Dictionary mapping column names to types
+            Schema object with inferred types, or None if schema cannot be inferred
 
         Example:
             >>> schema = query("data.csv").schema()
             >>> print(schema)
-            {'name': 'str', 'age': 'int', 'salary': 'float'}
+            Schema(name: STRING, age: INTEGER, salary: FLOAT)
         """
         return self.reader.get_schema()
 
