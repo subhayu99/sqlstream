@@ -30,11 +30,17 @@ class CSVReader(BaseReader):
         Initialize CSV reader
 
         Args:
-            path: Path to CSV file
+            path: Path to CSV file (local or s3://)
             encoding: File encoding (default: utf-8)
             delimiter: CSV delimiter (default: comma)
         """
-        self.path = Path(path)
+        self.path_str = path
+        self.is_s3 = path.startswith("s3://")
+        if not self.is_s3:
+            self.path = Path(path)
+        else:
+            self.path = None  # type: ignore
+
         self.encoding = encoding
         self.delimiter = delimiter
 
@@ -42,7 +48,7 @@ class CSVReader(BaseReader):
         self.filter_conditions: List[Condition] = []
         self.required_columns: List[str] = []
 
-        if not self.path.exists():
+        if not self.is_s3 and not self.path.exists():
             raise FileNotFoundError(f"CSV file not found: {path}")
 
     def supports_pushdown(self) -> bool:
@@ -61,6 +67,18 @@ class CSVReader(BaseReader):
         """Set required columns for pruning"""
         self.required_columns = columns
 
+    def _get_file_handle(self):
+        """Get file handle for reading (local or S3)."""
+        if self.is_s3:
+            try:
+                import s3fs
+                fs = s3fs.S3FileSystem(anon=False)
+                return fs.open(self.path_str, mode="r", encoding=self.encoding)
+            except ImportError:
+                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]")
+        else:
+            return open(self.path, encoding=self.encoding, newline="")
+
     def read_lazy(self) -> Iterator[Dict[str, Any]]:
         """
         Lazy iterator over CSV rows
@@ -69,7 +87,7 @@ class CSVReader(BaseReader):
         If filters are set, applies them during iteration.
         If columns are set, only yields those columns.
         """
-        with open(self.path, encoding=self.encoding, newline="") as f:
+        with self._get_file_handle() as f:
             reader = csv.DictReader(f, delimiter=self.delimiter)
 
             for row_num, raw_row in enumerate(reader, start=2):  # Start at 2 (after header)
@@ -222,7 +240,7 @@ class CSVReader(BaseReader):
         """
         sample_rows = []
 
-        with open(self.path, encoding=self.encoding, newline="") as f:
+        with self._get_file_handle() as f:
             reader = csv.DictReader(f, delimiter=self.delimiter)
 
             # Read sample rows to infer types

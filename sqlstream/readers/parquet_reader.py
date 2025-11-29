@@ -43,10 +43,29 @@ class ParquetReader(BaseReader):
         Initialize Parquet reader
 
         Args:
-            path: Path to Parquet file
+            path: Path to Parquet file (local or s3://)
         """
-        self.path = Path(path)
-        self.parquet_file = pq.ParquetFile(str(self.path))
+        self.path_str = path
+        self.is_s3 = path.startswith("s3://")
+        
+        filesystem = None
+        path_to_open = path
+
+        if self.is_s3:
+            try:
+                import s3fs
+                filesystem = s3fs.S3FileSystem(anon=False)
+                # s3fs expects path without protocol when filesystem is provided
+                path_to_open = path.replace("s3://", "")
+            except ImportError:
+                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]")
+        else:
+            self.path = Path(path)
+            path_to_open = str(self.path)
+            if not self.path.exists():
+                raise FileNotFoundError(f"Parquet file not found: {path}")
+
+        self.parquet_file = pq.ParquetFile(path_to_open, filesystem=filesystem)
 
         # Optimization state (set by planner)
         self.filter_conditions: List[Condition] = []
@@ -55,9 +74,6 @@ class ParquetReader(BaseReader):
         # Statistics tracking
         self.total_row_groups = self.parquet_file.num_row_groups
         self.row_groups_scanned = 0
-
-        if not self.path.exists():
-            raise FileNotFoundError(f"Parquet file not found: {path}")
 
     def supports_pushdown(self) -> bool:
         """Parquet reader supports predicate pushdown"""
