@@ -48,6 +48,7 @@ dev = [
     "mypy>=0.990",
     "pandas>=1.5.0",  # Include pandas in dev for testing
     "pyarrow>=10.0.0",
+    "httpx>=0.27.0",  # Include httpx in dev for testing
 ]
 
 [project.scripts]

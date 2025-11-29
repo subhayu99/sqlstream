@@ -62,6 +62,12 @@ class Query:
         Raises:
             ValueError: If file format is not supported
         """
+        # Check if source is HTTP/HTTPS URL
+        if source.startswith(("http://", "https://")):
+            from sqlstream.readers.http_reader import HTTPReader
+
+            return HTTPReader(source)
+
         path = Path(source)
 
         # Check file extension to determine format

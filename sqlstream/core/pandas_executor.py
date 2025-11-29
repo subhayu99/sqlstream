@@ -93,8 +93,16 @@ class PandasExecutor:
         """
         Load data file into DataFrame
 
-        Supports CSV and Parquet formats.
+        Supports CSV and Parquet formats, including HTTP URLs.
         """
+        # Handle HTTP URLs by using HTTPReader (for caching)
+        if source.startswith(("http://", "https://")):
+            from sqlstream.readers.http_reader import HTTPReader
+
+            # Use HTTPReader to download/cache, then get local path
+            reader = HTTPReader(source)
+            source = str(reader.local_path)
+
         if source.endswith(".parquet"):
             return pd.read_parquet(source)
         elif source.endswith(".csv"):
