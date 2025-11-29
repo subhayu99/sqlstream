@@ -30,6 +30,7 @@ $ sqlstream query data.csv "SELECT * FROM data" --interactive
 - ⚡ **10-100x Faster** - Optional pandas backend for performance
 - 🔗 **JOIN Support** - INNER, LEFT, RIGHT joins
 - 📈 **Aggregations** - GROUP BY with COUNT, SUM, AVG, MIN, MAX
+- 🔢 **Type System** - Automatic schema inference with type checking
 - 🎨 **Beautiful Output** - Rich tables, JSON, CSV formatting
 - 🖥️ **Interactive Mode** - Scrollable table viewer with Textual
 - 🔍 **Smart Optimizations** - Column pruning, predicate pushdown, lazy evaluation
@@ -98,7 +99,7 @@ Key sections:
 
 ## Development Status
 
-**Current Phase**: 7.6 (Inline File Path Support)
+**Current Phase**: 8 (Type System & Schema Inference)
 
 - ✅ **Phase 0-2**: Core query engine with Volcano model
 - ✅ **Phase 3**: Parquet support
@@ -109,11 +110,11 @@ Key sections:
 - ✅ **Phase 7**: CLI with beautiful output
 - ✅ **Phase 7.5**: Interactive mode with Textual
 - ✅ **Phase 7.6**: Inline file path support
-- 🚧 **Phase 8**: Type system & schema inference
+- ✅ **Phase 8**: Type system & schema inference
 - 🚧 **Phase 9**: Error handling & user feedback
 - 🚧 **Phase 10**: Testing & documentation
 
-**Test Coverage**: 307 tests, 38% coverage
+**Test Coverage**: 358 tests, 53% coverage
 
 ## Performance
 

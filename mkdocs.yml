@@ -71,6 +71,7 @@ nav:
       - Core Concepts: getting-started/core-concepts.md
   - Features:
       - SQL Support: features/sql-support.md
+      - Type System & Schema: features/type-system.md
       - Data Sources: features/data-sources.md
       - JOIN Operations: features/joins.md
       - Aggregations: features/aggregations.md

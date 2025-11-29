@@ -5,9 +5,10 @@ All readers implement this interface to provide a consistent API
 for the query engine.
 """
 
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Optional
 
 from sqlstream.sql.ast_nodes import Condition
+from sqlstream.core.types import Schema
 
 
 class BaseReader:
@@ -86,17 +87,18 @@ class BaseReader:
         """
         pass
 
-    def get_schema(self) -> Dict[str, str]:
+    def get_schema(self) -> Optional[Schema]:
         """
         Get schema information (column names and types)
 
         Returns:
-            Dictionary mapping column names to type names
+            Schema object with inferred types, or None if schema cannot be inferred
 
         Note:
-            Optional method. Returns empty dict by default.
+            Optional method. Returns None by default.
+            Readers should override this to provide schema inference.
         """
-        return {}
+        return None
 
     def __iter__(self):
         """Allow readers to be used directly in for loops"""

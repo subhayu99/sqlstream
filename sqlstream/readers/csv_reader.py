@@ -7,10 +7,11 @@ Uses Python's built-in csv module for simplicity and zero dependencies.
 import csv
 import warnings
 from pathlib import Path
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Optional
 
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
+from sqlstream.core.types import Schema
 
 
 class CSVReader(BaseReader):
@@ -209,31 +210,34 @@ class CSVReader(BaseReader):
             # This is fine - row just doesn't match
             return False
 
-    def get_schema(self) -> Dict[str, str]:
+    def get_schema(self, sample_size: int = 100) -> Optional[Schema]:
         """
-        Infer schema by reading first row
+        Infer schema by sampling rows from the CSV file
+
+        Args:
+            sample_size: Number of rows to sample for type inference (default: 100)
 
         Returns:
-            Dictionary mapping column names to inferred types
+            Schema object with inferred types, or None if file is empty
         """
-        schema = {}
+        sample_rows = []
 
         with open(self.path, encoding=self.encoding, newline="") as f:
             reader = csv.DictReader(f, delimiter=self.delimiter)
 
-            # Read first row to infer types
+            # Read sample rows to infer types
             try:
-                first_row = next(reader)
-                typed_row = self._infer_types(first_row)
-
-                for key, value in typed_row.items():
-                    if value is None:
-                        schema[key] = "unknown"
-                    else:
-                        schema[key] = type(value).__name__
+                for i, raw_row in enumerate(reader):
+                    if i >= sample_size:
+                        break
+                    typed_row = self._infer_types(raw_row)
+                    sample_rows.append(typed_row)
 
             except StopIteration:
-                # Empty file
+                # Empty file or fewer rows than sample_size
                 pass
 
-        return schema
+        if not sample_rows:
+            return None
+
+        return Schema.from_rows(sample_rows)

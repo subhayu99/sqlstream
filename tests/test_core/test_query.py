@@ -150,13 +150,15 @@ class TestSchemaInference:
 
     def test_get_schema(self, sample_csv):
         """Test .schema() method"""
+        from sqlstream.core.types import Schema, DataType
+
         schema = query(str(sample_csv)).schema()
 
-        assert isinstance(schema, dict)
+        assert isinstance(schema, Schema)
         assert "name" in schema
         assert "age" in schema
-        assert schema["name"] == "str"
-        assert schema["age"] == "int"
+        assert schema["name"] == DataType.STRING
+        assert schema["age"] == DataType.INTEGER
 
 
 class TestExplain:
