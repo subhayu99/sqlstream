@@ -21,9 +21,7 @@ from sqlstream.sql.parser import parse
 
 # Try to import pandas executor
 try:
-    from sqlstream.core.pandas_executor import PandasExecutor
-
-    PANDAS_AVAILABLE = True
+    from sqlstream.core.pandas_executor import PANDAS_AVAILABLE, PandasExecutor
 except ImportError:
     PANDAS_AVAILABLE = False
     PandasExecutor = None
