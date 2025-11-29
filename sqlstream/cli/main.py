@@ -83,6 +83,17 @@ def cli():
     is_flag=True,
     help="Show execution time",
 )
+@click.option(
+    "--interactive",
+    "-i",
+    is_flag=True,
+    help="Force interactive mode (scrollable table viewer)",
+)
+@click.option(
+    "--no-interactive",
+    is_flag=True,
+    help="Disable auto-detection of interactive mode",
+)
 def query(
     file: str,
     sql: str,
@@ -93,6 +104,8 @@ def query(
     no_color: bool,
     explain: bool,
     show_time: bool,
+    interactive: bool,
+    no_interactive: bool,
 ):
     """
     Execute SQL query on a data file
@@ -129,6 +142,7 @@ def query(
         if explain:
             result = q.sql(sql, backend=backend)
             output_text = result.explain()
+            click.echo(output_text)
         else:
             # Execute query
             result = q.sql(sql, backend=backend)
@@ -138,38 +152,57 @@ def query(
             if limit is not None:
                 results_list = results_list[:limit]
 
-            # Format results
-            formatter = get_formatter(format)
-            output_text = formatter.format(
+            # Check if interactive mode should be used
+            from sqlstream.cli.interactive import should_use_interactive, launch_interactive
+
+            if should_use_interactive(
                 results_list,
-                no_color=no_color or (not sys.stdout.isatty()),
-                show_footer=not output,
-            )
-
-        # Add execution time if requested
-        if show_time and not explain:
-            elapsed = time.time() - start_time
-            time_text = f"\nExecution time: {elapsed:.3f}s"
-            if format == "table" and not no_color:
-                # Add colored time for table format
+                force=interactive,
+                no_interactive=no_interactive,
+                output_file=output,
+                format=format,
+            ):
+                # Launch interactive TUI
                 try:
-                    from rich.console import Console
-                    console = Console()
-                    with console.capture() as capture:
-                        console.print(f"[dim]{time_text}[/dim]")
-                    output_text += capture.get()
-                except ImportError:
-                    output_text += time_text
+                    launch_interactive(results_list)
+                except ImportError as e:
+                    click.echo(f"Error: {e}", err=True)
+                    click.echo("Install with: pip install sqlstream[cli]", err=True)
+                    sys.exit(1)
             else:
-                output_text += time_text
+                # Use standard formatter
+                formatter = get_formatter(format)
+                output_text = formatter.format(
+                    results_list,
+                    no_color=no_color or (not sys.stdout.isatty()),
+                    show_footer=not output,
+                )
 
-        # Write output
-        if output:
-            with open(output, "w") as f:
-                f.write(output_text)
-            click.echo(f"Results written to {output}", err=True)
-        else:
-            click.echo(output_text)
+                # Add execution time if requested
+                if show_time:
+                    elapsed = time.time() - start_time
+                    time_text = f"\nExecution time: {elapsed:.3f}s"
+                    if format == "table" and not no_color:
+                        # Add colored time for table format
+                        try:
+                            from rich.console import Console
+
+                            console = Console()
+                            with console.capture() as capture:
+                                console.print(f"[dim]{time_text}[/dim]")
+                            output_text += capture.get()
+                        except ImportError:
+                            output_text += time_text
+                    else:
+                        output_text += time_text
+
+                # Write output
+                if output:
+                    with open(output, "w") as f:
+                        f.write(output_text)
+                    click.echo(f"Results written to {output}", err=True)
+                else:
+                    click.echo(output_text)
 
     except FileNotFoundError as e:
         click.echo(f"Error: File not found - {e}", err=True)

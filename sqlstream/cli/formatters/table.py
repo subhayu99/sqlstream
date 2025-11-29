@@ -5,6 +5,7 @@ Rich table formatter for beautiful terminal output
 from typing import Any, Dict, List
 
 try:
+    from rich import box
     from rich.console import Console
     from rich.table import Table
 
@@ -13,6 +14,7 @@ except ImportError:
     RICH_AVAILABLE = False
     Console = None
     Table = None
+    box = None
 
 from sqlstream.cli.formatters.base import BaseFormatter
 
@@ -40,24 +42,45 @@ class TableFormatter(BaseFormatter):
         if not results:
             return "No results found."
 
-        # Get column names from first row
+        # Get terminal width and column info
+        console = Console(force_terminal=not kwargs.get("no_color", False))
+        terminal_width = console.width
         columns = list(results[0].keys())
+        num_cols = len(columns)
 
-        # Create Rich table
-        table = Table(show_header=True, header_style="bold magenta")
+        # Adaptive column width based on terminal size
+        if terminal_width < 80 or num_cols > 8:
+            # Narrow terminal or many columns: aggressive truncation
+            max_col_width = kwargs.get("max_width", 15)
+            table = Table(show_header=True, header_style="bold magenta", box=box.SIMPLE)
 
-        # Add columns
-        for col in columns:
-            table.add_column(col, style="cyan", no_wrap=False)
+            for col in columns:
+                table.add_column(
+                    col,
+                    style="cyan",
+                    overflow="ellipsis",
+                    max_width=max_col_width,
+                    no_wrap=True,
+                )
+        else:
+            # Normal table with moderate truncation
+            table = Table(show_header=True, header_style="bold magenta")
+
+            for col in columns:
+                table.add_column(
+                    col, style="cyan", overflow="ellipsis", max_width=30, no_wrap=False
+                )
 
         # Add rows
         for row in results:
             # Convert None to "NULL" for display
-            values = [str(row[col]) if row[col] is not None else "[dim]NULL[/dim]" for col in columns]
+            values = [
+                str(row[col]) if row[col] is not None else "[dim]NULL[/dim]"
+                for col in columns
+            ]
             table.add_row(*values)
 
         # Render table to string
-        console = Console(force_terminal=not kwargs.get("no_color", False))
         with console.capture() as capture:
             console.print(table)
 
