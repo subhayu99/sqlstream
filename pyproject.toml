@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sqlstream"
-version = "0.2.5"
+version = "0.3.0"
 description = "A lightweight SQL query engine for data exploration with lazy evaluation and intelligent optimizations"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -70,7 +70,7 @@ dev = [
     "mkdocs-material-extensions>=1.3.0",   # Material extensions
     "mkdocstrings[python]>=0.24.0",        # Auto-generate API docs from docstrings
     "mkdocstrings-python>=1.7.0",          # Python handler for mkdocstrings
-]  # Material extensions
+]
 
 [project.scripts]
 sqlstream = "sqlstream.cli.main:cli"
