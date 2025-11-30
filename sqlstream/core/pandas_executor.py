@@ -89,30 +89,102 @@ class PandasExecutor:
         # Step 8: Convert to dictionaries and yield
         yield from df.to_dict("records")
 
-    def _load_dataframe(self, source: str) -> pd.DataFrame:
+    def _load_dataframe(self, source: str, format: Optional[str] = None) -> pd.DataFrame:
         """
         Load data file into DataFrame
 
-        Supports CSV and Parquet formats, including HTTP URLs.
+        Supports CSV, Parquet, HTML, and Markdown formats, including HTTP URLs.
+
+        Args:
+            source: Path or URL to data file (may include fragment like 'file.html#html:1')
+            format: Optional explicit format (csv, parquet, html, markdown)
         """
+        # Parse URL fragment if present (e.g., "data.html#html:1")
+        from sqlstream.core.fragment_parser import parse_source_fragment
+        source_path, format_hint, table_hint = parse_source_fragment(source)
+
+        # Use format hint from fragment if not explicitly provided
+        if not format and format_hint:
+            format = format_hint
+
         # Handle HTTP URLs by using HTTPReader (for caching)
-        if source.startswith(("http://", "https://")):
+        if source_path.startswith(("http://", "https://")):
             from sqlstream.readers.http_reader import HTTPReader
 
             # Use HTTPReader to download/cache, then get local path
-            reader = HTTPReader(source)
-            source = str(reader.local_path)
+            # Pass format if specified
+            if format:
+                reader = HTTPReader(source_path, format=format)
+            else:
+                reader = HTTPReader(source_path)
+            source_path = str(reader.local_path)
+            
+            # If format not specified, detect from reader
+            if not format:
+                delegate_type = type(reader.delegate_reader).__name__
+                if 'HTML' in delegate_type:
+                    format = 'html'
+                elif 'Markdown' in delegate_type:
+                    format = 'markdown'
+                elif 'Parquet' in delegate_type:
+                    format = 'parquet'
+                else:
+                    format = 'csv'
 
-        if source.endswith(".parquet"):
-            return pd.read_parquet(source)
-        elif source.endswith(".csv"):
-            return pd.read_csv(source)
+        # If format explicitly specified, use it
+        if format:
+            if format == "parquet":
+                return pd.read_parquet(source_path)
+            elif format == "html":
+                # read_html returns a list, take table at table_hint index (default 0)
+                tables = pd.read_html(source_path)
+                if not tables:
+                    raise ValueError(f"No tables found in HTML: {source_path}")
+                table_index = table_hint if table_hint is not None else 0
+                if table_index >= len(tables):
+                    raise ValueError(
+                        f"Table index {table_index} out of range. "
+                        f"HTML contains {len(tables)} table(s)."
+                    )
+                return tables[table_index]
+            elif format == "markdown":
+                # Use our markdown reader with table selection
+                from sqlstream.readers.markdown_reader import MarkdownReader
+                table_index = table_hint if table_hint is not None else 0
+                reader = MarkdownReader(source_path, table=table_index)
+                # Convert to DataFrame
+                return pd.DataFrame(reader.rows)
+            else:  # csv
+                return pd.read_csv(source_path)
+        
+        # Auto-detect from extension
+        source_lower = source_path.lower()
+        if source_lower.endswith(".parquet"):
+            return pd.read_parquet(source_path)
+        elif source_lower.endswith((".html", ".htm")):
+            tables = pd.read_html(source_path)
+            if not tables:
+                raise ValueError(f"No tables found in HTML: {source_path}")
+            table_index = table_hint if table_hint is not None else 0
+            if table_index >= len(tables):
+                raise ValueError(
+                    f"Table index {table_index} out of range. "
+                    f"HTML contains {len(tables)} table(s)."
+                )
+            return tables[table_index]
+        elif source_lower.endswith((".md", ".markdown")):
+            from sqlstream.readers.markdown_reader import MarkdownReader
+            table_index = table_hint if table_hint is not None else 0
+            reader = MarkdownReader(source_path, table=table_index)
+            return pd.DataFrame(reader.rows)
+        elif source_lower.endswith(".csv"):
+            return pd.read_csv(source_path)
         else:
             # Try CSV as default
             try:
-                return pd.read_csv(source)
+                return pd.read_csv(source_path)
             except Exception:
-                raise ValueError(f"Unsupported file format: {source}")
+                raise ValueError(f"Unsupported file format: {source_path}")
 
     def _apply_join(
         self, df: pd.DataFrame, ast: SelectStatement, right_source: str

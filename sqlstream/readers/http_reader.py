@@ -57,6 +57,8 @@ class HTTPReader(BaseReader):
         url: str,
         cache_dir: Optional[str] = None,
         force_download: bool = False,
+        format: Optional[str] = None,
+        **kwargs,
     ):
         """
         Initialize HTTP reader
@@ -65,6 +67,9 @@ class HTTPReader(BaseReader):
             url: HTTP/HTTPS URL to data file
             cache_dir: Directory to cache downloaded files (default: system temp)
             force_download: If True, re-download even if cached
+            format: Explicit format specification (csv, parquet, html, markdown).
+                   If not provided, will auto-detect from URL extension or content.
+            **kwargs: Additional arguments passed to the delegate reader
         """
         if not HTTPX_AVAILABLE:
             raise ImportError(
@@ -75,6 +80,8 @@ class HTTPReader(BaseReader):
         self.url = url
         self.cache_dir = Path(cache_dir) if cache_dir else Path(tempfile.gettempdir()) / "sqlstream_cache"
         self.force_download = force_download
+        self.explicit_format = format
+        self.reader_kwargs = kwargs
 
         # Ensure cache directory exists
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -135,21 +142,75 @@ class HTTPReader(BaseReader):
 
     def _create_delegate_reader(self) -> BaseReader:
         """Create appropriate reader based on file format"""
-        # Detect format from file extension
-        path_lower = str(self.local_path).lower()
-
-        if path_lower.endswith(".parquet"):
+        format_to_use = self.explicit_format
+        
+        # If no explicit format, try to detect from URL extension
+        if not format_to_use:
+            path_lower = str(self.local_path).lower()
+            
+            if path_lower.endswith(".parquet"):
+                format_to_use = "parquet"
+            elif path_lower.endswith(".csv"):
+                format_to_use = "csv"
+            elif path_lower.endswith((".html", ".htm")):
+                format_to_use = "html"
+            elif path_lower.endswith((".md", ".markdown")):
+                format_to_use = "markdown"
+            else:
+                # Try to detect from content
+                format_to_use = self._detect_format_from_content()
+        
+        # Create appropriate reader based on detected/specified format
+        if format_to_use == "parquet":
             if not PARQUET_AVAILABLE:
                 raise ImportError(
                     "Parquet files require pyarrow. "
                     "Install `sqlstream[parquet]`"
                 )
             return ParquetReader(str(self.local_path))
-        elif path_lower.endswith(".csv"):
+        
+        elif format_to_use == "html":
+            try:
+                from sqlstream.readers.html_reader import HTMLReader
+                return HTMLReader(str(self.local_path), **self.reader_kwargs)
+            except ImportError:
+                raise ImportError(
+                    "HTML reader requires pandas library. "
+                    "Install `sqlstream[pandas]`"
+                )
+        
+        elif format_to_use == "markdown":
+            from sqlstream.readers.markdown_reader import MarkdownReader
+            return MarkdownReader(str(self.local_path), **self.reader_kwargs)
+        
+        else:  # csv or unknown - default to CSV
             return CSVReader(str(self.local_path))
-        else:
-            # Default to CSV for unknown formats
-            return CSVReader(str(self.local_path))
+    
+    def _detect_format_from_content(self) -> str:
+        """Try to detect format by peeking at file content"""
+        try:
+            with open(self.local_path, 'rb') as f:
+                # Read first few bytes
+                header = f.read(512)
+            
+            # Check for HTML
+            if b'<html' in header.lower() or b'<!doctype html' in header.lower() or b'<table' in header.lower():
+                return "html"
+            
+            # Check for Markdown table (simple heuristic)
+            if b'|' in header and b'---' in header:
+                return "markdown"
+            
+            # Check for Parquet magic number
+            if header.startswith(b'PAR1'):
+                return "parquet"
+            
+            # Default to CSV
+            return "csv"
+        
+        except Exception:
+            # If detection fails, default to CSV
+            return "csv"
 
     def read_lazy(self) -> Iterator[Dict[str, Any]]:
         """Read data lazily, delegating to underlying reader"""

@@ -53,9 +53,11 @@ class Query:
     def _create_reader(self, source: str) -> BaseReader:
         """
         Auto-detect source type and create appropriate reader
+        
+        Supports URL fragments: source#format:table
 
         Args:
-            source: Path to data file or URL
+            source: Path to data file or URL, optionally with #format:table fragment
 
         Returns:
             Reader instance for the source
@@ -63,33 +65,53 @@ class Query:
         Raises:
             ValueError: If file format is not supported
         """
+        from sqlstream.core.fragment_parser import parse_source_fragment
+        
+        # Parse URL fragment if present
+        source_path, format_hint, table_hint = parse_source_fragment(source)
+        
         # Check if source is HTTP/HTTPS URL
-        if source.startswith(("http://", "https://")):
+        if source_path.startswith(("http://", "https://")):
             from sqlstream.readers.http_reader import HTTPReader
 
-            return HTTPReader(source)
+            kwargs = {}
+            if format_hint:
+                kwargs['format'] = format_hint
+            if table_hint is not None:
+                kwargs['table'] = table_hint
+            return HTTPReader(source_path, **kwargs)
 
-        path = Path(source)
+        path = Path(source_path)
 
         # Check file extension to determine format
         suffix = path.suffix.lower()
+        
+        # Explicit format from fragment takes precedence
+        if format_hint == 'html' or (not format_hint and suffix in ['.html', '.htm']):
+            from sqlstream.readers.html_reader import HTMLReader
+            table = table_hint if table_hint is not None else 0
+            return HTMLReader(source_path, table=table)
+        
+        elif format_hint == 'markdown' or (not format_hint and suffix in ['.md', '.markdown']):
+            from sqlstream.readers.markdown_reader import MarkdownReader
+            table = table_hint if table_hint is not None else 0
+            return MarkdownReader(source_path, table=table)
 
-        if suffix == ".csv":
-            return CSVReader(source)
-        elif suffix == ".parquet":
+        elif format_hint == 'parquet' or (not format_hint and suffix == ".parquet"):
             from sqlstream.readers.parquet_reader import ParquetReader
-
-            return ParquetReader(source)
-        # elif suffix in [".json", ".jsonl"]:
-        #     return JSONReader(source)  # Future
+            return ParquetReader(source_path)
+        
+        elif format_hint == 'csv' or (not format_hint and suffix == ".csv"):
+            return CSVReader(source_path)
+        
         else:
             # Try CSV as default
             try:
-                return CSVReader(source)
+                return CSVReader(source_path)
             except Exception as e:
                 raise ValueError(
                     f"Unsupported file format: {suffix}. "
-                    f"Supported formats: .csv, .parquet"
+                    f"Supported formats: .csv, .parquet, .html, .md"
                 ) from e
 
     def sql(
@@ -269,9 +291,11 @@ class QueryInline:
     def _create_reader(self, source: str) -> BaseReader:
         """
         Auto-detect source type and create appropriate reader
+        
+        Supports URL fragments: source#format:table
 
         Args:
-            source: Path to data file or URL
+            source: Path to data file or URL, optionally with #format:table fragment
 
         Returns:
             Reader instance for the source
@@ -279,31 +303,53 @@ class QueryInline:
         Raises:
             ValueError: If file format is not supported
         """
+        from sqlstream.core.fragment_parser import parse_source_fragment
+        
+        # Parse URL fragment if present
+        source_path, format_hint, table_hint = parse_source_fragment(source)
+        
         # Check if source is HTTP/HTTPS URL
-        if source.startswith(("http://", "https://")):
+        if source_path.startswith(("http://", "https://")):
             from sqlstream.readers.http_reader import HTTPReader
 
-            return HTTPReader(source)
+            kwargs = {}
+            if format_hint:
+                kwargs['format'] = format_hint
+            if table_hint is not None:
+                kwargs['table'] = table_hint
+            return HTTPReader(source_path, **kwargs)
 
-        path = Path(source)
+        path = Path(source_path)
 
         # Check file extension to determine format
         suffix = path.suffix.lower()
+        
+        # Explicit format from fragment takes precedence
+        if format_hint == 'html' or (not format_hint and suffix in ['.html', '.htm']):
+            from sqlstream.readers.html_reader import HTMLReader
+            table = table_hint if table_hint is not None else 0
+            return HTMLReader(source_path, table=table)
+        
+        elif format_hint == 'markdown' or (not format_hint and suffix in ['.md', '.markdown']):
+            from sqlstream.readers.markdown_reader import MarkdownReader
+            table = table_hint if table_hint is not None else 0
+            return MarkdownReader(source_path, table=table)
 
-        if suffix == ".csv":
-            return CSVReader(source)
-        elif suffix == ".parquet":
+        elif format_hint == 'parquet' or (not format_hint and suffix == ".parquet"):
             from sqlstream.readers.parquet_reader import ParquetReader
-
-            return ParquetReader(source)
+            return ParquetReader(source_path)
+        
+        elif format_hint == 'csv' or (not format_hint and suffix == ".csv"):
+            return CSVReader(source_path)
+        
         else:
             # Try CSV as default
             try:
-                return CSVReader(source)
+                return CSVReader(source_path)
             except Exception as e:
                 raise ValueError(
                     f"Unsupported file format: {suffix}. "
-                    f"Supported formats: .csv, .parquet"
+                    f"Supported formats: .csv, .parquet, .html, .md"
                 ) from e
 
     def sql(

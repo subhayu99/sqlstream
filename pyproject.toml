@@ -45,6 +45,12 @@ pandas = [
     "pyarrow>=14.0.0",
 ]
 http = ["httpx>=0.27.0"]
+html = [
+    "lxml>=4.8.0",
+    "pandas>=2.0.0",
+    "html5lib>=1.1",
+    "beautifulsoup4>=4.14.3",
+]
 s3 = ["s3fs>=2023.1.0"]
 bloom = []
 all = [
