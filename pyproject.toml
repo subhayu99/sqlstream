@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sqlstream"
-version = "0.2.0"
+version = "0.2.1"
 description = "A lightweight SQL query engine for data exploration with lazy evaluation and intelligent optimizations"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -35,8 +35,8 @@ cli = [
 ]
 interactive = [
     "textual>=0.40.0",
-    "tree-sitter>=0.25.0",
-    "tree-sitter-sql>=0.3.11",
+    "tree-sitter>=0.21.3",
+    "tree-sitter-sql>=0.3.5",
     "rich>=13.0.0",
 ]
 parquet = ["pyarrow>=10.0.0"]
@@ -55,8 +55,8 @@ all = [
     "click>=8.0.0",
     "rich>=13.0.0",
     "textual>=0.40.0",
-    "tree-sitter>=0.25.0",
-    "tree-sitter-sql>=0.3.11",
+    "tree-sitter>=0.21.3",
+    "tree-sitter-sql>=0.3.5",
 ]
 dev = [
     "pytest>=7.0.0",
