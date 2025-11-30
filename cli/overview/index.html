@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://subhayu99.github.io/sqlstream/cli/overview/">
       
       
-        <link rel="prev" href="../../features/data-sources/">
+        <link rel="prev" href="../../features/inline-paths/">
       
       
         <link rel="next" href="../query-command/">
@@ -354,7 +354,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../architecture/design.md" class="md-tabs__link">
+        <a href="../../architecture/design/" class="md-tabs__link">
           
   
   
@@ -743,7 +743,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/joins.md" class="md-nav__link">
+      <a href="../../features/s3-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S3 Support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/joins/" class="md-nav__link">
         
   
   
@@ -771,7 +799,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/aggregations.md" class="md-nav__link">
+      <a href="../../features/aggregations/" class="md-nav__link">
         
   
   
@@ -799,7 +827,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/pandas-backend.md" class="md-nav__link">
+      <a href="../../features/pandas-backend/" class="md-nav__link">
         
   
   
@@ -827,7 +855,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/inline-paths.md" class="md-nav__link">
+      <a href="../../features/inline-paths/" class="md-nav__link">
         
   
   
@@ -979,28 +1007,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic Usage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick Examples
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#available-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1009,6 +1015,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Available Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-execute-sql-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        query - Execute SQL Queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shell-interactive-sql-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        shell - Interactive SQL Shell
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1016,6 +1050,28 @@
     <span class="md-ellipsis">
       
         Global Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
       
     </span>
   </a>
@@ -1066,7 +1122,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../interactive-mode.md" class="md-nav__link">
+      <a href="../interactive-mode/" class="md-nav__link">
         
   
   
@@ -1094,7 +1150,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../output-formats.md" class="md-nav__link">
+      <a href="../output-formats/" class="md-nav__link">
         
   
   
@@ -1209,7 +1265,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/query.md" class="md-nav__link">
+      <a href="../../api/query/" class="md-nav__link">
         
   
   
@@ -1237,7 +1293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/readers.md" class="md-nav__link">
+      <a href="../../api/readers/" class="md-nav__link">
         
   
   
@@ -1265,7 +1321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/advanced.md" class="md-nav__link">
+      <a href="../../api/advanced/" class="md-nav__link">
         
   
   
@@ -1380,7 +1436,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/joins.md" class="md-nav__link">
+      <a href="../../examples/joins/" class="md-nav__link">
         
   
   
@@ -1408,7 +1464,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/aggregations.md" class="md-nav__link">
+      <a href="../../examples/aggregations/" class="md-nav__link">
         
   
   
@@ -1436,7 +1492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/real-world.md" class="md-nav__link">
+      <a href="../../examples/real-world/" class="md-nav__link">
         
   
   
@@ -1523,7 +1579,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/design.md" class="md-nav__link">
+      <a href="../../architecture/design/" class="md-nav__link">
         
   
   
@@ -1551,7 +1607,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/volcano-model.md" class="md-nav__link">
+      <a href="../../architecture/volcano-model/" class="md-nav__link">
         
   
   
@@ -1579,7 +1635,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/optimizations.md" class="md-nav__link">
+      <a href="../../architecture/optimizations/" class="md-nav__link">
         
   
   
@@ -1661,28 +1717,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic Usage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick Examples
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#available-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1691,6 +1725,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Available Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-execute-sql-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        query - Execute SQL Queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shell-interactive-sql-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        shell - Interactive SQL Shell
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1698,6 +1760,28 @@
     <span class="md-ellipsis">
       
         Global Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
       
     </span>
   </a>
@@ -1725,32 +1809,59 @@
 
 
 <h1 id="cli-overview">CLI Overview</h1>
-<p>The <code>sqlstream</code> command-line interface provides an easy way to query data files.</p>
-<h2 id="basic-usage">Basic Usage</h2>
+<p>The <code>sqlstream</code> command-line interface provides an easy way to query data files with SQL.</p>
+<h2 id="available-commands">Available Commands</h2>
+<h3 id="query-execute-sql-queries"><code>query</code> - Execute SQL Queries</h3>
+<p>Execute SQL queries on data files and display results.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="o">[</span>FILE<span class="o">]</span><span class="w"> </span>&lt;SQL&gt;<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </span></code></pre></div>
-<h2 id="quick-examples">Quick Examples</h2>
+<p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Query a file</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data WHERE age &gt; 25&quot;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Inline file path</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39;&quot;</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39; WHERE age &gt; 25&quot;</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># JSON output</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>--format<span class="w"> </span>json
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Interactive mode</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>--interactive
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># S3 files</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;s3://bucket/data.parquet&#39; LIMIT 100&quot;</span>
+</span></code></pre></div></p>
+<p>See <a href="../query-command/">Query Command</a> for full documentation.</p>
+<h3 id="shell-interactive-sql-shell"><code>shell</code> - Interactive SQL Shell</h3>
+<p>Launch the interactive shell with full TUI (Terminal User Interface).</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span><span class="o">[</span>FILE<span class="o">]</span>
 </span></code></pre></div>
-<h2 id="available-commands">Available Commands</h2>
-<ul>
-<li><code>query</code> - Execute SQL queries on data files</li>
-<li><code>interactive</code> - Launch interactive query interface (coming soon)</li>
-</ul>
+<p><strong>Features:</strong>
+- Modal dialogs for filtering, export, file selection
+- File browser (<code>Ctrl+O</code>) to select files
+- Query execution plan visualization (<code>F4</code>)
+- Multi-format export (<code>Ctrl+X</code>)
+- Live filtering (<code>Ctrl+F</code>)
+- Schema browser (<code>F2</code>)
+- Query history with multiline support</p>
+<p>See <a href="../interactive-mode/">Interactive Mode</a> for full documentation.</p>
 <h2 id="global-options">Global Options</h2>
 <ul>
-<li><code>--version</code> - Show version</li>
+<li><code>--version</code> - Show SQLStream version</li>
 <li><code>--help</code> - Show help message</li>
+</ul>
+<h2 id="quick-start">Quick Start</h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Simple query</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>employees.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM employees WHERE salary &gt; 80000&quot;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># With pandas backend for performance</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>large.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM large&quot;</span><span class="w"> </span>--backend<span class="w"> </span>pandas
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Launch interactive shell</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>employees.csv
+</span></code></pre></div>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><a href="../query-command/">Query Command Reference</a> - Detailed query command options</li>
+<li><a href="../interactive-mode/">Interactive Shell Guide</a> - Full interactive shell documentation</li>
+<li><a href="../output-formats/">Output Formats</a> - Available output formats</li>
 </ul>
 
 

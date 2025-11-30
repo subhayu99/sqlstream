@@ -354,7 +354,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../architecture/design.md" class="md-tabs__link">
+        <a href="../../architecture/design/" class="md-tabs__link">
           
   
   
@@ -731,10 +731,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-interactive-mode" class="md-nav__link">
+  <a href="#step-6-interactive-shell" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 6: Interactive Mode
+        Step 6: Interactive Shell
       
     </span>
   </a>
@@ -1000,7 +1000,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/joins.md" class="md-nav__link">
+      <a href="../../features/s3-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S3 Support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/joins/" class="md-nav__link">
         
   
   
@@ -1028,7 +1056,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/aggregations.md" class="md-nav__link">
+      <a href="../../features/aggregations/" class="md-nav__link">
         
   
   
@@ -1056,7 +1084,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/pandas-backend.md" class="md-nav__link">
+      <a href="../../features/pandas-backend/" class="md-nav__link">
         
   
   
@@ -1084,7 +1112,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/inline-paths.md" class="md-nav__link">
+      <a href="../../features/inline-paths/" class="md-nav__link">
         
   
   
@@ -1227,7 +1255,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/interactive-mode.md" class="md-nav__link">
+      <a href="../../cli/interactive-mode/" class="md-nav__link">
         
   
   
@@ -1255,7 +1283,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/output-formats.md" class="md-nav__link">
+      <a href="../../cli/output-formats/" class="md-nav__link">
         
   
   
@@ -1370,7 +1398,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/query.md" class="md-nav__link">
+      <a href="../../api/query/" class="md-nav__link">
         
   
   
@@ -1398,7 +1426,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/readers.md" class="md-nav__link">
+      <a href="../../api/readers/" class="md-nav__link">
         
   
   
@@ -1426,7 +1454,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/advanced.md" class="md-nav__link">
+      <a href="../../api/advanced/" class="md-nav__link">
         
   
   
@@ -1541,7 +1569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/joins.md" class="md-nav__link">
+      <a href="../../examples/joins/" class="md-nav__link">
         
   
   
@@ -1569,7 +1597,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/aggregations.md" class="md-nav__link">
+      <a href="../../examples/aggregations/" class="md-nav__link">
         
   
   
@@ -1597,7 +1625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/real-world.md" class="md-nav__link">
+      <a href="../../examples/real-world/" class="md-nav__link">
         
   
   
@@ -1684,7 +1712,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/design.md" class="md-nav__link">
+      <a href="../../architecture/design/" class="md-nav__link">
         
   
   
@@ -1712,7 +1740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/volcano-model.md" class="md-nav__link">
+      <a href="../../architecture/volcano-model/" class="md-nav__link">
         
   
   
@@ -1740,7 +1768,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/optimizations.md" class="md-nav__link">
+      <a href="../../architecture/optimizations/" class="md-nav__link">
         
   
   
@@ -1944,10 +1972,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-interactive-mode" class="md-nav__link">
+  <a href="#step-6-interactive-shell" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 6: Interactive Mode
+        Step 6: Interactive Shell
       
     </span>
   </a>
@@ -2211,15 +2239,17 @@
 </tbody>
 </table>
 <hr />
-<h2 id="step-6-interactive-mode">Step 6: Interactive Mode</h2>
-<p>For wide tables, use interactive mode:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span>employees.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM employees&quot;</span><span class="w"> </span>--interactive
+<h2 id="step-6-interactive-shell">Step 6: Interactive Shell</h2>
+<p>For a full interactive experience, use the shell command:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>shell<span class="w"> </span>employees.csv
 </span></code></pre></div>
-<p>This launches a scrollable table viewer with:</p>
+<p>This launches a powerful TUI (Terminal User Interface) with:</p>
 <ul>
-<li>⬅️➡️ Horizontal scrolling (or <code>h</code>/<code>l</code>)</li>
-<li>⬆️⬇️ Vertical scrolling (or <code>k</code>/<code>j</code>)</li>
-<li><code>q</code> or <code>Esc</code> to quit</li>
+<li><strong>Query Editor</strong>: Multi-line editing with syntax highlighting.</li>
+<li><strong>Results Viewer</strong>: Scrollable table with pagination.</li>
+<li><strong>Schema Browser</strong>: Press <code>F2</code> to see available tables and columns.</li>
+<li><strong>Export</strong>: Press <code>Ctrl+X</code> to export results to CSV/JSON/Parquet.</li>
+<li><strong>History</strong>: Use <code>Ctrl+Up</code>/<code>Down</code> to navigate previous queries.</li>
 </ul>
 <hr />
 <h2 id="common-workflows">Common Workflows</h2>
@@ -2268,14 +2298,13 @@
 </span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="s2">    FROM customers c</span>
 </span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="s2">    JOIN orders o ON c.id = o.customer_id</span>
 </span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="s2">    GROUP BY c.name</span>
-</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="s2">    HAVING COUNT(o.order_id) &gt; 5</span>
-</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="s2">    ORDER BY total_orders DESC</span>
-</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
-</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>
-</span><span id="__span-20-17"><a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="c1"># Load</span>
-</span><span id="__span-20-18"><a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-</span><span id="__span-20-19"><a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a>    <span class="c1"># Send to database, API, etc.</span>
-</span><span id="__span-20-20"><a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="s2">    ORDER BY total_orders DESC</span>
+</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>
+</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="c1"># Load</span>
+</span><span id="__span-20-17"><a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+</span><span id="__span-20-18"><a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a>    <span class="c1"># Send to database, API, etc.</span>
+</span><span id="__span-20-19"><a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 </span></code></pre></div>
 <hr />
 <h2 id="whats-next">What's Next?</h2>

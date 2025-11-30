@@ -352,7 +352,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="architecture/design.md" class="md-tabs__link">
+        <a href="architecture/design/" class="md-tabs__link">
           
   
   
@@ -926,7 +926,35 @@
   
   
     <li class="md-nav__item">
-      <a href="features/joins.md" class="md-nav__link">
+      <a href="features/s3-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S3 Support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="features/joins/" class="md-nav__link">
         
   
   
@@ -954,7 +982,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/aggregations.md" class="md-nav__link">
+      <a href="features/aggregations/" class="md-nav__link">
         
   
   
@@ -982,7 +1010,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/pandas-backend.md" class="md-nav__link">
+      <a href="features/pandas-backend/" class="md-nav__link">
         
   
   
@@ -1010,7 +1038,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/inline-paths.md" class="md-nav__link">
+      <a href="features/inline-paths/" class="md-nav__link">
         
   
   
@@ -1153,7 +1181,7 @@
   
   
     <li class="md-nav__item">
-      <a href="cli/interactive-mode.md" class="md-nav__link">
+      <a href="cli/interactive-mode/" class="md-nav__link">
         
   
   
@@ -1181,7 +1209,7 @@
   
   
     <li class="md-nav__item">
-      <a href="cli/output-formats.md" class="md-nav__link">
+      <a href="cli/output-formats/" class="md-nav__link">
         
   
   
@@ -1296,7 +1324,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/query.md" class="md-nav__link">
+      <a href="api/query/" class="md-nav__link">
         
   
   
@@ -1324,7 +1352,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/readers.md" class="md-nav__link">
+      <a href="api/readers/" class="md-nav__link">
         
   
   
@@ -1352,7 +1380,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/advanced.md" class="md-nav__link">
+      <a href="api/advanced/" class="md-nav__link">
         
   
   
@@ -1467,7 +1495,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/joins.md" class="md-nav__link">
+      <a href="examples/joins/" class="md-nav__link">
         
   
   
@@ -1495,7 +1523,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/aggregations.md" class="md-nav__link">
+      <a href="examples/aggregations/" class="md-nav__link">
         
   
   
@@ -1523,7 +1551,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/real-world.md" class="md-nav__link">
+      <a href="examples/real-world/" class="md-nav__link">
         
   
   
@@ -1610,7 +1638,7 @@
   
   
     <li class="md-nav__item">
-      <a href="architecture/design.md" class="md-nav__link">
+      <a href="architecture/design/" class="md-nav__link">
         
   
   
@@ -1638,7 +1666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="architecture/volcano-model.md" class="md-nav__link">
+      <a href="architecture/volcano-model/" class="md-nav__link">
         
   
   
@@ -1666,7 +1694,7 @@
   
   
     <li class="md-nav__item">
-      <a href="architecture/optimizations.md" class="md-nav__link">
+      <a href="architecture/optimizations/" class="md-nav__link">
         
   
   
@@ -1915,8 +1943,11 @@
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Join multiple files</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT c.name, o.total FROM &#39;customers.csv&#39; c JOIN &#39;orders.csv&#39; o ON c.id = o.customer_id&quot;</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Interactive mode for wide tables</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>--interactive
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Interactive shell with full TUI</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>shell
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Query S3 files</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;s3://my-bucket/data.parquet&#39; WHERE date &gt; &#39;2024-01-01&#39;&quot;</span>
 </span></code></pre></div>
 <hr />
 <h2 id="key-features">Key Features</h2>
@@ -1930,7 +1961,7 @@
 <li>
 <p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 9h5.5L13 3.5zM6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4c0-1.11.89-2 2-2m1 18h2v-6H7zm4 0h2v-8h-2zm4 0h2v-4h-2z"/></svg></span> <strong>Multiple Formats</strong></p>
 <hr />
-<p>Support for CSV, Parquet files, and HTTP URLs.</p>
+<p>Support for CSV, Parquet files, HTTP URLs, and S3 buckets.</p>
 </li>
 <li>
 <p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 15H6l7-14v8h5l-7 14z"/></svg></span> <strong>10-100x Faster</strong></p>
@@ -1953,9 +1984,9 @@
 <p>Rich tables, JSON, CSV with syntax highlighting.</p>
 </li>
 <li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 17H3V5h18m0-2H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5v2h8v-2h5a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span> <strong>Interactive Mode</strong></p>
+<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 17H3V5h18m0-2H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5v2h8v-2h5a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span> <strong>Interactive Shell</strong></p>
 <hr />
-<p>Scrollable table viewer for wide data (Phase 7.5).</p>
+<p>Full-featured TUI with modal dialogs, file browser, query plan visualization.</p>
 </li>
 <li>
 <p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h7c-.41-.25-.8-.56-1.14-.9a6.48 6.48 0 0 1-.36-9.18C13.69 9.5 17.33 9.13 20 11V8zm-1 7V3.5L18.5 9zm7.31 9.9c1.33-2.11.69-4.9-1.4-6.22-2.11-1.33-4.91-.68-6.22 1.4-1.34 2.11-.69 4.89 1.4 6.22 1.46.93 3.32.93 4.79.02L22 23.39 23.39 22zm-3.81.1a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5"/></svg></span> <strong>Inline File Paths</strong></p>
@@ -2100,7 +2131,7 @@
 </div>
 <hr />
 <h2 id="project-status">Project Status</h2>
-<p>SQLStream is in <strong>active development</strong>. Current phase: <strong>7.6</strong></p>
+<p>SQLStream is in <strong>active development</strong>. Current phase: <strong>8</strong></p>
 <ul>
 <li>✅ Phase 0-2: Core query engine with Volcano model</li>
 <li>✅ Phase 3: Parquet support</li>
@@ -2109,10 +2140,12 @@
 <li>✅ Phase 5.5: Pandas backend (10-100x speedup)</li>
 <li>✅ Phase 6: HTTP data sources</li>
 <li>✅ Phase 7: CLI with beautiful output</li>
-<li>✅ Phase 7.5: Interactive mode with Textual</li>
+<li>✅ Phase 7.5: Interactive shell with Textual</li>
 <li>✅ Phase 7.6: Inline file path support</li>
-<li>🚧 Phase 8: Type system &amp; schema inference</li>
-<li>🚧 Phase 9: Error handling &amp; user feedback</li>
+<li>✅ Phase 7.7: S3 Support for CSV and Parquet</li>
+<li>✅ Phase 8: Type system &amp; schema inference</li>
+<li>🚧 Phase 9: Enhanced interactive shell (modal dialogs, file browser, query plan)</li>
+<li>🚧 Phase 10: Error handling &amp; user feedback</li>
 </ul>
 <hr />
 <h2 id="license">License</h2>

@@ -12,13 +12,13 @@
         <meta name="author" content="SQLStream Team">
       
       
-        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/api/overview/">
+        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/api/readers/">
       
       
-        <link rel="prev" href="../../cli/output-formats/">
+        <link rel="prev" href="../query/">
       
       
-        <link rel="next" href="../query/">
+        <link rel="next" href="../advanced/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Overview - SQLStream</title>
+        <title>Readers - SQLStream</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#python-api-overview" class="md-skip">
+        <a href="#readers-api" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              Readers
             
           </span>
         </div>
@@ -314,7 +314,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../overview/" class="md-tabs__link">
           
   
   
@@ -1115,37 +1115,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -1161,48 +1134,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic Usage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#api-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        API Reference
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1240,10 +1171,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../readers/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Readers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1259,6 +1217,98 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basereader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BaseReader
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseReader">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_lazy-iteratordictstr-any" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_lazy() -&gt; Iterator[Dict[str, Any]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_schema-optionalschema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_schema() -&gt; Optional[Schema]
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#csvreader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSVReader
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parquetreader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ParquetReader
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#httpreader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTPReader
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1667,10 +1717,49 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
+  <a href="#basereader" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Basic Usage
+        BaseReader
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseReader">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_lazy-iteratordictstr-any" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_lazy() -&gt; Iterator[Dict[str, Any]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_schema-optionalschema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_schema() -&gt; Optional[Schema]
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#csvreader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSVReader
       
     </span>
   </a>
@@ -1678,10 +1767,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api-reference" class="md-nav__link">
+  <a href="#parquetreader" class="md-nav__link">
     <span class="md-ellipsis">
       
-        API Reference
+        ParquetReader
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#httpreader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTPReader
       
     </span>
   </a>
@@ -1708,27 +1808,28 @@
   
 
 
-<h1 id="python-api-overview">Python API Overview</h1>
-<p>Use SQLStream programmatically in your Python code.</p>
-<h2 id="basic-usage">Basic Usage</h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream</span><span class="w"> </span><span class="kn">import</span> <span class="n">query</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Execute query</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data WHERE age &gt; 25&quot;</span><span class="p">)</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Iterate (lazy)</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Or convert to list (eager)</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">results_list</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
-</span></code></pre></div>
-<h2 id="api-reference">API Reference</h2>
+<h1 id="readers-api">Readers API</h1>
+<p>Readers are responsible for abstracting data access from different file formats and storage systems.</p>
+<h2 id="basereader"><code>BaseReader</code></h2>
+<p>The abstract base class for all readers.</p>
+<h3 id="read_lazy-iteratordictstr-any"><code>read_lazy() -&gt; Iterator[Dict[str, Any]]</code></h3>
+<p>Yields rows one by one from the source.</p>
+<h3 id="get_schema-optionalschema"><code>get_schema() -&gt; Optional[Schema]</code></h3>
+<p>Returns the schema of the data source, if available.</p>
+<h2 id="csvreader"><code>CSVReader</code></h2>
+<p>Reads Comma-Separated Values files.</p>
 <ul>
-<li><a href="../query/">Query Class</a></li>
-<li><a href="../readers/">Readers</a></li>
-<li><a href="../advanced/">Advanced Usage</a></li>
+<li><strong>Source</strong>: Local files, URLs, S3.</li>
+<li><strong>Features</strong>: Type inference, header detection.</li>
 </ul>
+<h2 id="parquetreader"><code>ParquetReader</code></h2>
+<p>Reads Apache Parquet files.</p>
+<ul>
+<li><strong>Source</strong>: Local files, URLs, S3.</li>
+<li><strong>Features</strong>: Column pruning (reads only requested columns), predicate pushdown (filters data at the storage level).</li>
+</ul>
+<h2 id="httpreader"><code>HTTPReader</code></h2>
+<p>Reads data from HTTP/HTTPS URLs. Usually wraps another reader (like CSVReader) to handle the content format.</p>
 
 
 

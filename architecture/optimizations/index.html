@@ -12,13 +12,13 @@
         <meta name="author" content="SQLStream Team">
       
       
-        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/api/overview/">
+        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/architecture/optimizations/">
       
       
-        <link rel="prev" href="../../cli/output-formats/">
+        <link rel="prev" href="../volcano-model/">
       
       
-        <link rel="next" href="../query/">
+        <link rel="next" href="../../contributing/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Overview - SQLStream</title>
+        <title>Optimizations - SQLStream</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#python-api-overview" class="md-skip">
+        <a href="#optimizations" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              Optimizations
             
           </span>
         </div>
@@ -308,13 +308,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../api/overview/" class="md-tabs__link">
           
   
   
@@ -350,11 +348,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../architecture/design/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../design/" class="md-tabs__link">
           
   
   
@@ -1058,31 +1058,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1100,7 +1095,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1115,37 +1110,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../api/overview/" class="md-nav__link">
         
   
   
@@ -1161,48 +1129,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic Usage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#api-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        API Reference
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1215,7 +1141,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../query/" class="md-nav__link">
+      <a href="../../api/query/" class="md-nav__link">
         
   
   
@@ -1243,7 +1169,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../readers/" class="md-nav__link">
+      <a href="../../api/readers/" class="md-nav__link">
         
   
   
@@ -1271,7 +1197,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../advanced/" class="md-nav__link">
+      <a href="../../api/advanced/" class="md-nav__link">
         
   
   
@@ -1474,26 +1400,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   
@@ -1511,7 +1442,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1529,7 +1460,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/design/" class="md-nav__link">
+      <a href="../design/" class="md-nav__link">
         
   
   
@@ -1557,7 +1488,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/volcano-model/" class="md-nav__link">
+      <a href="../volcano-model/" class="md-nav__link">
         
   
   
@@ -1582,10 +1513,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../architecture/optimizations/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizations
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1601,6 +1559,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#predicate-pushdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predicate Pushdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#column-pruning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Column Pruning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vectorized-execution-pandas-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vectorized Execution (Pandas Backend)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lazy-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lazy Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1667,10 +1689,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
+  <a href="#predicate-pushdown" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Basic Usage
+        Predicate Pushdown
       
     </span>
   </a>
@@ -1678,10 +1700,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api-reference" class="md-nav__link">
+  <a href="#column-pruning" class="md-nav__link">
     <span class="md-ellipsis">
       
-        API Reference
+        Column Pruning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vectorized-execution-pandas-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vectorized Execution (Pandas Backend)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lazy-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lazy Evaluation
       
     </span>
   </a>
@@ -1708,27 +1752,29 @@
   
 
 
-<h1 id="python-api-overview">Python API Overview</h1>
-<p>Use SQLStream programmatically in your Python code.</p>
-<h2 id="basic-usage">Basic Usage</h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream</span><span class="w"> </span><span class="kn">import</span> <span class="n">query</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Execute query</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data WHERE age &gt; 25&quot;</span><span class="p">)</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Iterate (lazy)</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Or convert to list (eager)</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">results_list</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
-</span></code></pre></div>
-<h2 id="api-reference">API Reference</h2>
+<h1 id="optimizations">Optimizations</h1>
+<p>SQLStream implements several optimizations to ensure efficient query execution.</p>
+<h2 id="predicate-pushdown">Predicate Pushdown</h2>
+<p>Filters (WHERE clauses) are "pushed down" as close to the data source as possible.</p>
 <ul>
-<li><a href="../query/">Query Class</a></li>
-<li><a href="../readers/">Readers</a></li>
-<li><a href="../advanced/">Advanced Usage</a></li>
+<li><strong>CSV</strong>: Rows are filtered immediately after reading, before any other processing.</li>
+<li><strong>Parquet</strong>: Filters are pushed down to the Parquet reader, which can skip entire row groups based on statistics (min/max values), significantly reducing I/O.</li>
 </ul>
+<h2 id="column-pruning">Column Pruning</h2>
+<p>Only the columns required for the query are read from the disk.</p>
+<ul>
+<li><strong>Parquet</strong>: The reader only decodes the requested columns.</li>
+<li><strong>CSV</strong>: While the whole line is read, only relevant fields are parsed and kept.</li>
+</ul>
+<h2 id="vectorized-execution-pandas-backend">Vectorized Execution (Pandas Backend)</h2>
+<p>When using the Pandas backend, SQLStream leverages:
+- <strong>SIMD Instructions</strong>: CPU-level parallelism for array operations.
+- <strong>Efficient Memory Layout</strong>: Columnar storage in memory.
+- <strong>Optimized Algorithms</strong>: C-optimized implementations of joins and aggregations.</p>
+<h2 id="lazy-evaluation">Lazy Evaluation</h2>
+<p>The query result is an iterator. Execution only happens when you consume the results. This allows for:
+- <strong>Early Termination</strong>: <code>LIMIT</code> clauses stop execution as soon as enough rows are found.
+- <strong>Streaming</strong>: You can start processing the first results while the rest of the query is still running.</p>
 
 
 
