@@ -102,6 +102,8 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
+# Only use asyncio backend for anyio tests
+anyio_default_backend = "asyncio"
 
 # MyPy configuration
 [tool.mypy]

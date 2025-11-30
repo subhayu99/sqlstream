@@ -15,7 +15,9 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
-from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree
+from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList
+from textual.geometry import Offset
+from textual.events import Key
 
 try:
     from sqlstream.core.query import query, parse, QueryInline
@@ -25,8 +27,14 @@ except ImportError:
     from sqlstream import query
 
 
+class SQLAutoComplete(OptionList):
+    """A popup widget that shows autocomplete suggestions."""
+    def __init__(self, suggestions: list[str], **kwargs):
+        super().__init__(*suggestions, **kwargs)
+        self.add_class("autocomplete-popup")
+
 class QueryEditor(TextArea):
-    """Multi-line SQL query editor with syntax highlighting."""
+    """Multi-line SQL query editor with syntax highlighting and auto-completion."""
 
     BINDINGS = [
         Binding("ctrl+enter", "execute_query", "Execute", priority=True),
@@ -35,6 +43,99 @@ class QueryEditor(TextArea):
         Binding("ctrl+up", "history_prev", "Prev Query", priority=True),
         Binding("ctrl+down", "history_next", "Next Query", priority=True),
     ]
+
+    # SQL Keywords to suggest
+    KEYWORDS = [
+        "SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "LIMIT",
+        "JOIN", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "AND", "OR",
+        "NOT", "NULL", "IS", "IN", "VALUES", "INSERT", "UPDATE",
+        "DELETE", "CREATE", "TABLE", "DROP", "ALTER", "HAVING", "AS"
+    ]
+
+    autocomplete_popup: SQLAutoComplete | None = None
+
+    def _get_current_word(self) -> str:
+        """Get the word under the cursor."""
+        # Get current line text
+        line = self.document.get_line(self.cursor_location[0])
+        col = self.cursor_location[1]
+        
+        # Find start of word
+        start = col
+        while start > 0 and (line[start-1].isalnum() or line[start-1] == "_"):
+            start -= 1
+            
+        return line[start:col]
+
+    def _show_suggestions(self, word: str):
+        """Show the autocomplete popup if matches found."""
+        matches = [k for k in self.KEYWORDS if k.startswith(word.upper())]
+        
+        # Remove existing popup if it exists
+        if self.autocomplete_popup:
+            self.autocomplete_popup.remove()
+            self.autocomplete_popup = None
+
+        if not matches or not word:
+            return
+
+        # Create and mount the popup
+        self.autocomplete_popup = SQLAutoComplete(matches)
+        self.screen.mount(self.autocomplete_popup)
+
+        # Position the popup near the cursor
+        x, y = self.cursor_screen_offset
+        
+        # FIXED LINE: Use x, y directly as they are already screen coordinates
+        popup_offset = Offset(x, y + 1)
+        
+        self.autocomplete_popup.styles.offset = (popup_offset.x, popup_offset.y)
+        self.autocomplete_popup.styles.width = 20
+        self.autocomplete_popup.styles.height = min(len(matches) + 2, 10)
+
+    def on_text_area_changed(self) -> None:
+        """Called when text changes."""
+        word = self._get_current_word()
+        self._show_suggestions(word)
+
+    def on_key(self, event: Key) -> None:
+        """Handle key presses for selecting suggestions."""
+        if self.autocomplete_popup:
+            if event.key == "down":
+                self.autocomplete_popup.action_cursor_down()
+                event.prevent_default()
+                return
+            elif event.key == "up":
+                self.autocomplete_popup.action_cursor_up()
+                event.prevent_default()
+                return
+            elif event.key in ("enter", "tab"):
+                # Complete the word
+                selected = self.autocomplete_popup.get_option_at_index(self.autocomplete_popup.highlighted).prompt
+                self._insert_completion(str(selected))
+                self._close_popup()
+                event.prevent_default()
+                return
+            elif event.key == "escape":
+                self._close_popup()
+                event.prevent_default()
+                return
+
+    def _insert_completion(self, completion: str):
+        """Replace the current partial word with the completion."""
+        current_word = self._get_current_word()
+        # Delete the partial word
+        self.delete(
+            start=(self.cursor_location[0], self.cursor_location[1] - len(current_word)),
+            end=self.cursor_location
+        )
+        # Insert the full keyword
+        self.insert(completion)
+
+    def _close_popup(self):
+        if self.autocomplete_popup:
+            self.autocomplete_popup.remove()
+            self.autocomplete_popup = None
 
     def action_execute_query(self) -> None:
         """Execute the current query."""
@@ -378,6 +479,14 @@ class SQLShellApp(App):
         border: solid $accent;
         margin-bottom: 1;
     }
+
+    .autocomplete-popup {
+        layer: overlay;
+        background: $panel;
+        border: $accent;
+        display: block;
+        position: absolute; /* Crucial for floating */
+    }
     """
 
     BINDINGS = [
@@ -427,7 +536,7 @@ class SQLShellApp(App):
         self.filter_text = ""
         self.sort_column = None
         self.sort_reverse = False
-        
+
         if initial_file:
             self.loaded_files.append(initial_file)
 
@@ -757,6 +866,7 @@ class SQLShellApp(App):
                 # Use special delimiter to separate queries (supports multiline)
                 if content:
                     self.query_history = content.split("\n===\n")
+                    self.query_history = sorted(set(self.query_history), key=self.query_history.index, reverse=True)
                 else:
                     self.query_history = []
             except Exception:
@@ -787,6 +897,9 @@ class SQLShellApp(App):
                 schemas[file] = {"Error": str(e)}
 
         self.call_from_thread(self.query_one(SchemaBrowser).show_schemas, schemas)
+        
+        if hasattr(self, 'suggester'):
+            self.call_from_thread(self.suggester.update_schema, schemas)
 
     def action_show_help(self) -> None:
         """Show help dialog."""
