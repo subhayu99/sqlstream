@@ -44,10 +44,11 @@ class LimitPushdownOptimizer(Optimizer):
 
         Conditions:
         1. Query has LIMIT clause
-        2. No ORDER BY (would need to read all rows first)
-        3. No GROUP BY (would need to read all rows first)
-        4. No aggregates (would need to read all rows first)
-        5. No JOIN (complex - skip for now)
+        2. Reader supports limit pushdown
+        3. No ORDER BY (would need to read all rows first)
+        4. No GROUP BY (would need to read all rows first)
+        5. No aggregates (would need to read all rows first)
+        6. No JOIN (complex - skip for now)
 
         Args:
             ast: Parsed SQL statement
@@ -58,6 +59,10 @@ class LimitPushdownOptimizer(Optimizer):
         """
         # Must have LIMIT
         if ast.limit is None:
+            return False
+
+        # Reader must support limit pushdown
+        if not reader.supports_limit():
             return False
 
         # Cannot push down with ORDER BY
@@ -82,17 +87,10 @@ class LimitPushdownOptimizer(Optimizer):
         """
         Apply limit pushdown optimization
 
-        Note: This optimization is currently a no-op because BaseReader
-        doesn't have a set_limit() method. This is here as a placeholder
-        for future implementation.
-
         Args:
             ast: Parsed SQL statement
             reader: Data source reader
         """
-        # TODO: Add set_limit() method to BaseReader
-        # For now, this is a placeholder to show the optimization opportunity
-        # reader.set_limit(ast.limit)
-
+        reader.set_limit(ast.limit)
         self.applied = True
-        self.description = f"limit {ast.limit} (not yet implemented in readers)"
+        self.description = f"limit {ast.limit}"

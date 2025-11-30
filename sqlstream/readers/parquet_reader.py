@@ -8,7 +8,7 @@ The magic happens in row group selection using min/max statistics.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Optional
 
 import pyarrow.parquet as pq
 
@@ -71,6 +71,7 @@ class ParquetReader(BaseReader):
         # Optimization state (set by planner)
         self.filter_conditions: List[Condition] = []
         self.required_columns: List[str] = []
+        self.limit: Optional[int] = None
 
         # Statistics tracking
         self.total_row_groups = self.parquet_file.num_row_groups
@@ -84,6 +85,10 @@ class ParquetReader(BaseReader):
         """Parquet reader supports column pruning"""
         return True
 
+    def supports_limit(self) -> bool:
+        """Parquet reader supports limit pushdown"""
+        return True
+
     def set_filter(self, conditions: List[Condition]) -> None:
         """Set filter conditions for pushdown"""
         self.filter_conditions = conditions
@@ -91,6 +96,10 @@ class ParquetReader(BaseReader):
     def set_columns(self, columns: List[str]) -> None:
         """Set required columns for pruning"""
         self.required_columns = columns
+
+    def set_limit(self, limit: int) -> None:
+        """Set maximum rows to read for early termination"""
+        self.limit = limit
 
     def read_lazy(self) -> Iterator[Dict[str, Any]]:
         """
@@ -101,6 +110,7 @@ class ParquetReader(BaseReader):
         2. Read only selected row groups
         3. Read only required columns
         4. Yield rows as dictionaries
+        5. Early termination if limit is reached
         """
         # Step 1: Intelligent row group selection
         selected_row_groups = self._select_row_groups_with_statistics()
@@ -109,9 +119,16 @@ class ParquetReader(BaseReader):
         self.row_groups_scanned = len(selected_row_groups)
 
         # Step 2: Read only selected row groups
+        rows_yielded = 0
         for rg_idx in selected_row_groups:
             # Read this row group (with column selection)
-            yield from self._read_row_group(rg_idx)
+            for row in self._read_row_group(rg_idx):
+                yield row
+                rows_yielded += 1
+
+                # Early termination if limit reached
+                if self.limit is not None and rows_yielded >= self.limit:
+                    return
 
     def _select_row_groups_with_statistics(self) -> List[int]:
         """

@@ -328,3 +328,75 @@ class TestEdgeCases:
         assert reader.filter_conditions == []
         assert reader.required_columns == []
         assert "No optimizations" in planner.get_optimization_summary()
+
+
+class TestLimitPushdown:
+    """Test limit pushdown optimization"""
+
+    def test_limit_pushdown_simple(self, sample_csv):
+        """Test that LIMIT is pushed to reader"""
+        ast = parse("SELECT * FROM data LIMIT 5")
+        reader = CSVReader(str(sample_csv))
+        planner = QueryPlanner()
+
+        # Initially, reader has no limit set
+        assert reader.limit is None
+
+        # Apply optimization
+        planner.optimize(ast, reader)
+
+        # Limit should be pushed to reader
+        assert reader.limit == 5
+
+    def test_limit_pushdown_with_results(self, sample_csv):
+        """Test that limit pushdown produces correct results"""
+        # Query with limit
+        results = query(str(sample_csv)).sql("SELECT * FROM data LIMIT 2").to_list()
+
+        # Should only get 2 rows
+        assert len(results) == 2
+
+    def test_limit_pushdown_optimization_recorded(self, sample_csv):
+        """Test that limit pushdown is recorded"""
+        ast = parse("SELECT * FROM data LIMIT 3")
+        reader = CSVReader(str(sample_csv))
+        planner = QueryPlanner()
+
+        planner.optimize(ast, reader)
+
+        # Should record the optimization
+        assert "Limit pushdown" in planner.get_optimization_summary()
+        assert "limit 3" in planner.get_optimization_summary()
+
+    def test_limit_not_pushed_with_order_by(self, sample_csv):
+        """Test that limit is NOT pushed when ORDER BY exists"""
+        ast = parse("SELECT * FROM data ORDER BY age LIMIT 3")
+        reader = CSVReader(str(sample_csv))
+        planner = QueryPlanner()
+
+        planner.optimize(ast, reader)
+
+        # Limit should NOT be pushed (need all rows to sort)
+        assert reader.limit is None
+        assert "Limit pushdown" not in planner.get_optimization_summary()
+
+    def test_limit_not_pushed_with_group_by(self, sample_csv):
+        """Test that limit is NOT pushed when GROUP BY exists"""
+        ast = parse("SELECT city, COUNT(*) FROM data GROUP BY city LIMIT 2")
+        reader = CSVReader(str(sample_csv))
+        planner = QueryPlanner()
+
+        planner.optimize(ast, reader)
+
+        # Limit should NOT be pushed (need all rows to group)
+        assert reader.limit is None
+
+    def test_limit_with_filter(self, sample_csv):
+        """Test limit pushdown works with filters"""
+        results = query(str(sample_csv)).sql(
+            "SELECT * FROM data WHERE age > 25 LIMIT 2"
+        ).to_list()
+
+        # Should get 2 rows (Charlie and Eve)
+        assert len(results) == 2
+        assert all(row["age"] > 25 for row in results)

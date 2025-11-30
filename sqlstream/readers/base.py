@@ -87,6 +87,31 @@ class BaseReader:
         """
         pass
 
+    def supports_limit(self) -> bool:
+        """
+        Does this reader support early termination with LIMIT?
+
+        If True, the query optimizer can call set_limit() to specify
+        the maximum number of rows to read, allowing early termination.
+
+        Returns:
+            True if limit pushdown is supported
+        """
+        return False
+
+    def set_limit(self, limit: int) -> None:
+        """
+        Set maximum number of rows to read (limit pushdown)
+
+        Args:
+            limit: Maximum number of rows to yield
+
+        Note:
+            Only called if supports_limit() returns True
+            Reader should stop yielding rows after 'limit' rows
+        """
+        pass
+
     def get_schema(self) -> Optional[Schema]:
         """
         Get schema information (column names and types)

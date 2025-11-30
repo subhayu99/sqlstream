@@ -47,6 +47,7 @@ class CSVReader(BaseReader):
         # For optimization (set by query optimizer)
         self.filter_conditions: List[Condition] = []
         self.required_columns: List[str] = []
+        self.limit: Optional[int] = None
 
         if not self.is_s3 and not self.path.exists():
             raise FileNotFoundError(f"CSV file not found: {path}")
@@ -59,6 +60,10 @@ class CSVReader(BaseReader):
         """CSV reader supports column pruning"""
         return True
 
+    def supports_limit(self) -> bool:
+        """CSV reader supports limit pushdown"""
+        return True
+
     def set_filter(self, conditions: List[Condition]) -> None:
         """Set filter conditions for pushdown"""
         self.filter_conditions = conditions
@@ -66,6 +71,10 @@ class CSVReader(BaseReader):
     def set_columns(self, columns: List[str]) -> None:
         """Set required columns for pruning"""
         self.required_columns = columns
+
+    def set_limit(self, limit: int) -> None:
+        """Set maximum rows to read for early termination"""
+        self.limit = limit
 
     def _get_file_handle(self):
         """Get file handle for reading (local or S3)."""
@@ -86,9 +95,11 @@ class CSVReader(BaseReader):
         Yields rows as dictionaries with type inference applied.
         If filters are set, applies them during iteration.
         If columns are set, only yields those columns.
+        If limit is set, stops after yielding that many rows.
         """
         with self._get_file_handle() as f:
             reader = csv.DictReader(f, delimiter=self.delimiter)
+            rows_yielded = 0
 
             for row_num, raw_row in enumerate(reader, start=2):  # Start at 2 (after header)
                 try:
@@ -105,6 +116,11 @@ class CSVReader(BaseReader):
                         row = {k: v for k, v in row.items() if k in self.required_columns}
 
                     yield row
+                    rows_yielded += 1
+
+                    # Early termination if limit reached (limit pushdown)
+                    if self.limit is not None and rows_yielded >= self.limit:
+                        break
 
                 except Exception as e:
                     # Handle malformed rows gracefully
