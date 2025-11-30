@@ -9,13 +9,14 @@ and export data - all from a beautiful terminal interface.
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import json
 
 from textual import work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
-from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList
+from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList, TabbedContent, TabPane, ContentSwitcher
 from textual.geometry import Offset
 from textual.events import Key
 
@@ -42,6 +43,7 @@ class QueryEditor(TextArea):
         Binding("ctrl+l", "clear_editor", "Clear", priority=True),
         Binding("ctrl+up", "history_prev", "Prev Query", priority=True),
         Binding("ctrl+down", "history_next", "Next Query", priority=True),
+        Binding("ctrl+d", "app.quit", "Exit", priority=True),
     ]
 
     # SQL Keywords to suggest
@@ -305,34 +307,13 @@ class SaveFileDialog(ModalScreen[str]):
             self.dismiss(event.value)
 
 
-class OpenFileDialog(ModalScreen[str]):
-    """Modal dialog for opening files."""
+class FileBrowser(DirectoryTree):
+    """Side panel for browsing files."""
 
-    def compose(self) -> ComposeResult:
-        with Container(id="open-dialog"):
-            yield Label("Select File to Query")
-            yield DirectoryTree("./", id="file-tree")
-            with Horizontal(id="dialog-buttons"):
-                yield Button("Open", variant="primary", id="open-btn")
-                yield Button("Cancel", variant="default", id="cancel-btn")
+    def __init__(self, path: str, **kwargs) -> None:
+        super().__init__(path, **kwargs)
+        self.border_title = "Files"
 
-    def on_mount(self) -> None:
-        self.query_one(DirectoryTree).focus()
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "open-btn":
-            tree = self.query_one(DirectoryTree)
-            if tree.cursor_node:
-                path = tree.cursor_node.data.path
-                if path.is_file():
-                    self.dismiss(str(path))
-                else:
-                    self.app.bell()
-        else:
-            self.dismiss(None)
-
-    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
-        self.dismiss(str(event.path))
 
 
 class SQLShellApp(App):
@@ -353,7 +334,7 @@ class SQLShellApp(App):
         height: 100%;
     }
 
-    #schema-container {
+    #sidebar-container {
         width: 25%;
         height: 100%;
         border: solid $primary;
@@ -361,7 +342,7 @@ class SQLShellApp(App):
         display: none;
     }
 
-    #schema-container.visible {
+    #sidebar-container.visible {
         display: block;
     }
 
@@ -469,15 +450,9 @@ class SQLShellApp(App):
         padding: 1;
     }
 
-    #open-dialog {
-        width: 70;
-        height: 25;
-    }
-
-    #file-tree {
+    #file-browser {
         height: 1fr;
-        border: solid $accent;
-        margin-bottom: 1;
+        border: none;
     }
 
     .autocomplete-popup {
@@ -491,16 +466,20 @@ class SQLShellApp(App):
 
     BINDINGS = [
         Binding("f1", "show_help", "Help"),
-        Binding("f2", "toggle_schema", "Schema"),
+        Binding("f2", "toggle_sidebar", "Sidebar"),
         Binding("f3", "toggle_history", "History", show=False),
         Binding("f4", "toggle_explain", "Explain"),
-        Binding("ctrl+o", "open_file", "Open File"),
-        Binding("ctrl+d", "quit", "Exit"),
+        Binding("ctrl+o", "open_file", "Files"),
+        Binding("ctrl+q", "quit", "Exit", priority=True),
+        Binding("ctrl+d", "quit", "Exit", priority=True),
+        Binding("ctrl+s", "save_state", "Save State"),
         Binding("ctrl+x", "export_results", "Export"),
         Binding("ctrl+f", "filter_results", "Filter"),
         # NOTE: The ctrl+p overrides the default palette binding
         # Binding("ctrl+p", "prev_page", "Prev Page", priority=True),
         # Binding("ctrl+n", "next_page", "Next Page", priority=True),
+        Binding("ctrl+t", "new_tab", "New Tab"),
+        Binding("ctrl+w", "close_tab", "Close Tab"),
         Binding("[", "prev_page", "◀ Prev", show=True, priority=True),
         Binding("]", "next_page", "Next ▶", show=True, priority=True),
     ]
@@ -538,6 +517,9 @@ class SQLShellApp(App):
         self.sort_column = None
         self.sort_reverse = False
 
+        self.state_file = str(Path.home() / ".sqlstream_state")
+        self.tab_counter = 0
+
         if initial_file:
             self.loaded_files.append(initial_file)
 
@@ -546,20 +528,21 @@ class SQLShellApp(App):
         yield Header(show_clock=True)
 
         with Horizontal(id="main-container"):
-            # Schema Browser (Hidden by default)
-            with Container(id="schema-container"):
-                yield SchemaBrowser(id="schema-browser")
+            # Sidebar (Hidden by default)
+            with Container(id="sidebar-container"):
+                with TabbedContent(id="sidebar-tabs"):
+                    with TabPane("Schema", id="tab-schema"):
+                        yield SchemaBrowser(id="schema-browser")
+                    with TabPane("Files", id="tab-files"):
+                        yield FileBrowser("./", id="file-browser")
 
             # Main Content
             with Vertical(id="right-panel"):
                 # Query Editor Container
                 with Container(id="query-container"):
-                    yield QueryEditor(
-                        id="query-editor",
-                        language="sql",
-                        theme="dracula",
-                        show_line_numbers=True,
-                    )
+                    with TabbedContent(id="query-tabs"):
+                        # Tabs will be loaded dynamically
+                        pass
 
                 # Results Viewer Container
                 with Container(id="results-container"):
@@ -570,13 +553,13 @@ class SQLShellApp(App):
 
         yield Footer()
 
-    def on_mount(self) -> None:
+    async def on_mount(self) -> None:
         """Initialize the shell on mount."""
         self.title = "SQLStream Interactive Shell"
         self.sub_title = "Press Ctrl+Enter to execute query, Ctrl+D to exit"
 
-        # Load query history
-        self._load_history()
+        # Load state (tabs)
+        await self._load_state()
 
         # Show welcome message
         status_bar = self.query_one(StatusBar)
@@ -584,8 +567,8 @@ class SQLShellApp(App):
             "Welcome to SQLStream! Type your SQL query and press Ctrl+Enter to execute."
         )
 
-        # Focus the query editor
-        self.query_one(QueryEditor).focus()
+        # Focus the active query editor
+        self._get_active_editor().focus()
 
         # Load initial file if provided
         if self.initial_file:
@@ -646,9 +629,18 @@ class SQLShellApp(App):
             self.history_index = -1
             self._set_editor_text("")
 
+    def _get_active_editor(self) -> QueryEditor:
+        """Get the currently active query editor."""
+        tabs = self.query_one("#query-tabs", TabbedContent)
+        if not tabs.active:
+            return self.query_one("#query-editor-1", QueryEditor)
+        
+        active_pane = self.query_one(f"#{tabs.active}", TabPane)
+        return active_pane.query_one(QueryEditor)
+
     def _set_editor_text(self, text: str) -> None:
-        """Set text in query editor."""
-        editor = self.query_one(QueryEditor)
+        """Set text in active query editor."""
+        editor = self._get_active_editor()
         editor.text = text
         if text:
             editor.cursor_location = (len(text.splitlines()) - 1, len(text.splitlines()[-1]))
@@ -851,7 +843,7 @@ class SQLShellApp(App):
 
         try:
             # Pre-populate query editor
-            editor = self.query_one(QueryEditor)
+            editor = self._get_active_editor()
             editor.text = f"SELECT * FROM '{self.initial_file}' LIMIT 10"
 
             self._show_status(f"Loaded {self.initial_file}. Press Ctrl+Enter to execute.")
@@ -903,15 +895,15 @@ class SQLShellApp(App):
         """Show help dialog."""
         self._show_status("Tab=Switch| Ctrl+E=Execute | Ctrl+L=Clear | F2=Schema | Ctrl+X=Export | [=Prev Page | ]=Next Page | Click headers to sort")
 
-    def action_toggle_schema(self) -> None:
-        """Toggle schema browser panel."""
-        container = self.query_one("#schema-container")
+    def action_toggle_sidebar(self) -> None:
+        """Toggle sidebar panel."""
+        container = self.query_one("#sidebar-container")
         if container.has_class("visible"):
             container.remove_class("visible")
-            self._show_status("Schema browser hidden")
+            self._show_status("Sidebar hidden")
         else:
             container.add_class("visible")
-            self._show_status("Schema browser visible")
+            self._show_status("Sidebar visible")
 
     def action_toggle_history(self) -> None:
         """Toggle query history panel."""
@@ -1136,17 +1128,26 @@ class SQLShellApp(App):
         except Exception as e:
             self._show_status(f"Export failed: {e}", error=True)
 
-    @work
-    async def action_open_file(self) -> None:
-        """Show file browser dialog to select file for query."""
-        # Show open file dialog
-        file_path = await self.push_screen_wait(OpenFileDialog())
+    def action_open_file(self) -> None:
+        """Switch to file browser tab and show sidebar."""
+        # Show sidebar if hidden
+        container = self.query_one("#sidebar-container")
+        if not container.has_class("visible"):
+            container.add_class("visible")
+        
+        # Switch to Files tab
+        self.query_one("#sidebar-tabs", TabbedContent).active = "tab-files"
+        
+        # Focus file browser
+        self.query_one("#file-browser", FileBrowser).focus()
+        self._show_status("Select a file from the sidebar")
 
-        if file_path is None:
-            return  # Cancelled
-
-        # Get current query text
-        editor = self.query_one(QueryEditor)
+    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
+        """Handle file selection from sidebar."""
+        file_path = str(event.path)
+        
+        # Get active editor
+        editor = self._get_active_editor()
         current_text = editor.text.strip()
 
         # Build query text with selected file
@@ -1162,7 +1163,6 @@ class SQLShellApp(App):
 
             new_text = f"SELECT * FROM '{file_path}'"
             self._show_status("Last query stored in history")
-            return
         else:
             # Append FROM clause
             new_text = f"{current_text}\nFROM '{file_path}'"
@@ -1172,9 +1172,139 @@ class SQLShellApp(App):
         # Move cursor to end
         lines = new_text.splitlines()
         editor.cursor_location = (len(lines) - 1, len(lines[-1]))
+        
+        # Focus editor
+        editor.focus()
 
         self._show_status(f"Added file to query: {file_path}")
 
+
+    async def action_new_tab(self, content: str = "", title: str = None) -> None:
+        """Create a new query tab."""
+        self.tab_counter += 1
+        if not title:
+            title = f"Query {self.tab_counter}"
+        
+        tab_id = f"tab-query-{self.tab_counter}"
+        editor_id = f"query-editor-{self.tab_counter}"
+        
+        pane = TabPane(title, id=tab_id)
+        editor = QueryEditor(
+            id=editor_id,
+            language="sql",
+            theme="dracula",
+            show_line_numbers=True,
+            text=content
+        )
+        
+        tabs = self.query_one("#query-tabs", TabbedContent)
+        await tabs.add_pane(pane)
+        await pane.mount(editor)
+        tabs.active = tab_id
+        editor.focus()
+
+    async def action_close_tab(self) -> None:
+        """Close the current query tab."""
+        tabs = self.query_one("#query-tabs", TabbedContent)
+        active_tab = tabs.active
+        if not active_tab:
+            return
+            
+        await tabs.remove_pane(active_tab)
+        
+        # If no tabs left, create a new one
+        if not tabs.query(TabPane):
+             await self.action_new_tab()
+
+    def action_quit(self) -> None:
+        """Save state and exit."""
+        self._save_state()
+        self.exit()
+
+    def action_save_state(self) -> None:
+        """Manual save state action."""
+        self._save_state()
+        self._show_status("State saved!")
+
+    def _save_state(self) -> None:
+        """Save editor state to file."""
+        try:
+            print("DEBUG: Starting save state...")
+            tabs = self.query_one("#query-tabs", TabbedContent)
+            print(f"DEBUG: Tabs widget: {tabs}")
+            
+            state = []
+            
+            # Strategy 1: ContentSwitcher children
+            try:
+                switcher = tabs.query_one(ContentSwitcher)
+                print(f"DEBUG: ContentSwitcher found: {switcher}")
+                print(f"DEBUG: Switcher children: {len(switcher.children)}")
+                
+                for child in switcher.children:
+                    print(f"DEBUG: Child type: {type(child)}")
+                    if isinstance(child, TabPane):
+                        print(f"DEBUG: Processing TabPane: {child._title}")
+                        # Try to find editor
+                        editors = list(child.query(QueryEditor))
+                        print(f"DEBUG: Editors found in pane: {len(editors)}")
+                        
+                        if editors:
+                            editor = editors[0]
+                            print(f"DEBUG: Editor content length: {len(editor.text)}")
+                            state.append({
+                                "title": str(child._title),
+                                "content": editor.text
+                            })
+            except Exception as e:
+                print(f"DEBUG: Strategy 1 failed: {e}")
+
+            # Strategy 2: Direct query if Strategy 1 found nothing
+            if not state:
+                print("DEBUG: Strategy 1 yielded no state, trying Strategy 2 (recursive query)...")
+                for pane in tabs.query(TabPane):
+                    print(f"DEBUG: Found TabPane via query: {pane._title}")
+                    editors = list(pane.query(QueryEditor))
+                    if editors:
+                        state.append({
+                            "title": str(pane._title),
+                            "content": editors[0].text
+                        })
+
+            # Write to file
+            path = Path(self.state_file)
+            path.write_text(json.dumps(state))
+            print(f"Saved {len(state)} tabs to {path}")
+            self.notify(f"Saved {len(state)} tabs")
+            
+        except Exception as e:
+            self.notify(f"Failed to save state: {e}", severity="error")
+            print(f"Failed to save state: {e}")
+
+    async def _load_state(self) -> None:
+        """Load editor state from file."""
+        # Load history first
+        self._load_history()
+        
+        state_path = Path(self.state_file)
+        loaded = False
+        
+        if state_path.exists():
+            try:
+                state = json.loads(state_path.read_text())
+                if state and isinstance(state, list):
+                    for tab_data in state:
+                        await self.action_new_tab(
+                            content=tab_data.get("content", ""),
+                            title=tab_data.get("title")
+                        )
+                    loaded = True
+            except Exception as e:
+                self.notify(f"Failed to load state: {e}", severity="error")
+        
+        if not loaded:
+            # Create default tab
+            await self.action_new_tab()
 
 def launch_shell(initial_file: Optional[str] = None, history_file: Optional[str] = None) -> None:
     """

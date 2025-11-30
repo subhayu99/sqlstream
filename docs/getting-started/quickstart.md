@@ -202,11 +202,13 @@ $ sqlstream shell employees.csv
 
 This launches a powerful TUI (Terminal User Interface) with:
 
-- **Query Editor**: Multi-line editing with syntax highlighting.
+- **Query Editor**: Multi-line editing with syntax highlighting and **multiple tabs** (`Ctrl+T` to add, `Ctrl+W` to close).
 - **Results Viewer**: Scrollable table with pagination.
-- **Schema Browser**: Press `F2` to see available tables and columns.
+- **Sidebar**: Toggle between **Schema** and **Files** browser (`F2` to toggle, `Ctrl+O` to open files).
+- **Save Progress**: Save your work with `Ctrl+S`.
 - **Export**: Press `Ctrl+X` to export results to CSV/JSON/Parquet.
 - **History**: Use `Ctrl+Up`/`Down` to navigate previous queries.
+- **State Persistence**: Your open tabs and queries are saved automatically on exit.
 
 ---
 
