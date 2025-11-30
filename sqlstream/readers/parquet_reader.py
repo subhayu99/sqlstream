@@ -14,6 +14,7 @@ import pyarrow.parquet as pq
 
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
+from sqlstream.core.types import Schema, DataType
 
 
 class ParquetReader(BaseReader):
@@ -58,7 +59,7 @@ class ParquetReader(BaseReader):
                 # s3fs expects path without protocol when filesystem is provided
                 path_to_open = path.replace("s3://", "")
             except ImportError:
-                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]")
+                raise ImportError("s3fs is required for S3 support. Install `sqlstream[s3]`")
         else:
             self.path = Path(path)
             path_to_open = str(self.path)
@@ -378,15 +379,15 @@ class ParquetReader(BaseReader):
         Returns:
             Dictionary mapping column names to types
         """
-        schema = {}
+        schema: Dict[str, DataType] = {}
         arrow_schema = self.parquet_file.schema_arrow
 
         for i in range(len(arrow_schema)):
             field = arrow_schema.field(i)
             # Map Arrow types to simple type names
-            schema[field.name] = self._arrow_type_to_string(field.type)
+            schema[field.name] = self._arrow_type_to_dtype(field.type)
 
-        return schema
+        return Schema(schema)
 
     def _arrow_type_to_string(self, arrow_type) -> str:
         """
@@ -402,7 +403,7 @@ class ParquetReader(BaseReader):
 
         if "int" in type_str.lower():
             return "int"
-        elif "float" in type_str.lower() or "double" in type_str.lower():
+        elif "float" in type_str.lower() or "double" in type_str.lower() or "decimal" in type_str.lower():
             return "float"
         elif "string" in type_str.lower() or "utf8" in type_str.lower():
             return "string"
@@ -414,6 +415,30 @@ class ParquetReader(BaseReader):
             return "datetime"
         else:
             return type_str
+
+    def _arrow_type_to_dtype(self, arrow_type) -> DataType:
+        """
+        Convert PyArrow type to SQLStream data type
+
+        Args:
+            arrow_type: PyArrow data type
+
+        Returns:
+            SQLStream data type
+        """
+        simple_type = self._arrow_type_to_string(arrow_type)
+        if simple_type == "int":
+            return DataType.INTEGER
+        elif simple_type == "float":
+            return DataType.FLOAT
+        elif simple_type == "string":
+            return DataType.STRING
+        elif simple_type == "bool":
+            return DataType.BOOLEAN
+        elif simple_type in ["date", "datetime"]:
+            return DataType.DATE
+        else:
+            return DataType.NULL
 
     def get_statistics(self) -> Dict[str, Any]:
         """

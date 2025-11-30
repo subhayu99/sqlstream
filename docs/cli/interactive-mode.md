@@ -72,8 +72,8 @@ sqlstream shell --history-file ~/.my_sqlstream_history
 | `Ctrl+O` | Open File | Browse files to add to query |
 | `Ctrl+X` | Export | Export with custom filename |
 | `Ctrl+F` | Filter | Filter current results |
-| `Ctrl+P` / `[` | Previous Page | Navigate to previous page |
-| `Ctrl+N` / `]` | Next Page | Navigate to next page |
+| `[` | Previous Page | Navigate to previous page |
+| `]` | Next Page | Navigate to next page |
 | `Ctrl+Up` | Prev Query | Load previous from history |
 | `Ctrl+Down` | Next Query | Load next from history |
 | **Click Header** | Sort Column | Sort by column (click again to reverse) |

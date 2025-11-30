@@ -40,7 +40,7 @@ class PandasExecutor:
         if not PANDAS_AVAILABLE:
             raise ImportError(
                 "Pandas backend requires pandas library. "
-                "Install with: pip install pandas"
+                "Install `sqlstream[pandas]`"
             )
 
     def execute(

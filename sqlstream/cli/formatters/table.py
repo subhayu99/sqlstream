@@ -36,7 +36,7 @@ class TableFormatter(BaseFormatter):
         if not RICH_AVAILABLE:
             raise ImportError(
                 "Table formatter requires rich library. "
-                "Install with: pip install sqlstream[cli]"
+                "Install `sqlstream[cli]`"
             )
 
         if not results:

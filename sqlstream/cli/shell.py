@@ -498,10 +498,11 @@ class SQLShellApp(App):
         Binding("ctrl+d", "quit", "Exit"),
         Binding("ctrl+x", "export_results", "Export"),
         Binding("ctrl+f", "filter_results", "Filter"),
-        Binding("ctrl+p", "prev_page", "Prev Page", priority=True),
-        Binding("ctrl+n", "next_page", "Next Page", priority=True),
-        Binding("[", "prev_page", "◀ Prev", show=False, priority=True),
-        Binding("]", "next_page", "Next ▶", show=False, priority=True),
+        # NOTE: The ctrl+p overrides the default palette binding
+        # Binding("ctrl+p", "prev_page", "Prev Page", priority=True),
+        # Binding("ctrl+n", "next_page", "Next Page", priority=True),
+        Binding("[", "prev_page", "◀ Prev", show=True, priority=True),
+        Binding("]", "next_page", "Next ▶", show=True, priority=True),
     ]
 
     def __init__(
@@ -556,7 +557,7 @@ class SQLShellApp(App):
                     yield QueryEditor(
                         id="query-editor",
                         language="sql",
-                        theme="monokai",
+                        theme="dracula",
                         show_line_numbers=True,
                     )
 
@@ -897,13 +898,10 @@ class SQLShellApp(App):
                 schemas[file] = {"Error": str(e)}
 
         self.call_from_thread(self.query_one(SchemaBrowser).show_schemas, schemas)
-        
-        if hasattr(self, 'suggester'):
-            self.call_from_thread(self.suggester.update_schema, schemas)
 
     def action_show_help(self) -> None:
         """Show help dialog."""
-        self._show_status("Ctrl+Enter=Execute | Ctrl+L=Clear | F2=Schema | Ctrl+X=Export | Ctrl+P/N=Page | Click headers to sort")
+        self._show_status("Tab=Switch| Ctrl+E=Execute | Ctrl+L=Clear | F2=Schema | Ctrl+X=Export | [=Prev Page | ]=Next Page | Click headers to sort")
 
     def action_toggle_schema(self) -> None:
         """Toggle schema browser panel."""
@@ -953,7 +951,7 @@ class SQLShellApp(App):
                 plan_lines.append(f"{step}. JOIN")
                 plan_lines.append(f"   Type: {parsed.join.join_type.upper()}")
                 plan_lines.append(f"   Right Source: {parsed.join.right_source}")
-                plan_lines.append(f"   Condition: {parsed.join.left_key} = {parsed.join.right_key}")
+                plan_lines.append(f"   Condition: {parsed.join.on_left} = {parsed.join.on_right}")
                 step += 1
 
             # WHERE clause
@@ -990,8 +988,8 @@ class SQLShellApp(App):
             # Projection
             plan_lines.append("")
             plan_lines.append(f"{step}. PROJECTION")
-            if parsed.select_columns:
-                plan_lines.append(f"   Columns: {', '.join(parsed.select_columns)}")
+            if parsed.columns:
+                plan_lines.append(f"   Columns: {', '.join(parsed.columns)}")
             else:
                 plan_lines.append("   Columns: * (all)")
 
@@ -1156,8 +1154,14 @@ class SQLShellApp(App):
             # Empty editor - create simple SELECT query
             new_text = f"SELECT * FROM '{file_path}'"
         elif "FROM" in current_text.upper():
-            # Already has FROM clause - just show message
-            self._show_status(f"Selected: {file_path} (manually add to query)")
+            # Already has FROM clause - add the current text to history and replace with simple select statement
+            # Add to history if new
+            if not self.query_history or self.query_history[-1] != current_text:
+                self.query_history.append(current_text)
+                self._save_history()
+
+            new_text = f"SELECT * FROM '{file_path}'"
+            self._show_status("Last query stored in history")
             return
         else:
             # Append FROM clause

@@ -174,7 +174,7 @@ def launch_interactive(results: List[Dict[str, Any]]) -> None:
     if not TEXTUAL_AVAILABLE:
         raise ImportError(
             "Interactive mode requires textual library. "
-            "Install with: pip install sqlstream[cli]"
+            "Install `sqlstream[cli]`"
         )
 
     app = TableApp(results)

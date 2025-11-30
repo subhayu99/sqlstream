@@ -14,7 +14,7 @@ SQLStream supports six core data types:
 | `FLOAT` | `float` | `3.14`, `-2.5`, `0.0` |
 | `STRING` | `str` | `"hello"`, `"Alice"` |
 | `BOOLEAN` | `bool` | `true`, `false` |
-| `DATE` | `date`, `datetime` | `2024-01-15` |
+| `DATE` | `date`, `datetime` | `2024-01-15`, `2023-12-31T12:34:56.789` |
 | `NULL` | `None` | Empty values |
 
 ---

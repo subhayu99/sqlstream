@@ -69,7 +69,7 @@ class HTTPReader(BaseReader):
         if not HTTPX_AVAILABLE:
             raise ImportError(
                 "HTTP reader requires httpx library. "
-                "Install with: pip install sqlstream[http]"
+                "Install `sqlstream[http]`"
             )
 
         self.url = url
@@ -142,7 +142,7 @@ class HTTPReader(BaseReader):
             if not PARQUET_AVAILABLE:
                 raise ImportError(
                     "Parquet files require pyarrow. "
-                    "Install with: pip install sqlstream[parquet]"
+                    "Install `sqlstream[parquet]`"
                 )
             return ParquetReader(str(self.local_path))
         elif path_lower.endswith(".csv"):

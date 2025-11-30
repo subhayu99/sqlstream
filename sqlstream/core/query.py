@@ -179,7 +179,7 @@ class QueryResult:
             if not PANDAS_AVAILABLE:
                 raise ImportError(
                     "Pandas backend requested but pandas is not installed. "
-                    "Install with: pip install pandas"
+                    "Install `sqlstream[pandas]`"
                 )
             self.executor = PandasExecutor()
             self.use_pandas = True
