@@ -13,8 +13,11 @@ $ sqlstream query "SELECT * FROM 'data.csv' WHERE age > 25"
 # Join multiple files
 $ sqlstream query "SELECT c.name, o.total FROM 'customers.csv' c JOIN 'orders.csv' o ON c.id = o.customer_id"
 
-# Interactive mode for wide tables
-$ sqlstream query data.csv "SELECT * FROM data" --interactive
+# Interactive shell with full TUI
+$ sqlstream shell
+
+# Query S3 files
+$ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '2024-01-01'"
 ```
 
 ---
@@ -33,7 +36,7 @@ $ sqlstream query data.csv "SELECT * FROM data" --interactive
 
     ---
 
-    Support for CSV, Parquet files, and HTTP URLs.
+    Support for CSV, Parquet files, HTTP URLs, and S3 buckets.
 
 -   :material-lightning-bolt:{ .lg .middle } __10-100x Faster__
 
@@ -59,11 +62,11 @@ $ sqlstream query data.csv "SELECT * FROM data" --interactive
 
     Rich tables, JSON, CSV with syntax highlighting.
 
--   :material-television:{ .lg .middle } __Interactive Mode__
+-   :material-television:{ .lg .middle } __Interactive Shell__
 
     ---
 
-    Scrollable table viewer for wide data (Phase 7.5).
+    Full-featured TUI with modal dialogs, file browser, query plan visualization.
 
 -   :material-file-search:{ .lg .middle } __Inline File Paths__
 
@@ -212,7 +215,7 @@ SQLStream offers two execution backends:
 
 ## Project Status
 
-SQLStream is in **active development**. Current phase: **7.6**
+SQLStream is in **active development**. Current phase: **8**
 
 - ✅ Phase 0-2: Core query engine with Volcano model
 - ✅ Phase 3: Parquet support
@@ -221,10 +224,12 @@ SQLStream is in **active development**. Current phase: **7.6**
 - ✅ Phase 5.5: Pandas backend (10-100x speedup)
 - ✅ Phase 6: HTTP data sources
 - ✅ Phase 7: CLI with beautiful output
-- ✅ Phase 7.5: Interactive mode with Textual
+- ✅ Phase 7.5: Interactive shell with Textual
 - ✅ Phase 7.6: Inline file path support
-- 🚧 Phase 8: Type system & schema inference
-- 🚧 Phase 9: Error handling & user feedback
+- ✅ Phase 7.7: S3 Support for CSV and Parquet
+- ✅ Phase 8: Type system & schema inference
+- 🚧 Phase 9: Enhanced interactive shell (modal dialogs, file browser, query plan)
+- 🚧 Phase 10: Error handling & user feedback
 
 ---
 

@@ -36,7 +36,7 @@ $ sqlstream shell data.csv
 - 🔢 **Type System** - Automatic schema inference with type checking
 - ☁️ **S3 Support** - Query files directly from Amazon S3
 - 🎨 **Beautiful Output** - Rich tables, JSON, CSV formatting
-- 🖥️ **Interactive Shell** - Full-featured TUI with history, pagination, sorting, export
+- 🖥️ **Interactive Shell** - Full-featured TUI with modal dialogs, file browser, query plan visualization, multi-format export
 - 🔍 **Smart Optimizations** - Column pruning, predicate pushdown, lazy evaluation
 - 📦 **Lightweight** - Minimal dependencies, works everywhere
 
@@ -68,9 +68,27 @@ $ sqlstream query data.csv "SELECT * FROM data" --backend pandas
 # JSON output
 $ sqlstream query data.csv "SELECT * FROM data" --format json
 
-# Interactive mode
-$ sqlstream query data.csv "SELECT * FROM data" --interactive
+# Interactive shell with TUI
+$ sqlstream shell data.csv
 ```
+
+### Interactive Shell
+
+```bash
+$ sqlstream shell
+```
+
+Features:
+- **Modal Dialogs**: Professional UI for filtering, export, file selection
+- **File Browser** (`Ctrl+O`): Browse and select files to query
+- **Query History** (`Ctrl+Up/Down`): Navigate through previous queries (multiline supported)
+- **Execution Plan** (`F4`): View detailed query execution steps
+- **Smart Export** (`Ctrl+X`): Save results as CSV, JSON, or Parquet with custom filenames
+- **Live Filtering** (`Ctrl+F`): Search across all columns
+- **Schema Browser** (`F2`): View file schemas with column types
+- **Pagination**: Handle large result sets (100 rows per page)
+- **Column Sorting**: Click headers to sort ascending/descending
+- **Syntax Highlighting**: Monokai theme for SQL queries
 
 ### Python API
 

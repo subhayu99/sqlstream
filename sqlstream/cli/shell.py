@@ -753,7 +753,12 @@ class SQLShellApp(App):
         history_path = Path(self.history_file)
         if history_path.exists():
             try:
-                self.query_history = history_path.read_text().splitlines()
+                content = history_path.read_text()
+                # Use special delimiter to separate queries (supports multiline)
+                if content:
+                    self.query_history = content.split("\n===\n")
+                else:
+                    self.query_history = []
             except Exception:
                 pass  # Silently ignore history loading errors
 
@@ -764,7 +769,8 @@ class SQLShellApp(App):
             history_path.parent.mkdir(parents=True, exist_ok=True)
             # Keep last 100 queries
             history_to_save = self.query_history[-100:]
-            history_path.write_text("\n".join(history_to_save))
+            # Use special delimiter to separate queries (preserves multiline)
+            history_path.write_text("\n===\n".join(history_to_save))
         except Exception:
             pass  # Silently ignore history saving errors
 
