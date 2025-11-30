@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#optimizations" class="md-skip">
+        <a href="#query-optimizations" class="md-skip">
           Skip to content
         </a>
       
@@ -1576,10 +1576,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#predicate-pushdown" class="md-nav__link">
+  <a href="#optimizer-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Predicate Pushdown
+        Optimizer Architecture
       
     </span>
   </a>
@@ -1587,10 +1587,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#column-pruning" class="md-nav__link">
+  <a href="#1-predicate-pushdown" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Column Pruning
+        1. Predicate Pushdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-column-pruning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Column Pruning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-limit-pushdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Limit Pushdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-projection-pushdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Projection Pushdown
       
     </span>
   </a>
@@ -1613,6 +1646,50 @@
     <span class="md-ellipsis">
       
         Lazy Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimization Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-optimizers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Optimizers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Tips
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-optimizations-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Optimizations (Roadmap)
       
     </span>
   </a>
@@ -1689,10 +1766,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#predicate-pushdown" class="md-nav__link">
+  <a href="#optimizer-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Predicate Pushdown
+        Optimizer Architecture
       
     </span>
   </a>
@@ -1700,10 +1777,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#column-pruning" class="md-nav__link">
+  <a href="#1-predicate-pushdown" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Column Pruning
+        1. Predicate Pushdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-column-pruning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Column Pruning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-limit-pushdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Limit Pushdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-projection-pushdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Projection Pushdown
       
     </span>
   </a>
@@ -1732,6 +1842,50 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optimization-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimization Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-optimizers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Optimizers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Tips
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-optimizations-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Optimizations (Roadmap)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1752,29 +1906,214 @@
   
 
 
-<h1 id="optimizations">Optimizations</h1>
-<p>SQLStream implements several optimizations to ensure efficient query execution.</p>
-<h2 id="predicate-pushdown">Predicate Pushdown</h2>
-<p>Filters (WHERE clauses) are "pushed down" as close to the data source as possible.</p>
+<h1 id="query-optimizations">Query Optimizations</h1>
+<p>SQLStream implements a pipeline-based optimization framework to ensure efficient query execution.</p>
+<hr />
+<h2 id="optimizer-architecture">Optimizer Architecture</h2>
+<p>The optimizer module uses a <strong>modular pipeline design</strong> where each optimization rule is a separate class:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QueryPlanner</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">planner</span> <span class="o">=</span> <span class="n">QueryPlanner</span><span class="p">()</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">planner</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">ast</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="n">planner</span><span class="o">.</span><span class="n">get_optimization_summary</span><span class="p">())</span>
+</span></code></pre></div>
+<p><strong>Pipeline Order:</strong>
+1. Predicate Pushdown (reduce data read)
+2. Column Pruning (narrow columns)
+3. Limit Pushdown (early termination)
+4. Projection Pushdown (transform at source - future)</p>
+<hr />
+<h2 id="1-predicate-pushdown">1. Predicate Pushdown</h2>
+<p>Filters (WHERE clauses) are "pushed down" to the data source for early filtering.</p>
+<p><strong>Benefits:</strong>
+- Reduces I/O by filtering at the source
+- Reduces memory usage
+- Especially effective for columnar formats (Parquet)
+- Can leverage indexes if available</p>
+<p><strong>Example:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="p">.</span><span class="n">csv</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">30</span>
+</span></code></pre></div></p>
+<p><strong>Without pushdown:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Read all rows → Filter in memory → Return results
+</span></code></pre></div></p>
+<p><strong>With pushdown:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Filter while reading → Return only matching rows
+</span></code></pre></div></p>
+<p><strong>Implementation by Reader:</strong></p>
 <ul>
-<li><strong>CSV</strong>: Rows are filtered immediately after reading, before any other processing.</li>
-<li><strong>Parquet</strong>: Filters are pushed down to the Parquet reader, which can skip entire row groups based on statistics (min/max values), significantly reducing I/O.</li>
+<li><strong>CSV</strong>: Rows are filtered immediately after reading, before processing</li>
+<li><strong>Parquet</strong>: Filters can skip entire row groups based on statistics (min/max values), significantly reducing I/O</li>
+<li><strong>HTTP</strong>: Filters applied after download but before buffering</li>
 </ul>
-<h2 id="column-pruning">Column Pruning</h2>
-<p>Only the columns required for the query are read from the disk.</p>
+<p><strong>Limitations:</strong>
+- Currently only supports simple comparisons (column op value)
+- Does not support complex expressions (e.g., <code>LENGTH(name) &gt; 5</code>)
+- Does not support cross-column comparisons (e.g., <code>age &gt; salary</code>)
+- Disabled for JOIN queries (needs smarter per-table analysis)</p>
+<hr />
+<h2 id="2-column-pruning">2. Column Pruning</h2>
+<p>Only columns required for the query are read from disk.</p>
+<p><strong>Benefits:</strong>
+- Massive I/O reduction for wide tables
+- Reduces memory usage
+- Critical for columnar formats (Parquet, ORC)
+- Can read 10x faster if selecting 1 column from 10</p>
+<p><strong>Example:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w">  </span><span class="c1">-- 100 columns total</span>
+</span></code></pre></div></p>
+<p><strong>Without pruning:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Read all 100 columns → Project to 2 columns
+</span></code></pre></div></p>
+<p><strong>With pruning:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Read only 2 columns → Much faster
+</span></code></pre></div></p>
+<p><strong>Implementation by Reader:</strong></p>
 <ul>
-<li><strong>Parquet</strong>: The reader only decodes the requested columns.</li>
-<li><strong>CSV</strong>: While the whole line is read, only relevant fields are parsed and kept.</li>
+<li><strong>Parquet</strong>: Only decodes requested columns from file</li>
+<li><strong>CSV</strong>: Whole line is read, but only relevant fields are parsed and kept</li>
+<li><strong>HTTP</strong>: Entire response read, but only needed columns extracted</li>
 </ul>
+<p><strong>Column Analysis:</strong></p>
+<p>The optimizer analyzes which columns are needed from:
+- SELECT clause
+- WHERE clause
+- GROUP BY clause
+- ORDER BY clause
+- Aggregate functions
+- JOIN conditions</p>
+<p><strong>Limitations:</strong>
+- Cannot prune with <code>SELECT *</code>
+- CSV still reads full lines (just parses fewer fields)</p>
+<hr />
+<h2 id="3-limit-pushdown">3. Limit Pushdown</h2>
+<p>LIMIT clauses enable early termination of data reading.</p>
+<p><strong>Benefits:</strong>
+- Stop reading after N rows
+- Massive speedup for large files
+- Reduces memory usage</p>
+<p><strong>Example:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">large_file</span><span class="p">.</span><span class="n">csv</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span>
+</span></code></pre></div></p>
+<p><strong>Without pushdown:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Read entire file → Take first 10 rows
+</span></code></pre></div></p>
+<p><strong>With pushdown:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Stop reading after 10 rows → Much faster
+</span></code></pre></div></p>
+<p><strong>Limitations (Current Implementation):</strong>
+- Not yet implemented in readers (placeholder for future work)
+- Cannot push down with ORDER BY (need all rows to sort)
+- Cannot push down with GROUP BY (need all rows to group)
+- Cannot push down with aggregates (need all rows)
+- Cannot push down with JOINs (complex - may need all rows)</p>
+<p><strong>Status:</strong> ⚠️ Optimizer detects opportunities but readers don't implement yet</p>
+<hr />
+<h2 id="4-projection-pushdown">4. Projection Pushdown</h2>
+<p>Push computed expressions to the data source for evaluation.</p>
+<p><strong>Benefits (when implemented):</strong>
+- Evaluate expressions at read time
+- Reduce data movement
+- Leverage native database/engine functions</p>
+<p><strong>Example (future):</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">UPPER</span><span class="p">(</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span>
+</span></code></pre></div></p>
+<p><strong>With pushdown:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Reader evaluates UPPER() and age*2 → Return transformed data
+</span></code></pre></div></p>
+<p><strong>Status:</strong> ⚠️ Not yet implemented - placeholder for future work</p>
+<hr />
 <h2 id="vectorized-execution-pandas-backend">Vectorized Execution (Pandas Backend)</h2>
-<p>When using the Pandas backend, SQLStream leverages:
-- <strong>SIMD Instructions</strong>: CPU-level parallelism for array operations.
-- <strong>Efficient Memory Layout</strong>: Columnar storage in memory.
-- <strong>Optimized Algorithms</strong>: C-optimized implementations of joins and aggregations.</p>
+<p>When using the Pandas backend (<code>backend="pandas"</code>), SQLStream leverages:</p>
+<ul>
+<li><strong>SIMD Instructions</strong>: CPU-level parallelism for array operations</li>
+<li><strong>Efficient Memory Layout</strong>: Columnar storage in memory</li>
+<li><strong>Optimized Algorithms</strong>: C-optimized implementations of joins and aggregations</li>
+<li><strong>NumPy</strong>: Highly optimized numerical operations</li>
+</ul>
+<p><strong>When to use:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># For large datasets or complex aggregations</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">)</span>
+</span></code></pre></div></p>
+<hr />
 <h2 id="lazy-evaluation">Lazy Evaluation</h2>
-<p>The query result is an iterator. Execution only happens when you consume the results. This allows for:
-- <strong>Early Termination</strong>: <code>LIMIT</code> clauses stop execution as soon as enough rows are found.
-- <strong>Streaming</strong>: You can start processing the first results while the rest of the query is still running.</p>
+<p>Query results are iterators - execution only happens when you consume results.</p>
+<p><strong>Benefits:</strong>
+- <strong>Early Termination</strong>: <code>LIMIT</code> clauses stop execution as soon as enough rows are found
+- <strong>Streaming</strong>: Start processing first results while rest of query runs
+- <strong>Memory Efficient</strong>: Don't load entire result set into memory</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data LIMIT 10&quot;</span><span class="p">)</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1"># No execution yet</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>  <span class="c1"># Execution starts here</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="optimization-summary">Optimization Summary</h2>
+<p>You can see which optimizations were applied:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">plan</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="s2">    SELECT name, age</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="s2">    FROM data</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="s2">    WHERE age &gt; 30</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">explain</span><span class="p">()</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Output:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Query Plan:
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>  Scan: data.csv
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>  Filter: age &gt; 30
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>  Project: name, age
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>Optimizations applied:
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>  - Predicate pushdown: 1 condition(s)
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>  - Column pruning: 3 column(s) selected
+</span></code></pre></div></p>
+<hr />
+<h2 id="custom-optimizers">Custom Optimizers</h2>
+<p>You can add custom optimization rules:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QueryPlanner</span><span class="p">,</span> <span class="n">Optimizer</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyCustomOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>        <span class="k">return</span> <span class="s2">&quot;My custom rule&quot;</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">can_optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>        <span class="c1"># Check if optimization applies</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>        <span class="c1"># Apply optimization</span>
+</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">applied</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;did something cool&quot;</span>
+</span><span id="__span-16-15"><a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>
+</span><span id="__span-16-16"><a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="n">planner</span> <span class="o">=</span> <span class="n">QueryPlanner</span><span class="p">()</span>
+</span><span id="__span-16-17"><a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="n">planner</span><span class="o">.</span><span class="n">add_optimizer</span><span class="p">(</span><span class="n">MyCustomOptimizer</span><span class="p">())</span>
+</span></code></pre></div>
+<hr />
+<h2 id="performance-tips">Performance Tips</h2>
+<ol>
+<li><strong>Use Parquet for wide tables</strong>: Column pruning is most effective</li>
+<li><strong>Use WHERE early</strong>: Predicate pushdown reduces data read</li>
+<li><strong>Select specific columns</strong>: Avoid <code>SELECT *</code> when possible</li>
+<li><strong>Use LIMIT for exploration</strong>: Quick previews of large files</li>
+<li><strong>Use Pandas backend for aggregations</strong>: Faster for GROUP BY queries</li>
+<li><strong>Check explain plans</strong>: Use <code>.explain()</code> to see which optimizations applied</li>
+</ol>
+<hr />
+<h2 id="future-optimizations-roadmap">Future Optimizations (Roadmap)</h2>
+<ul>
+<li>✅ Predicate pushdown (implemented)</li>
+<li>✅ Column pruning (implemented)</li>
+<li>⏳ Limit pushdown (detected but not implemented in readers)</li>
+<li>⏳ Projection pushdown (placeholder)</li>
+<li>⏳ Partition pruning (for partitioned Parquet)</li>
+<li>⏳ Join reordering (optimize join order)</li>
+<li>⏳ Aggregate pushdown (push GROUP BY to readers)</li>
+<li>⏳ Index usage (when indexes available)</li>
+<li>⏳ Parallel execution (multi-threaded readers)</li>
+<li>⏳ Adaptive query execution (runtime optimization)</li>
+</ul>
 
 
 
