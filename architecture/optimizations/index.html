@@ -1620,10 +1620,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-projection-pushdown" class="md-nav__link">
+  <a href="#4-partition-pruning" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Projection Pushdown
+        4. Partition Pruning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-join-reordering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Join Reordering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-cost-based-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Cost-Based Optimization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-parallel-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Parallel Execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-projection-pushdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Projection Pushdown
       
     </span>
   </a>
@@ -1686,13 +1730,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#future-optimizations-roadmap" class="md-nav__link">
+  <a href="#implementation-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Future Optimizations (Roadmap)
+        Implementation Status
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Implementation Status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fully-implemented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fully Implemented ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framework-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Framework Available ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#future-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Enhancements 🔮
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1810,10 +1893,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-projection-pushdown" class="md-nav__link">
+  <a href="#4-partition-pruning" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Projection Pushdown
+        4. Partition Pruning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-join-reordering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Join Reordering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-cost-based-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Cost-Based Optimization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-parallel-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Parallel Execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-projection-pushdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Projection Pushdown
       
     </span>
   </a>
@@ -1876,13 +2003,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#future-optimizations-roadmap" class="md-nav__link">
+  <a href="#implementation-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Future Optimizations (Roadmap)
+        Implementation Status
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Implementation Status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fully-implemented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fully Implemented ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framework-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Framework Available ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#future-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Enhancements 🔮
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1918,10 +2084,12 @@
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="n">planner</span><span class="o">.</span><span class="n">get_optimization_summary</span><span class="p">())</span>
 </span></code></pre></div>
 <p><strong>Pipeline Order:</strong>
-1. Predicate Pushdown (reduce data read)
-2. Column Pruning (narrow columns)
-3. Limit Pushdown (early termination)
-4. Projection Pushdown (transform at source - future)</p>
+1. Join Reordering (optimize join execution plan)
+2. Partition Pruning (skip entire partitions/files)
+3. Predicate Pushdown (reduce data read)
+4. Column Pruning (narrow columns)
+5. Limit Pushdown (early termination)
+6. Projection Pushdown (transform at source - future)</p>
 <hr />
 <h2 id="1-predicate-pushdown">1. Predicate Pushdown</h2>
 <p>Filters (WHERE clauses) are "pushed down" to the data source for early filtering.</p>
@@ -2000,25 +2168,129 @@
 <p><strong>With pushdown:</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Stop reading after 10 rows → Much faster
 </span></code></pre></div></p>
-<p><strong>Limitations (Current Implementation):</strong>
-- Not yet implemented in readers (placeholder for future work)
+<p><strong>Implementation:</strong>
+- ✅ Fully implemented in CSVReader and ParquetReader
+- Early termination at reader level (stops reading after N rows)
+- Works seamlessly with filters (limit applied after filtering)</p>
+<p><strong>Limitations:</strong>
 - Cannot push down with ORDER BY (need all rows to sort)
 - Cannot push down with GROUP BY (need all rows to group)
 - Cannot push down with aggregates (need all rows)
 - Cannot push down with JOINs (complex - may need all rows)</p>
-<p><strong>Status:</strong> ⚠️ Optimizer detects opportunities but readers don't implement yet</p>
+<p><strong>Status:</strong> ✅ Fully implemented and tested</p>
 <hr />
-<h2 id="4-projection-pushdown">4. Projection Pushdown</h2>
+<h2 id="4-partition-pruning">4. Partition Pruning</h2>
+<p>Skip entire partitions/files based on filter conditions for Hive-style partitioned datasets.</p>
+<p><strong>Benefits:</strong>
+- Massive I/O reduction (can skip 10x-1000x data)
+- Critical for data lakes and partitioned datasets
+- Zero-cost filtering at partition level
+- Works with S3 and cloud storage</p>
+<p><strong>Example:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">-- Dataset: s3://data/year=2023/month=01/data.parquet</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1">--          s3://data/year=2024/month=01/data.parquet</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1">--          s3://data/year=2024/month=02/data.parquet</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="k">year</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2024</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">month</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+</span></code></pre></div></p>
+<p><strong>Without partition pruning:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Read all 3 files → Filter rows → Return results
+</span></code></pre></div></p>
+<p><strong>With partition pruning:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Skip year=2023 files → Read only year=2024/month=1 → Return results
+</span></code></pre></div></p>
+<p><strong>Implementation:</strong>
+- ✅ Fully implemented in ParquetReader
+- Detects Hive-style partitioning (key=value in path)
+- Partition columns added as virtual columns to results
+- Filters on partition columns removed from row-level filtering</p>
+<p><strong>How it works:</strong>
+1. Parse partition info from file path (e.g., <code>year=2024/month=01/</code>)
+2. Extract partition column filters from WHERE clause
+3. Evaluate filters against partition values
+4. Skip reading file if partition doesn't match
+5. Add partition columns to output rows</p>
+<p><strong>Status:</strong> ✅ Fully implemented and tested</p>
+<hr />
+<h2 id="5-join-reordering">5. Join Reordering</h2>
+<p>Optimize join execution order to minimize intermediate result sizes.</p>
+<p><strong>Benefits:</strong>
+- Smaller intermediate results = less memory
+- Faster execution (less data to process)
+- Better cache utilization</p>
+<p><strong>Strategy:</strong>
+- Join smaller tables first
+- Apply filters early to reduce row counts
+- Future: Use table statistics for cost-based decisions</p>
+<p><strong>Example:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1">-- Tables: A (1M rows), B (100 rows), C (1K rows)</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1">-- Bad order:  A JOIN B JOIN C = huge intermediate result</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="c1">-- Good order: B JOIN C JOIN A = smaller intermediate result</span>
+</span></code></pre></div></p>
+<p><strong>Status:</strong> ⚠️ Framework implemented, placeholder (not yet active)</p>
+<p><strong>Note:</strong> Join reordering is complex and can break query correctness if done incorrectly. Current implementation is a placeholder that provides the infrastructure but doesn't actually reorder joins yet.</p>
+<hr />
+<h2 id="6-cost-based-optimization">6. Cost-Based Optimization</h2>
+<p>Framework for statistics-driven optimization decisions.</p>
+<p><strong>Components:</strong>
+- Table statistics (row counts, cardinality, min/max values)
+- Cost models for operations (scan, filter, join, sort)
+- Selectivity estimation
+- Plan cost comparison</p>
+<p><strong>Benefits:</strong>
+- Smarter optimization decisions
+- Better join ordering
+- Adaptive query execution (future)
+- Index selection (future)</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CostModel</span><span class="p">,</span> <span class="n">TableStatistics</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1"># Estimate join cost</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">cost</span> <span class="o">=</span> <span class="n">CostModel</span><span class="o">.</span><span class="n">estimate_join_cost</span><span class="p">(</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">left_rows</span><span class="o">=</span><span class="mi">1000000</span><span class="p">,</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">right_rows</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">selectivity</span><span class="o">=</span><span class="mf">0.1</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="p">)</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="c1"># Estimate filter selectivity</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="n">selectivity</span> <span class="o">=</span> <span class="n">CostModel</span><span class="o">.</span><span class="n">estimate_selectivity</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+</span></code></pre></div></p>
+<p><strong>Status:</strong> ⚠️ Framework implemented (not yet active in query execution)</p>
+<p><strong>Note:</strong> Full cost-based optimization requires statistics collection (expensive) and plan enumeration. Current implementation provides the cost models and infrastructure for future use.</p>
+<hr />
+<h2 id="7-parallel-execution">7. Parallel Execution</h2>
+<p>Multi-threaded data reading for improved performance.</p>
+<p><strong>Benefits:</strong>
+- Faster data ingestion
+- Better CPU utilization
+- Overlap I/O with computation</p>
+<p><strong>Implementation:</strong>
+- Thread pool for parallel reading
+- Queue-based producer-consumer pattern
+- Works with any reader (CSV, Parquet, HTTP)</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream.readers</span><span class="w"> </span><span class="kn">import</span> <span class="n">enable_parallel_reading</span><span class="p">,</span> <span class="n">CSVReader</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">reader</span> <span class="o">=</span> <span class="n">CSVReader</span><span class="p">(</span><span class="s2">&quot;large_file.csv&quot;</span><span class="p">)</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">parallel_reader</span> <span class="o">=</span> <span class="n">enable_parallel_reading</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">parallel_reader</span><span class="p">:</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">process</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</span></code></pre></div></p>
+<p><strong>Status:</strong> ⚠️ Infrastructure implemented (basic functionality)</p>
+<p><strong>Note:</strong> Python's GIL limits true parallelism for CPU-bound tasks. Parallel execution is most effective for I/O-bound operations. Parquet already has native parallel reading via PyArrow.</p>
+<hr />
+<h2 id="8-projection-pushdown">8. Projection Pushdown</h2>
 <p>Push computed expressions to the data source for evaluation.</p>
 <p><strong>Benefits (when implemented):</strong>
 - Evaluate expressions at read time
 - Reduce data movement
 - Leverage native database/engine functions</p>
 <p><strong>Example (future):</strong>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">UPPER</span><span class="p">(</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">UPPER</span><span class="p">(</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span>
 </span></code></pre></div></p>
 <p><strong>With pushdown:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Reader evaluates UPPER() and age*2 → Return transformed data
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Reader evaluates UPPER() and age*2 → Return transformed data
 </span></code></pre></div></p>
 <p><strong>Status:</strong> ⚠️ Not yet implemented - placeholder for future work</p>
 <hr />
@@ -2031,8 +2303,8 @@
 <li><strong>NumPy</strong>: Highly optimized numerical operations</li>
 </ul>
 <p><strong>When to use:</strong>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># For large datasets or complex aggregations</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># For large datasets or complex aggregations</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">)</span>
 </span></code></pre></div></p>
 <hr />
 <h2 id="lazy-evaluation">Lazy Evaluation</h2>
@@ -2042,53 +2314,53 @@
 - <strong>Streaming</strong>: Start processing first results while rest of query runs
 - <strong>Memory Efficient</strong>: Don't load entire result set into memory</p>
 <p><strong>Example:</strong>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data LIMIT 10&quot;</span><span class="p">)</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1"># No execution yet</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>  <span class="c1"># Execution starts here</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM data LIMIT 10&quot;</span><span class="p">)</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="c1"># No execution yet</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>  <span class="c1"># Execution starts here</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 </span></code></pre></div></p>
 <hr />
 <h2 id="optimization-summary">Optimization Summary</h2>
 <p>You can see which optimizations were applied:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">plan</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="s2">    SELECT name, age</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="s2">    FROM data</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="s2">    WHERE age &gt; 30</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">explain</span><span class="p">()</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">plan</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="s2">    SELECT name, age</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="s2">    FROM data</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="s2">    WHERE age &gt; 30</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">explain</span><span class="p">()</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
 </span></code></pre></div>
 <p><strong>Output:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Query Plan:
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>  Scan: data.csv
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>  Filter: age &gt; 30
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>  Project: name, age
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>Optimizations applied:
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>  - Predicate pushdown: 1 condition(s)
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>  - Column pruning: 3 column(s) selected
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>Query Plan:
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>  Scan: data.csv
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>  Filter: age &gt; 30
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>  Project: name, age
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>Optimizations applied:
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>  - Predicate pushdown: 1 condition(s)
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>  - Column pruning: 3 column(s) selected
 </span></code></pre></div></p>
 <hr />
 <h2 id="custom-optimizers">Custom Optimizers</h2>
 <p>You can add custom optimization rules:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QueryPlanner</span><span class="p">,</span> <span class="n">Optimizer</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyCustomOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>        <span class="k">return</span> <span class="s2">&quot;My custom rule&quot;</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">can_optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>        <span class="c1"># Check if optimization applies</span>
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>
-</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>        <span class="c1"># Apply optimization</span>
-</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">applied</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;did something cool&quot;</span>
-</span><span id="__span-16-15"><a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>
-</span><span id="__span-16-16"><a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="n">planner</span> <span class="o">=</span> <span class="n">QueryPlanner</span><span class="p">()</span>
-</span><span id="__span-16-17"><a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="n">planner</span><span class="o">.</span><span class="n">add_optimizer</span><span class="p">(</span><span class="n">MyCustomOptimizer</span><span class="p">())</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QueryPlanner</span><span class="p">,</span> <span class="n">Optimizer</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyCustomOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">):</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>        <span class="k">return</span> <span class="s2">&quot;My custom rule&quot;</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">can_optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>        <span class="c1"># Check if optimization applies</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">,</span> <span class="n">reader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>        <span class="c1"># Apply optimization</span>
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">applied</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;did something cool&quot;</span>
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="n">planner</span> <span class="o">=</span> <span class="n">QueryPlanner</span><span class="p">()</span>
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a><span class="n">planner</span><span class="o">.</span><span class="n">add_optimizer</span><span class="p">(</span><span class="n">MyCustomOptimizer</span><span class="p">())</span>
 </span></code></pre></div>
 <hr />
 <h2 id="performance-tips">Performance Tips</h2>
@@ -2101,18 +2373,29 @@
 <li><strong>Check explain plans</strong>: Use <code>.explain()</code> to see which optimizations applied</li>
 </ol>
 <hr />
-<h2 id="future-optimizations-roadmap">Future Optimizations (Roadmap)</h2>
+<h2 id="implementation-status">Implementation Status</h2>
+<h3 id="fully-implemented">Fully Implemented ✅</h3>
 <ul>
-<li>✅ Predicate pushdown (implemented)</li>
-<li>✅ Column pruning (implemented)</li>
-<li>⏳ Limit pushdown (detected but not implemented in readers)</li>
-<li>⏳ Projection pushdown (placeholder)</li>
-<li>⏳ Partition pruning (for partitioned Parquet)</li>
-<li>⏳ Join reordering (optimize join order)</li>
+<li><strong>Predicate pushdown</strong> - Push WHERE filters to readers</li>
+<li><strong>Column pruning</strong> - Read only required columns</li>
+<li><strong>Limit pushdown</strong> - Early termination for LIMIT queries</li>
+<li><strong>Partition pruning</strong> - Skip partitions based on filters (Parquet)</li>
+</ul>
+<h3 id="framework-available">Framework Available ⚠️</h3>
+<ul>
+<li><strong>Join reordering</strong> - Infrastructure exists, not yet active</li>
+<li><strong>Cost-based optimization</strong> - Cost models and statistics framework available</li>
+<li><strong>Parallel execution</strong> - Basic thread pool implementation available</li>
+</ul>
+<h3 id="future-enhancements">Future Enhancements 🔮</h3>
+<ul>
+<li>⏳ Projection pushdown (push computed expressions to source)</li>
 <li>⏳ Aggregate pushdown (push GROUP BY to readers)</li>
 <li>⏳ Index usage (when indexes available)</li>
-<li>⏳ Parallel execution (multi-threaded readers)</li>
 <li>⏳ Adaptive query execution (runtime optimization)</li>
+<li>⏳ Query result caching</li>
+<li>⏳ Materialized views</li>
+<li>⏳ Advanced statistics collection (histograms, sketches)</li>
 </ul>
 
 
