@@ -7,6 +7,7 @@ import pyarrow.parquet as pq
 import pytest
 
 from sqlstream import query
+from sqlstream.core.types import DataType
 from sqlstream.readers.parquet_reader import ParquetReader
 from sqlstream.sql.ast_nodes import Condition
 
@@ -106,11 +107,8 @@ class TestBasicReading:
         reader = ParquetReader(str(sample_parquet))
         schema = reader.get_schema()
 
-        assert "name" in schema
-        assert "age" in schema
-        assert "city" in schema
-        assert schema["age"] == "int"
-        assert schema["name"] == "string"
+        assert schema.get_column_type("age") == DataType.INTEGER
+        assert schema.get_column_type("name") == DataType.STRING
 
     def test_file_not_found(self):
         """Test error when file doesn't exist"""

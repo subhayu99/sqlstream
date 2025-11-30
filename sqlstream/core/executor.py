@@ -7,7 +7,7 @@ that implement the query using the Volcano pull-based model.
 
 from typing import Any, Callable, Dict, Iterator, Optional
 
-from sqlstream.core.planner import QueryPlanner
+from sqlstream.optimizers import QueryPlanner
 from sqlstream.operators.filter import Filter
 from sqlstream.operators.groupby import GroupByOperator
 from sqlstream.operators.join import HashJoinOperator

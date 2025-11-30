@@ -8,7 +8,7 @@ import pytest
 
 from sqlstream import query
 from sqlstream.core.executor import Executor
-from sqlstream.core.planner import QueryPlanner
+from sqlstream.optimizers import QueryPlanner
 from sqlstream.readers.csv_reader import CSVReader
 from sqlstream.sql.parser import parse
 

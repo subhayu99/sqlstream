@@ -9,6 +9,7 @@ import pytest
 
 from sqlstream.readers.csv_reader import CSVReader
 from sqlstream.sql.ast_nodes import Condition
+from sqlstream.core.types import DataType
 
 
 @pytest.fixture
@@ -236,20 +237,16 @@ class TestSchemaInference:
         reader = CSVReader(str(mixed_types_csv))
         schema = reader.get_schema()
 
-        assert "name" in schema
-        assert "age" in schema
-        assert "price" in schema
-
-        assert schema["name"] == "str"
-        assert schema["age"] == "int"
-        assert schema["price"] == "float"
+        assert schema.get_column_type("name") == DataType.STRING
+        assert schema.get_column_type("age") == DataType.INTEGER
+        assert schema.get_column_type("price") == DataType.FLOAT
 
     def test_schema_empty_file(self, empty_csv):
         """Test schema on empty file"""
         reader = CSVReader(str(empty_csv))
         schema = reader.get_schema()
 
-        assert len(schema) == 0
+        assert len(schema or []) == 0
 
 
 class TestMalformedData:

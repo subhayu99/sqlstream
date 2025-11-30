@@ -372,7 +372,7 @@ class ParquetReader(BaseReader):
             # This is fine - row just doesn't match
             return False
 
-    def get_schema(self) -> Dict[str, str]:
+    def get_schema(self) -> Schema:
         """
         Get schema from Parquet metadata
 

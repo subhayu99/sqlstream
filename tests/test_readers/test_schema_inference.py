@@ -5,7 +5,7 @@ from pathlib import Path
 import csv
 
 from sqlstream.readers.csv_reader import CSVReader
-from sqlstream.core.types import DataType, Schema
+from sqlstream.core.types import DataType
 
 
 @pytest.fixture

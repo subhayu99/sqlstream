@@ -6,7 +6,7 @@ SQLStream includes a powerful interactive shell built with [Textual](https://tex
 
 ## Features
 
-- 🎨 **Syntax Highlighting** - Monokai theme for SQL queries
+- 🎨 **Syntax Highlighting** - Dracula theme for SQL queries
 - 📊 **Scrollable Results** - Zebra-striped table with smooth scrolling
 - 📜 **Query History** - Navigate previous queries with keyboard shortcuts
 - 🗂️ **Schema Browser** - View file schemas with column types

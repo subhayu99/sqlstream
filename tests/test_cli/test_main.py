@@ -167,7 +167,8 @@ class TestInteractiveCommand:
         result = runner.invoke(cli, ["interactive", str(sample_csv)])
 
         # Should show message about coming soon or missing textual
-        assert "Interactive" in result.output or "textual" in result.output
+        assert "'interactive' command is deprecated." in result.output
+        assert "Use 'sqlstream shell' instead" in result.output
 
 
 @pytest.mark.skipif(not CLICK_AVAILABLE, reason="Click not installed")
