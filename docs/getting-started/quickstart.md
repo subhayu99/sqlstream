@@ -192,19 +192,21 @@ Performance comparison:
 
 ---
 
-## Step 6: Interactive Mode
+## Step 6: Interactive Shell
 
-For wide tables, use interactive mode:
+For a full interactive experience, use the shell command:
 
 ```bash
-$ sqlstream query employees.csv "SELECT * FROM employees" --interactive
+$ sqlstream shell employees.csv
 ```
 
-This launches a scrollable table viewer with:
+This launches a powerful TUI (Terminal User Interface) with:
 
-- ⬅️➡️ Horizontal scrolling (or `h`/`l`)
-- ⬆️⬇️ Vertical scrolling (or `k`/`j`)
-- `q` or `Esc` to quit
+- **Query Editor**: Multi-line editing with syntax highlighting.
+- **Results Viewer**: Scrollable table with pagination.
+- **Schema Browser**: Press `F2` to see available tables and columns.
+- **Export**: Press `Ctrl+X` to export results to CSV/JSON/Parquet.
+- **History**: Use `Ctrl+Up`/`Down` to navigate previous queries.
 
 ---
 
@@ -263,7 +265,6 @@ result = query("customers.csv").sql("""
     FROM customers c
     JOIN orders o ON c.id = o.customer_id
     GROUP BY c.name
-    HAVING COUNT(o.order_id) > 5
     ORDER BY total_orders DESC
 """)
 

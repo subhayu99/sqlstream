@@ -120,7 +120,6 @@ FROM employees
 WHERE hire_date > '2020-01-01'
   AND status = 'active'
 GROUP BY department
-HAVING COUNT(*) > 5
 ORDER BY avg_salary DESC
 LIMIT 10
 ```
