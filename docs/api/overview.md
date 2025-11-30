@@ -17,9 +17,3 @@ for row in results:
 # Or convert to list (eager)
 results_list = query("data.csv").sql("SELECT * FROM data").to_list()
 ```
-
-## API Reference
-
-- [Query Class](query.md)
-- [Readers](readers.md)
-- [Advanced Usage](advanced.md)

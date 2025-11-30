@@ -26,6 +26,11 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install mkdocs mkdocs-material mkdocs-material-extensions
+          pip install "mkdocstrings[python]>=0.24.0" mkdocstrings-python>=1.7.0
+          pip install pyyaml  # For generate_api_docs.py
+
+      - name: Generate API reference docs
+        run: python3 scripts/generate_api_docs.py
 
       - name: Build documentation
         run: mkdocs build

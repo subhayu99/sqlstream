@@ -43,6 +43,20 @@ theme:
 
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google          # Match existing docstring style
+            show_source: true                # Show "View Source" links
+            show_root_heading: true
+            show_root_full_path: false       # Show just class name, not full path
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source            # Preserve source code order
+            group_by_category: true          # Group methods/attributes/etc
+            show_signature_annotations: true # Show type hints
+            separate_signature: true         # Put signature on separate line
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -85,9 +99,8 @@ nav:
       - Output Formats: cli/output-formats.md
   - Python API:
       - Overview: api/overview.md
-      - Query Class: api/query.md
-      - Readers: api/readers.md
-      - Advanced Usage: api/advanced.md
+      - Guides:
+          - Advanced Usage: api/guides/advanced.md
   - Examples:
       - Basic Queries: examples/basic-queries.md
       - JOIN Examples: examples/joins.md

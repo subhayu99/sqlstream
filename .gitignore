@@ -54,3 +54,4 @@ dmypy.json
 *.csv
 *.json
 test_data/
+docs/api/reference/
