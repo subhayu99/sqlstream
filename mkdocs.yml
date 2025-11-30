@@ -73,6 +73,7 @@ nav:
       - SQL Support: features/sql-support.md
       - Type System & Schema: features/type-system.md
       - Data Sources: features/data-sources.md
+      - S3 Support: features/s3-support.md
       - JOIN Operations: features/joins.md
       - Aggregations: features/aggregations.md
       - Pandas Backend: features/pandas-backend.md

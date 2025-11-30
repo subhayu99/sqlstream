@@ -16,23 +16,27 @@
 # Query a CSV file
 $ sqlstream query "SELECT * FROM 'data.csv' WHERE age > 25"
 
+# Query S3 files
+$ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '2024-01-01'"
+
 # Join multiple files
 $ sqlstream query "SELECT c.name, o.total FROM 'customers.csv' c JOIN 'orders.csv' o ON c.id = o.customer_id"
 
-# Interactive mode for wide tables
-$ sqlstream query data.csv "SELECT * FROM data" --interactive
+# Interactive shell with full TUI
+$ sqlstream shell data.csv
 ```
 
 ## Features
 
 - 🚀 **Pure Python** - No database installation required
-- 📊 **Multiple Formats** - CSV, Parquet files, HTTP URLs
+- 📊 **Multiple Formats** - CSV, Parquet files, HTTP URLs, S3 buckets
 - ⚡ **10-100x Faster** - Optional pandas backend for performance
 - 🔗 **JOIN Support** - INNER, LEFT, RIGHT joins
 - 📈 **Aggregations** - GROUP BY with COUNT, SUM, AVG, MIN, MAX
 - 🔢 **Type System** - Automatic schema inference with type checking
+- ☁️ **S3 Support** - Query files directly from Amazon S3
 - 🎨 **Beautiful Output** - Rich tables, JSON, CSV formatting
-- 🖥️ **Interactive Mode** - Scrollable table viewer with Textual
+- 🖥️ **Interactive Shell** - Full-featured TUI with history, pagination, sorting, export
 - 🔍 **Smart Optimizations** - Column pruning, predicate pushdown, lazy evaluation
 - 📦 **Lightweight** - Minimal dependencies, works everywhere
 
@@ -114,7 +118,7 @@ Key sections:
 - 🚧 **Phase 9**: Error handling & user feedback
 - 🚧 **Phase 10**: Testing & documentation
 
-**Test Coverage**: 358 tests, 53% coverage
+**Test Coverage**: 377 tests, 53% coverage
 
 ## Performance
 
