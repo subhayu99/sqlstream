@@ -13,8 +13,9 @@ from typing import Any, Dict, List, Optional
 from textual import work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Container, Horizontal, Vertical
-from textual.widgets import DataTable, Footer, Header, Static, TextArea, Tree
+from textual.containers import Container, Horizontal, Vertical, VerticalScroll
+from textual.screen import ModalScreen
+from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree
 
 try:
     from sqlstream.core.query import query, parse, QueryInline
@@ -121,6 +122,118 @@ class SchemaBrowser(Tree):
                     file_node.add(f"[green]{col}[/green]: [dim]{dtype}[/dim]")
 
 
+class FilterDialog(ModalScreen[str]):
+    """Modal dialog for entering filter text."""
+
+    def compose(self) -> ComposeResult:
+        with Container(id="filter-dialog"):
+            yield Label("Filter Results (case-insensitive)")
+            yield Input(placeholder="Enter search text...", id="filter-input")
+            with Horizontal(id="dialog-buttons"):
+                yield Button("Filter", variant="primary", id="filter-btn")
+                yield Button("Clear", variant="default", id="clear-btn")
+                yield Button("Cancel", variant="default", id="cancel-btn")
+
+    def on_mount(self) -> None:
+        self.query_one("#filter-input", Input).focus()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "filter-btn":
+            filter_text = self.query_one("#filter-input", Input).value
+            self.dismiss(filter_text)
+        elif event.button.id == "clear-btn":
+            self.dismiss("")
+        else:
+            self.dismiss(None)
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        self.dismiss(event.value)
+
+
+class ExplainDialog(ModalScreen):
+    """Modal dialog for showing query execution plan."""
+
+    def __init__(self, plan: str, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.plan = plan
+
+    def compose(self) -> ComposeResult:
+        with Container(id="explain-dialog"):
+            yield Label("Query Execution Plan", id="explain-title")
+            with VerticalScroll(id="explain-content"):
+                yield Static(self.plan, id="explain-text")
+            yield Button("Close", variant="primary", id="close-btn")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.dismiss()
+
+
+class SaveFileDialog(ModalScreen[str]):
+    """Modal dialog for saving files."""
+
+    def __init__(self, default_name: str = "", **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.default_name = default_name
+
+    def compose(self) -> ComposeResult:
+        with Container(id="save-dialog"):
+            yield Label("Save Results")
+            yield Input(value=self.default_name, placeholder="Enter filename...", id="filename-input")
+            yield Label("(Formats: .csv, .json, .parquet)", id="format-hint")
+            with Horizontal(id="dialog-buttons"):
+                yield Button("Save", variant="primary", id="save-btn")
+                yield Button("Cancel", variant="default", id="cancel-btn")
+
+    def on_mount(self) -> None:
+        input_widget = self.query_one("#filename-input", Input)
+        input_widget.focus()
+        # Select the filename part (before extension)
+        if "." in self.default_name:
+            input_widget.cursor_position = self.default_name.rindex(".")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "save-btn":
+            filename = self.query_one("#filename-input", Input).value
+            if filename:
+                self.dismiss(filename)
+        else:
+            self.dismiss(None)
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if event.value:
+            self.dismiss(event.value)
+
+
+class OpenFileDialog(ModalScreen[str]):
+    """Modal dialog for opening files."""
+
+    def compose(self) -> ComposeResult:
+        with Container(id="open-dialog"):
+            yield Label("Select File to Query")
+            yield DirectoryTree("./", id="file-tree")
+            with Horizontal(id="dialog-buttons"):
+                yield Button("Open", variant="primary", id="open-btn")
+                yield Button("Cancel", variant="default", id="cancel-btn")
+
+    def on_mount(self) -> None:
+        self.query_one(DirectoryTree).focus()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "open-btn":
+            tree = self.query_one(DirectoryTree)
+            if tree.cursor_node:
+                path = tree.cursor_node.data.path
+                if path.is_file():
+                    self.dismiss(str(path))
+                else:
+                    self.app.bell()
+        else:
+            self.dismiss(None)
+
+    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
+        self.dismiss(str(event.path))
+
+
 class SQLShellApp(App):
     """
     SQLStream Interactive Shell Application.
@@ -196,6 +309,75 @@ class SQLShellApp(App):
         background: $success;
         color: $text;
     }
+
+    /* Dialog styles */
+    #filter-dialog, #save-dialog, #open-dialog, #explain-dialog {
+        align: center middle;
+        width: 60;
+        height: auto;
+        background: $panel;
+        border: thick $primary;
+        padding: 1 2;
+    }
+
+    #filter-dialog Label, #save-dialog Label, #open-dialog Label {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 1;
+    }
+
+    #filter-input, #filename-input {
+        width: 100%;
+        margin-bottom: 1;
+    }
+
+    #format-hint {
+        color: $text-muted;
+        text-align: center;
+        margin-bottom: 1;
+    }
+
+    #dialog-buttons {
+        width: 100%;
+        height: auto;
+        align: center middle;
+    }
+
+    #dialog-buttons Button {
+        margin: 0 1;
+    }
+
+    #explain-dialog {
+        width: 80;
+        height: 30;
+    }
+
+    #explain-title {
+        text-style: bold;
+        text-align: center;
+        margin-bottom: 1;
+    }
+
+    #explain-content {
+        height: 1fr;
+        border: solid $accent;
+        margin-bottom: 1;
+    }
+
+    #explain-text {
+        padding: 1;
+    }
+
+    #open-dialog {
+        width: 70;
+        height: 25;
+    }
+
+    #file-tree {
+        height: 1fr;
+        border: solid $accent;
+        margin-bottom: 1;
+    }
     """
 
     BINDINGS = [
@@ -203,6 +385,7 @@ class SQLShellApp(App):
         Binding("f2", "toggle_schema", "Schema"),
         Binding("f3", "toggle_history", "History", show=False),
         Binding("f4", "toggle_explain", "Explain"),
+        Binding("ctrl+o", "open_file", "Open File"),
         Binding("ctrl+d", "quit", "Exit"),
         Binding("ctrl+x", "export_results", "Export"),
         Binding("ctrl+f", "filter_results", "Filter"),
@@ -232,13 +415,14 @@ class SQLShellApp(App):
         self.history_index = -1
         self.last_results: List[Dict[str, Any]] = []
         self.filtered_results: List[Dict[str, Any]] = []
+        self.last_query = ""  # Store last executed query for explain
         self.query_engine = QueryInline()
         self.loaded_files: List[str] = []
-        
+
         # Pagination state
         self.page_size = 100
         self.current_page = 0
-        
+
         # Filter and sort state
         self.filter_text = ""
         self.sort_column = None
@@ -409,8 +593,9 @@ class SQLShellApp(App):
             results = result.to_list()
             execution_time = (datetime.now() - start_time).total_seconds()
 
-            # Store results
+            # Store results and query
             self.last_results = results
+            self.last_query = query_text  # Store for explain mode
 
             # Display results
             if results:
@@ -471,14 +656,31 @@ class SQLShellApp(App):
         except Exception:
             return results
 
+    def _format_value(self, value: Any) -> str:
+        """Format a value for display, handling scientific notation."""
+        if value is None:
+            return "NULL"
+        elif isinstance(value, float):
+            # Format floats nicely - avoid scientific notation for small numbers
+            if abs(value) < 1e-10 and value != 0:
+                return "0.0"
+            elif abs(value) < 0.01 or abs(value) > 1e6:
+                # Use scientific notation for very small or very large
+                return f"{value:.6g}"
+            else:
+                # Regular decimal notation
+                return f"{value:.6f}".rstrip('0').rstrip('.')
+        else:
+            return str(value)
+
     def _refresh_displayed_results(self, execution_time: Optional[float] = None) -> None:
         """Refresh the displayed results with current page."""
         results_viewer = self.query_one(ResultsViewer)
         status_bar = self.query_one(StatusBar)
-        
+
         # Clear existing
         results_viewer.clear(columns=True)
-        
+
         if not self.filtered_results:
             status_bar.update_status("No results to display")
             return
@@ -488,7 +690,7 @@ class SQLShellApp(App):
         start_idx = self.current_page * self.page_size
         end_idx = min(start_idx + self.page_size, total_rows)
         page_results = self.filtered_results[start_idx:end_idx]
-        
+
         columns = list(self.filtered_results[0].keys())
 
         # Add columns
@@ -497,7 +699,7 @@ class SQLShellApp(App):
 
         # Add rows (current page only)
         for row in page_results:
-            values = [str(row.get(col, "NULL")) for col in columns]
+            values = [self._format_value(row.get(col)) for col in columns]
             results_viewer.add_row(*values)
 
         # Update status with pagination info
@@ -582,7 +784,7 @@ class SQLShellApp(App):
 
     def action_show_help(self) -> None:
         """Show help dialog."""
-        self._show_status("Ctrl+Enter=Execute | Ctrl+L=Clear | F2=Schema | Ctrl+X=Export | Ctrl+P/N or [/]=Page | Click headers to sort")
+        self._show_status("Ctrl+Enter=Execute | Ctrl+L=Clear | F2=Schema | Ctrl+X=Export | Ctrl+P/N=Page | Click headers to sort")
 
     def action_toggle_schema(self) -> None:
         """Toggle schema browser panel."""
@@ -598,14 +800,94 @@ class SQLShellApp(App):
         """Toggle query history panel."""
         self._show_status("Query history - Coming soon!")
 
-    def action_toggle_explain(self) -> None:
+    @work
+    async def action_toggle_explain(self) -> None:
         """Toggle explain mode - shows query execution plan."""
-        if not self.last_results:
+        if not self.last_query:
             self._show_status("Execute a query first to see explain plan", error=True)
             return
-        
-        # Show placeholder for now
-        self._show_status("Explain Mode: Query plan analysis - Coming soon!")
+
+        # Generate query plan
+        try:
+            parsed = parse(self.last_query)
+
+            # Build explain plan text
+            plan_lines = []
+            plan_lines.append("=" * 60)
+            plan_lines.append("QUERY EXECUTION PLAN")
+            plan_lines.append("=" * 60)
+            plan_lines.append("")
+            plan_lines.append(f"Query: {self.last_query}")
+            plan_lines.append("")
+            plan_lines.append("--- PLAN STEPS ---")
+            plan_lines.append("")
+
+            step = 1
+            # Source scan
+            plan_lines.append(f"{step}. TABLE SCAN")
+            plan_lines.append(f"   Source: {parsed.source}")
+            step += 1
+
+            # JOIN if present
+            if parsed.join and parsed.join.right_source:
+                plan_lines.append("")
+                plan_lines.append(f"{step}. JOIN")
+                plan_lines.append(f"   Type: {parsed.join.join_type.upper()}")
+                plan_lines.append(f"   Right Source: {parsed.join.right_source}")
+                plan_lines.append(f"   Condition: {parsed.join.left_key} = {parsed.join.right_key}")
+                step += 1
+
+            # WHERE clause
+            if parsed.where:
+                plan_lines.append("")
+                plan_lines.append(f"{step}. FILTER")
+                plan_lines.append(f"   Condition: {parsed.where}")
+                step += 1
+
+            # GROUP BY
+            if parsed.group_by:
+                plan_lines.append("")
+                plan_lines.append(f"{step}. GROUP BY")
+                plan_lines.append(f"   Columns: {', '.join(parsed.group_by)}")
+                step += 1
+
+            # ORDER BY
+            if parsed.order_by:
+                plan_lines.append("")
+                plan_lines.append(f"{step}. SORT")
+                order_strs = []
+                for col, direction in parsed.order_by:
+                    order_strs.append(f"{col} {'DESC' if direction else 'ASC'}")
+                plan_lines.append(f"   Order: {', '.join(order_strs)}")
+                step += 1
+
+            # LIMIT
+            if parsed.limit is not None:
+                plan_lines.append("")
+                plan_lines.append(f"{step}. LIMIT")
+                plan_lines.append(f"   Rows: {parsed.limit}")
+                step += 1
+
+            # Projection
+            plan_lines.append("")
+            plan_lines.append(f"{step}. PROJECTION")
+            if parsed.select_columns:
+                plan_lines.append(f"   Columns: {', '.join(parsed.select_columns)}")
+            else:
+                plan_lines.append("   Columns: * (all)")
+
+            plan_lines.append("")
+            plan_lines.append("=" * 60)
+            plan_lines.append(f"Estimated rows returned: {len(self.last_results)}")
+            plan_lines.append("=" * 60)
+
+            plan_text = "\n".join(plan_lines)
+
+            # Show explain dialog
+            await self.push_screen_wait(ExplainDialog(plan_text))
+
+        except Exception as e:
+            self._show_status(f"Could not generate explain plan: {e}", error=True)
 
     def action_prev_page(self) -> None:
         """Go to previous page of results."""
@@ -630,82 +912,145 @@ class SQLShellApp(App):
         else:
             self._show_status("Already on last page")
 
-    def action_filter_results(self) -> None:
-        """Toggle filter on current results."""
+    @work
+    async def action_filter_results(self) -> None:
+        """Show filter dialog for current results."""
         if not self.last_results:
             self._show_status("No results to filter", error=True)
             return
-        
-        # Simple toggle filter for demo
-        # In a real app, you'd show an input dialog
-        # For now, let's use a simple prompt-style approach
-        if not self.filter_text:
-            # Enable filter mode - user can type filter
-            self._show_status("Filter mode: Type filter text and press Enter (or leave empty to show all)")
-            # For MVP, just show a message
-            # A full implementation would add an Input widget
-        else:
+
+        # Show filter dialog
+        filter_text = await self.push_screen_wait(FilterDialog())
+
+        if filter_text is None:
+            # Cancelled
+            return
+        elif filter_text == "":
             # Clear filter
             self.filter_text = ""
-            self.filtered_results = self._apply_filter(self.last_results)
+            self.filtered_results = self.last_results.copy()
             self.current_page = 0
             self._refresh_displayed_results()
             self._show_status("Filter cleared")
+        else:
+            # Apply filter
+            self.filter_text = filter_text
+            self.filtered_results = self._apply_filter(self.last_results)
+            self.current_page = 0
+            self._refresh_displayed_results()
+            self._show_status(f"Filtered to {len(self.filtered_results)} rows")
 
-    def action_export_results(self) -> None:
-        """Export current results in multiple formats."""
+    @work
+    async def action_export_results(self) -> None:
+        """Export current results with file dialog."""
         if not self.last_results:
             self._show_status("No results to export", error=True)
             return
 
-        # Cycle through formats: CSV -> JSON -> Parquet
+        # Show save dialog with default filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
-        # Export format selection (we'll cycle through them)
-        # For a full implementation, you'd show a selection dialog
-        # For now, let's export to all three formats
-        
-        formats_exported = []
-        
-        # Export CSV
-        try:
-            import csv
-            csv_file = f"results_{timestamp}.csv"
-            with open(csv_file, "w", newline="") as f:
-                writer = csv.DictWriter(f, fieldnames=self.last_results[0].keys())
-                writer.writeheader()
-                writer.writerows(self.last_results)
-            formats_exported.append(("CSV", csv_file))
-        except Exception as e:
-            self._show_status(f"CSV export failed: {e}", error=True)
+        default_name = f"results_{timestamp}.csv"
+        filename = await self.push_screen_wait(SaveFileDialog(default_name))
+
+        if filename is None:
+            return  # Cancelled
+
+        # Determine format from extension
+        filename = filename.strip()
+        if not filename:
+            self._show_status("No filename provided", error=True)
             return
 
-        # Export JSON
+        # Get file extension
+        file_lower = filename.lower()
+
         try:
-            import json
-            json_file = f"results_{timestamp}.json"
-            with open(json_file, "w") as f:
-                json.dump(self.last_results, f, indent=2, default=str)
-            formats_exported.append(("JSON", json_file))
+            # Export based on extension
+            if file_lower.endswith('.csv'):
+                import csv
+                with open(filename, "w", newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=self.last_results[0].keys())
+                    writer.writeheader()
+                    # Use formatted values for export
+                    formatted_rows = []
+                    for row in self.last_results:
+                        formatted_row = {k: self._format_value(v) for k, v in row.items()}
+                        formatted_rows.append(formatted_row)
+                    writer.writerows(formatted_rows)
+                self._show_status(f"Exported to CSV: {filename}")
+
+            elif file_lower.endswith('.json'):
+                import json
+                # Format values for JSON export
+                formatted_rows = []
+                for row in self.last_results:
+                    formatted_row = {k: self._format_value(v) for k, v in row.items()}
+                    formatted_rows.append(formatted_row)
+                with open(filename, "w") as f:
+                    json.dump(formatted_rows, f, indent=2)
+                self._show_status(f"Exported to JSON: {filename}")
+
+            elif file_lower.endswith('.parquet'):
+                try:
+                    import pyarrow as pa
+                    import pyarrow.parquet as pq
+
+                    table = pa.Table.from_pylist(self.last_results)
+                    pq.write_table(table, filename)
+                    self._show_status(f"Exported to Parquet: {filename}")
+                except ImportError:
+                    self._show_status("pyarrow not installed. Install with: pip install pyarrow", error=True)
+
+            else:
+                # Default to CSV if no recognized extension
+                if not file_lower.endswith(('.csv', '.json', '.parquet')):
+                    filename = filename + '.csv'
+                import csv
+                with open(filename, "w", newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=self.last_results[0].keys())
+                    writer.writeheader()
+                    formatted_rows = []
+                    for row in self.last_results:
+                        formatted_row = {k: self._format_value(v) for k, v in row.items()}
+                        formatted_rows.append(formatted_row)
+                    writer.writerows(formatted_rows)
+                self._show_status(f"Exported to CSV: {filename}")
+
         except Exception as e:
-            pass  # Optional format
+            self._show_status(f"Export failed: {e}", error=True)
 
-        # Export Parquet (if pyarrow available)
-        try:
-            import pyarrow as pa
-            import pyarrow.parquet as pq
-            
-            parquet_file = f"results_{timestamp}.parquet"
-            table = pa.Table.from_pylist(self.last_results)
-            pq.write_table(table, parquet_file)
-            formats_exported.append(("Parquet", parquet_file))
-        except Exception:
-            pass  # Optional format
+    @work
+    async def action_open_file(self) -> None:
+        """Show file browser dialog to select file for query."""
+        # Show open file dialog
+        file_path = await self.push_screen_wait(OpenFileDialog())
 
-        # Show success message
-        if formats_exported:
-            formats_str = ", ".join([f"{fmt} ({path})" for fmt, path in formats_exported])
-            self._show_status(f"Exported to: {formats_str}")
+        if file_path is None:
+            return  # Cancelled
+
+        # Get current query text
+        editor = self.query_one(QueryEditor)
+        current_text = editor.text.strip()
+
+        # Build query text with selected file
+        if not current_text:
+            # Empty editor - create simple SELECT query
+            new_text = f"SELECT * FROM '{file_path}'"
+        elif "FROM" in current_text.upper():
+            # Already has FROM clause - just show message
+            self._show_status(f"Selected: {file_path} (manually add to query)")
+            return
+        else:
+            # Append FROM clause
+            new_text = f"{current_text}\nFROM '{file_path}'"
+
+        # Update editor
+        editor.text = new_text
+        # Move cursor to end
+        lines = new_text.splitlines()
+        editor.cursor_location = (len(lines) - 1, len(lines[-1]))
+
+        self._show_status(f"Added file to query: {file_path}")
 
 
 def launch_shell(initial_file: Optional[str] = None, history_file: Optional[str] = None) -> None:

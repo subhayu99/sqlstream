@@ -69,7 +69,8 @@ sqlstream shell --history-file ~/.my_sqlstream_history
 | `F1` | Help | Show help message |
 | `F2` | Toggle Schema | Show/hide schema browser |
 | `F4` | Explain Mode | Show query plan |
-| `Ctrl+X` | Export | Export to CSV/JSON/Parquet |
+| `Ctrl+O` | Open File | Browse files to add to query |
+| `Ctrl+X` | Export | Export with custom filename |
 | `Ctrl+F` | Filter | Filter current results |
 | `Ctrl+P` / `[` | Previous Page | Navigate to previous page |
 | `Ctrl+N` / `]` | Next Page | Navigate to next page |

@@ -5,6 +5,12 @@ Pytest configuration and shared fixtures
 import pytest
 
 
+@pytest.fixture(scope="session")
+def anyio_backend():
+    """Configure anyio to only use asyncio backend."""
+    return "asyncio"
+
+
 @pytest.fixture
 def sample_data():
     """Sample data for testing"""
