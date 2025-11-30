@@ -41,7 +41,7 @@ def cli():
 @click.option(
     "--format",
     "-f",
-    type=click.Choice(["table", "json", "csv"], case_sensitive=False),
+    type=click.Choice(["table", "json", "csv", "markdown"], case_sensitive=False),
     default="table",
     help="Output format (default: table)",
 )

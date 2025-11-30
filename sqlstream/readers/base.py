@@ -112,6 +112,45 @@ class BaseReader:
         """
         pass
 
+    def supports_partition_pruning(self) -> bool:
+        """
+        Does this reader support partition pruning?
+
+        If True, the query optimizer can call set_partition_filters() to specify
+        which partitions to read based on filter conditions.
+
+        Returns:
+            True if partition pruning is supported
+        """
+        return False
+
+    def get_partition_columns(self) -> set:
+        """
+        Get partition column names for Hive-style partitioning
+
+        Returns:
+            Set of partition column names (e.g., {'year', 'month', 'day'})
+            Empty set if not partitioned
+
+        Example:
+            For path: s3://bucket/data/year=2024/month=01/data.parquet
+            Returns: {'year', 'month'}
+        """
+        return set()
+
+    def set_partition_filters(self, conditions: List[Condition]) -> None:
+        """
+        Set filter conditions for partition pruning
+
+        Args:
+            conditions: List of WHERE conditions on partition columns
+
+        Note:
+            Only called if supports_partition_pruning() returns True
+            Reader should skip partitions that don't match these conditions
+        """
+        pass
+
     def get_schema(self) -> Optional[Schema]:
         """
         Get schema information (column names and types)

@@ -17,10 +17,12 @@ print(planner.get_optimization_summary())
 ```
 
 **Pipeline Order:**
-1. Predicate Pushdown (reduce data read)
-2. Column Pruning (narrow columns)
-3. Limit Pushdown (early termination)
-4. Projection Pushdown (transform at source - future)
+1. Join Reordering (optimize join execution plan)
+2. Partition Pruning (skip entire partitions/files)
+3. Predicate Pushdown (reduce data read)
+4. Column Pruning (narrow columns)
+5. Limit Pushdown (early termination)
+6. Projection Pushdown (transform at source - future)
 
 ---
 
@@ -134,18 +136,163 @@ Read entire file → Take first 10 rows
 Stop reading after 10 rows → Much faster
 ```
 
-**Limitations (Current Implementation):**
-- Not yet implemented in readers (placeholder for future work)
+**Implementation:**
+- ✅ Fully implemented in CSVReader and ParquetReader
+- Early termination at reader level (stops reading after N rows)
+- Works seamlessly with filters (limit applied after filtering)
+
+**Limitations:**
 - Cannot push down with ORDER BY (need all rows to sort)
 - Cannot push down with GROUP BY (need all rows to group)
 - Cannot push down with aggregates (need all rows)
 - Cannot push down with JOINs (complex - may need all rows)
 
-**Status:** ⚠️ Optimizer detects opportunities but readers don't implement yet
+**Status:** ✅ Fully implemented and tested
 
 ---
 
-## 4. Projection Pushdown
+## 4. Partition Pruning
+
+Skip entire partitions/files based on filter conditions for Hive-style partitioned datasets.
+
+**Benefits:**
+- Massive I/O reduction (can skip 10x-1000x data)
+- Critical for data lakes and partitioned datasets
+- Zero-cost filtering at partition level
+- Works with S3 and cloud storage
+
+**Example:**
+```sql
+-- Dataset: s3://data/year=2023/month=01/data.parquet
+--          s3://data/year=2024/month=01/data.parquet
+--          s3://data/year=2024/month=02/data.parquet
+
+SELECT * FROM data WHERE year = 2024 AND month = 1
+```
+
+**Without partition pruning:**
+```
+Read all 3 files → Filter rows → Return results
+```
+
+**With partition pruning:**
+```
+Skip year=2023 files → Read only year=2024/month=1 → Return results
+```
+
+**Implementation:**
+- ✅ Fully implemented in ParquetReader
+- Detects Hive-style partitioning (key=value in path)
+- Partition columns added as virtual columns to results
+- Filters on partition columns removed from row-level filtering
+
+**How it works:**
+1. Parse partition info from file path (e.g., `year=2024/month=01/`)
+2. Extract partition column filters from WHERE clause
+3. Evaluate filters against partition values
+4. Skip reading file if partition doesn't match
+5. Add partition columns to output rows
+
+**Status:** ✅ Fully implemented and tested
+
+---
+
+## 5. Join Reordering
+
+Optimize join execution order to minimize intermediate result sizes.
+
+**Benefits:**
+- Smaller intermediate results = less memory
+- Faster execution (less data to process)
+- Better cache utilization
+
+**Strategy:**
+- Join smaller tables first
+- Apply filters early to reduce row counts
+- Future: Use table statistics for cost-based decisions
+
+**Example:**
+```sql
+-- Tables: A (1M rows), B (100 rows), C (1K rows)
+-- Bad order:  A JOIN B JOIN C = huge intermediate result
+-- Good order: B JOIN C JOIN A = smaller intermediate result
+```
+
+**Status:** ⚠️ Framework implemented, placeholder (not yet active)
+
+**Note:** Join reordering is complex and can break query correctness if done incorrectly. Current implementation is a placeholder that provides the infrastructure but doesn't actually reorder joins yet.
+
+---
+
+## 6. Cost-Based Optimization
+
+Framework for statistics-driven optimization decisions.
+
+**Components:**
+- Table statistics (row counts, cardinality, min/max values)
+- Cost models for operations (scan, filter, join, sort)
+- Selectivity estimation
+- Plan cost comparison
+
+**Benefits:**
+- Smarter optimization decisions
+- Better join ordering
+- Adaptive query execution (future)
+- Index selection (future)
+
+**Example:**
+```python
+from sqlstream.optimizers import CostModel, TableStatistics
+
+# Estimate join cost
+cost = CostModel.estimate_join_cost(
+    left_rows=1000000,
+    right_rows=100,
+    selectivity=0.1
+)
+
+# Estimate filter selectivity
+selectivity = CostModel.estimate_selectivity(condition)
+```
+
+**Status:** ⚠️ Framework implemented (not yet active in query execution)
+
+**Note:** Full cost-based optimization requires statistics collection (expensive) and plan enumeration. Current implementation provides the cost models and infrastructure for future use.
+
+---
+
+## 7. Parallel Execution
+
+Multi-threaded data reading for improved performance.
+
+**Benefits:**
+- Faster data ingestion
+- Better CPU utilization
+- Overlap I/O with computation
+
+**Implementation:**
+- Thread pool for parallel reading
+- Queue-based producer-consumer pattern
+- Works with any reader (CSV, Parquet, HTTP)
+
+**Example:**
+```python
+from sqlstream.readers import enable_parallel_reading, CSVReader
+
+reader = CSVReader("large_file.csv")
+parallel_reader = enable_parallel_reading(reader, num_threads=4)
+
+for row in parallel_reader:
+    process(row)
+```
+
+**Status:** ⚠️ Infrastructure implemented (basic functionality)
+
+**Note:** Python's GIL limits true parallelism for CPU-bound tasks. Parallel execution is most effective for I/O-bound operations. Parquet already has native parallel reading via PyArrow.
+
+---
+
+## 8. Projection Pushdown
 
 Push computed expressions to the data source for evaluation.
 
@@ -270,15 +417,24 @@ planner.add_optimizer(MyCustomOptimizer())
 
 ---
 
-## Future Optimizations (Roadmap)
+## Implementation Status
 
-- ✅ Predicate pushdown (implemented)
-- ✅ Column pruning (implemented)
-- ⏳ Limit pushdown (detected but not implemented in readers)
-- ⏳ Projection pushdown (placeholder)
-- ⏳ Partition pruning (for partitioned Parquet)
-- ⏳ Join reordering (optimize join order)
+### Fully Implemented ✅
+- **Predicate pushdown** - Push WHERE filters to readers
+- **Column pruning** - Read only required columns
+- **Limit pushdown** - Early termination for LIMIT queries
+- **Partition pruning** - Skip partitions based on filters (Parquet)
+
+### Framework Available ⚠️
+- **Join reordering** - Infrastructure exists, not yet active
+- **Cost-based optimization** - Cost models and statistics framework available
+- **Parallel execution** - Basic thread pool implementation available
+
+### Future Enhancements 🔮
+- ⏳ Projection pushdown (push computed expressions to source)
 - ⏳ Aggregate pushdown (push GROUP BY to readers)
 - ⏳ Index usage (when indexes available)
-- ⏳ Parallel execution (multi-threaded readers)
 - ⏳ Adaptive query execution (runtime optimization)
+- ⏳ Query result caching
+- ⏳ Materialized views
+- ⏳ Advanced statistics collection (histograms, sketches)

@@ -72,6 +72,15 @@ class ParquetReader(BaseReader):
         self.filter_conditions: List[Condition] = []
         self.required_columns: List[str] = []
         self.limit: Optional[int] = None
+        self.partition_filters: List[Condition] = []
+
+        # Parse partition information from path
+        self.partition_columns: set = set()
+        self.partition_values: Dict[str, Any] = {}
+        self._parse_partition_info()
+
+        # Check if file should be skipped based on partition filters
+        self.partition_pruned = False
 
         # Statistics tracking
         self.total_row_groups = self.parquet_file.num_row_groups
@@ -101,17 +110,46 @@ class ParquetReader(BaseReader):
         """Set maximum rows to read for early termination"""
         self.limit = limit
 
+    def supports_partition_pruning(self) -> bool:
+        """Parquet reader supports partition pruning for Hive-style partitioning"""
+        return True
+
+    def get_partition_columns(self) -> set:
+        """Get partition column names detected from file path"""
+        return self.partition_columns
+
+    def set_partition_filters(self, conditions: List[Condition]) -> None:
+        """
+        Set partition filters and check if this file should be skipped
+
+        Args:
+            conditions: List of WHERE conditions on partition columns
+        """
+        self.partition_filters = conditions
+
+        # Check if this file's partitions match the filters
+        # If not, mark it as pruned so we skip reading it
+        if not self._partition_matches_filters():
+            self.partition_pruned = True
+
     def read_lazy(self) -> Iterator[Dict[str, Any]]:
         """
         Lazy iterator over Parquet rows with intelligent row group pruning
 
         This is where the magic happens:
-        1. Select row groups using statistics (skip irrelevant ones!)
-        2. Read only selected row groups
-        3. Read only required columns
-        4. Yield rows as dictionaries
-        5. Early termination if limit is reached
+        1. Check partition pruning (skip entire file if needed!)
+        2. Select row groups using statistics (skip irrelevant ones!)
+        3. Read only selected row groups
+        4. Read only required columns
+        5. Yield rows as dictionaries
+        6. Early termination if limit is reached
         """
+        # Step 0: Partition pruning - skip entire file if partition doesn't match
+        if self.partition_pruned:
+            # File has been pruned based on partition filters
+            # Don't read any data!
+            return
+
         # Step 1: Intelligent row group selection
         selected_row_groups = self._select_row_groups_with_statistics()
 
@@ -123,6 +161,11 @@ class ParquetReader(BaseReader):
         for rg_idx in selected_row_groups:
             # Read this row group (with column selection)
             for row in self._read_row_group(rg_idx):
+                # Add partition columns to the row
+                # These are "virtual" columns from the directory structure
+                for col, value in self.partition_values.items():
+                    row[col] = value
+
                 yield row
                 rows_yielded += 1
 
@@ -457,6 +500,138 @@ class ParquetReader(BaseReader):
         else:
             return DataType.NULL
 
+    def _parse_partition_info(self) -> None:
+        """
+        Parse partition information from Hive-style partitioned path
+
+        Detects partition columns and values from path structure:
+        - s3://bucket/data/year=2024/month=01/data.parquet
+        - /path/to/data/country=USA/state=CA/data.parquet
+
+        Populates:
+        - self.partition_columns: {'year', 'month'} or {'country', 'state'}
+        - self.partition_values: {'year': 2024, 'month': 1} or {'country': 'USA', 'state': 'CA'}
+        """
+        import re
+
+        # Parse the path string for partition key=value patterns
+        # Match pattern: name=value in directory structure
+        partition_pattern = re.compile(r'([^/=]+)=([^/]+)')
+
+        matches = partition_pattern.findall(self.path_str)
+
+        for key, value in matches:
+            self.partition_columns.add(key)
+
+            # Try to infer type of partition value
+            # Common patterns: year=2024 (int), month=01 (int), country=USA (str)
+            typed_value = self._infer_partition_value_type(value)
+            self.partition_values[key] = typed_value
+
+    def _infer_partition_value_type(self, value: str) -> Any:
+        """
+        Infer the type of a partition value string
+
+        Args:
+            value: String value from partition path (e.g., "2024", "01", "USA")
+
+        Returns:
+            Typed value (int, float, or str)
+        """
+        # Try int first
+        try:
+            return int(value)
+        except ValueError:
+            pass
+
+        # Try float
+        try:
+            return float(value)
+        except ValueError:
+            pass
+
+        # Default to string
+        return value
+
+    def _partition_matches_filters(self) -> bool:
+        """
+        Check if this file's partition values match the partition filters
+
+        Returns:
+            True if partition matches (file should be read)
+            False if partition doesn't match (file should be skipped)
+
+        Example:
+            File path: s3://bucket/data/year=2024/month=01/data.parquet
+            Partition values: {'year': 2024, 'month': 1}
+
+            Filter: year > 2023 AND month = 1
+            Result: True (matches)
+
+            Filter: year = 2025
+            Result: False (doesn't match, skip file!)
+        """
+        if not self.partition_filters:
+            # No filters, all partitions match
+            return True
+
+        # Check each partition filter condition
+        for condition in self.partition_filters:
+            column = condition.column
+            operator = condition.operator
+            expected = condition.value
+
+            # Get partition value for this column
+            if column not in self.partition_values:
+                # Filter references a partition column that doesn't exist in path
+                # Conservatively assume match (don't skip)
+                continue
+
+            actual = self.partition_values[column]
+
+            # Evaluate condition
+            if not self._evaluate_partition_condition(actual, operator, expected):
+                # Condition failed, skip this file!
+                return False
+
+        # All conditions passed
+        return True
+
+    def _evaluate_partition_condition(
+        self, actual: Any, operator: str, expected: Any
+    ) -> bool:
+        """
+        Evaluate a partition filter condition
+
+        Args:
+            actual: Actual partition value from path
+            operator: Comparison operator (=, >, <, etc.)
+            expected: Expected value from WHERE clause
+
+        Returns:
+            True if condition is satisfied, False otherwise
+        """
+        try:
+            if operator == "=":
+                return actual == expected
+            elif operator == ">":
+                return actual > expected
+            elif operator == "<":
+                return actual < expected
+            elif operator == ">=":
+                return actual >= expected
+            elif operator == "<=":
+                return actual <= expected
+            elif operator == "!=":
+                return actual != expected
+            else:
+                # Unknown operator, conservatively match
+                return True
+
+        except (TypeError, ValueError):
+            # Type mismatch, conservatively match
+            return True
+
     def get_statistics(self) -> Dict[str, Any]:
         """
         Get statistics about row group pruning
@@ -474,4 +649,7 @@ class ParquetReader(BaseReader):
                 if self.total_row_groups > 0
                 else 0
             ),
+            "partition_pruned": self.partition_pruned,
+            "partition_columns": list(self.partition_columns),
+            "partition_values": self.partition_values,
         }

@@ -9,7 +9,9 @@ from typing import List
 
 from sqlstream.optimizers.base import OptimizerPipeline
 from sqlstream.optimizers.column_pruning import ColumnPruningOptimizer
+from sqlstream.optimizers.join_reordering import JoinReorderingOptimizer
 from sqlstream.optimizers.limit_pushdown import LimitPushdownOptimizer
+from sqlstream.optimizers.partition_pruning import PartitionPruningOptimizer
 from sqlstream.optimizers.predicate_pushdown import PredicatePushdownOptimizer
 from sqlstream.optimizers.projection_pushdown import ProjectionPushdownOptimizer
 from sqlstream.readers.base import BaseReader
@@ -21,10 +23,12 @@ class QueryPlanner:
     Query planner and optimizer orchestrator
 
     Applies a pipeline of optimizations to improve query performance:
-    1. Predicate pushdown - push WHERE filters to readers
-    2. Column pruning - tell readers which columns to read
-    3. Limit pushdown - early termination for LIMIT queries
-    4. Projection pushdown - push computed expressions (future)
+    1. Join reordering - optimize join order for performance
+    2. Partition pruning - skip entire partitions/files based on filters
+    3. Predicate pushdown - push WHERE filters to readers
+    4. Column pruning - tell readers which columns to read
+    5. Limit pushdown - early termination for LIMIT queries
+    6. Projection pushdown - push computed expressions (future)
 
     The planner modifies the reader in-place with optimization hints.
 
@@ -41,13 +45,17 @@ class QueryPlanner:
         Initialize planner with default optimization pipeline
 
         The order matters:
-        1. Predicate pushdown first (reduces data read)
-        2. Column pruning second (narrows columns)
-        3. Limit pushdown third (early termination)
-        4. Projection pushdown last (transform data at source)
+        1. Join reordering first (affects join execution plan)
+        2. Partition pruning second (can skip entire files!)
+        3. Predicate pushdown third (reduces data read)
+        4. Column pruning fourth (narrows columns)
+        5. Limit pushdown fifth (early termination)
+        6. Projection pushdown last (transform data at source)
         """
         self.pipeline = OptimizerPipeline(
             [
+                JoinReorderingOptimizer(),
+                PartitionPruningOptimizer(),
                 PredicatePushdownOptimizer(),
                 ColumnPruningOptimizer(),
                 LimitPushdownOptimizer(),

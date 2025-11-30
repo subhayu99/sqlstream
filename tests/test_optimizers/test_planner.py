@@ -400,3 +400,223 @@ class TestLimitPushdown:
         # Should get 2 rows (Charlie and Eve)
         assert len(results) == 2
         assert all(row["age"] > 25 for row in results)
+
+
+class TestPartitionPruning:
+    """Test partition pruning optimization for Parquet files"""
+
+    @pytest.fixture
+    def partitioned_parquet(self, tmp_path):
+        """Create partitioned Parquet files for testing"""
+        try:
+            import pandas as pd
+            import pyarrow as pa
+            import pyarrow.parquet as pq
+        except ImportError:
+            pytest.skip("Requires pandas and pyarrow")
+
+        # Create a partitioned directory structure:
+        # data/year=2023/month=12/data.parquet
+        # data/year=2024/month=01/data.parquet
+        # data/year=2024/month=02/data.parquet
+
+        base_dir = tmp_path / "data"
+
+        # Partition 1: year=2023/month=12
+        partition_2023_12 = base_dir / "year=2023" / "month=12"
+        partition_2023_12.mkdir(parents=True)
+        df1 = pd.DataFrame({
+            "name": ["Alice", "Bob"],
+            "age": [30, 25],
+            "sales": [100, 150]
+        })
+        pq.write_table(pa.Table.from_pandas(df1), partition_2023_12 / "data.parquet")
+
+        # Partition 2: year=2024/month=01
+        partition_2024_01 = base_dir / "year=2024" / "month=1"
+        partition_2024_01.mkdir(parents=True)
+        df2 = pd.DataFrame({
+            "name": ["Charlie", "Diana"],
+            "age": [35, 28],
+            "sales": [200, 180]
+        })
+        pq.write_table(pa.Table.from_pandas(df2), partition_2024_01 / "data.parquet")
+
+        # Partition 3: year=2024/month=02
+        partition_2024_02 = base_dir / "year=2024" / "month=2"
+        partition_2024_02.mkdir(parents=True)
+        df3 = pd.DataFrame({
+            "name": ["Eve", "Frank"],
+            "age": [32, 40],
+            "sales": [220, 190]
+        })
+        pq.write_table(pa.Table.from_pandas(df3), partition_2024_02 / "data.parquet")
+
+        return base_dir
+
+    def test_partition_detection(self, partitioned_parquet):
+        """Test that partition columns are detected from path"""
+        try:
+            from sqlstream.readers.parquet_reader import ParquetReader
+        except ImportError:
+            pytest.skip("Requires pyarrow")
+
+        # Read one of the partitioned files
+        file_path = str(partitioned_parquet / "year=2024" / "month=1" / "data.parquet")
+        reader = ParquetReader(file_path)
+
+        # Should detect partition columns from path
+        assert "year" in reader.partition_columns
+        assert "month" in reader.partition_columns
+
+        # Should parse partition values
+        assert reader.partition_values["year"] == 2024
+        assert reader.partition_values["month"] == 1
+
+    def test_partition_pruning_match(self, partitioned_parquet):
+        """Test that matching partition is not pruned"""
+        try:
+            from sqlstream.readers.parquet_reader import ParquetReader
+        except ImportError:
+            pytest.skip("Requires pyarrow")
+
+        file_path = str(partitioned_parquet / "year=2024" / "month=1" / "data.parquet")
+        reader = ParquetReader(file_path)
+
+        ast = parse("SELECT * FROM data WHERE year = 2024")
+        planner = QueryPlanner()
+        planner.optimize(ast, reader)
+
+        # File should NOT be pruned (year=2024 matches filter)
+        assert not reader.partition_pruned
+
+        # Should be able to read data
+        results = list(reader.read_lazy())
+        assert len(results) == 2  # Charlie and Diana
+
+    def test_partition_pruning_no_match(self, partitioned_parquet):
+        """Test that non-matching partition is pruned"""
+        try:
+            from sqlstream.readers.parquet_reader import ParquetReader
+        except ImportError:
+            pytest.skip("Requires pyarrow")
+
+        file_path = str(partitioned_parquet / "year=2023" / "month=12" / "data.parquet")
+        reader = ParquetReader(file_path)
+
+        ast = parse("SELECT * FROM data WHERE year = 2024")
+        planner = QueryPlanner()
+        planner.optimize(ast, reader)
+
+        # File should be pruned (year=2023 doesn't match year=2024 filter)
+        assert reader.partition_pruned
+
+        # Should return no data (pruned)
+        results = list(reader.read_lazy())
+        assert len(results) == 0
+
+    def test_partition_columns_in_results(self, partitioned_parquet):
+        """Test that partition columns are added to result rows"""
+        try:
+            from sqlstream.readers.parquet_reader import ParquetReader
+        except ImportError:
+            pytest.skip("Requires pyarrow")
+
+        file_path = str(partitioned_parquet / "year=2024" / "month=1" / "data.parquet")
+        reader = ParquetReader(file_path)
+
+        # Read without filters
+        results = list(reader.read_lazy())
+
+        # Results should include partition columns
+        assert len(results) == 2
+        for row in results:
+            assert "year" in row
+            assert "month" in row
+            assert row["year"] == 2024
+            assert row["month"] == 1
+            # Regular columns should also be present
+            assert "name" in row
+            assert "age" in row
+            assert "sales" in row
+
+    def test_partition_pruning_with_range_filter(self, partitioned_parquet):
+        """Test partition pruning with range filters (>, <, etc.)"""
+        try:
+            from sqlstream.readers.parquet_reader import ParquetReader
+        except ImportError:
+            pytest.skip("Requires pyarrow")
+
+        # Test year > 2023 (should NOT prune 2024 files)
+        file_path_2024 = str(partitioned_parquet / "year=2024" / "month=1" / "data.parquet")
+        reader = ParquetReader(file_path_2024)
+        ast = parse("SELECT * FROM data WHERE year > 2023")
+        planner = QueryPlanner()
+        planner.optimize(ast, reader)
+        assert not reader.partition_pruned
+
+        # Test year > 2023 (should prune 2023 files)
+        file_path_2023 = str(partitioned_parquet / "year=2023" / "month=12" / "data.parquet")
+        reader = ParquetReader(file_path_2023)
+        ast = parse("SELECT * FROM data WHERE year > 2023")
+        planner = QueryPlanner()
+        planner.optimize(ast, reader)
+        assert reader.partition_pruned
+
+    def test_partition_pruning_multiple_conditions(self, partitioned_parquet):
+        """Test partition pruning with multiple partition filters"""
+        try:
+            from sqlstream.readers.parquet_reader import ParquetReader
+        except ImportError:
+            pytest.skip("Requires pyarrow")
+
+        file_path = str(partitioned_parquet / "year=2024" / "month=1" / "data.parquet")
+        reader = ParquetReader(file_path)
+
+        # Filter: year = 2024 AND month = 1 (both match)
+        ast = parse("SELECT * FROM data WHERE year = 2024 AND month = 1")
+        planner = QueryPlanner()
+        planner.optimize(ast, reader)
+
+        assert not reader.partition_pruned
+        results = list(reader.read_lazy())
+        assert len(results) == 2
+
+    def test_partition_pruning_optimization_recorded(self, partitioned_parquet):
+        """Test that partition pruning is recorded in optimization summary"""
+        try:
+            from sqlstream.readers.parquet_reader import ParquetReader
+        except ImportError:
+            pytest.skip("Requires pyarrow")
+
+        file_path = str(partitioned_parquet / "year=2024" / "month=1" / "data.parquet")
+        reader = ParquetReader(file_path)
+
+        ast = parse("SELECT * FROM data WHERE year = 2024")
+        planner = QueryPlanner()
+        planner.optimize(ast, reader)
+
+        # Should record partition pruning in summary
+        summary = planner.get_optimization_summary()
+        assert "Partition pruning" in summary
+
+    def test_partition_pruning_with_non_partition_filters(self, partitioned_parquet):
+        """Test that non-partition filters don't affect partition pruning"""
+        try:
+            from sqlstream.readers.parquet_reader import ParquetReader
+        except ImportError:
+            pytest.skip("Requires pyarrow")
+
+        file_path = str(partitioned_parquet / "year=2024" / "month=1" / "data.parquet")
+        reader = ParquetReader(file_path)
+
+        # Filter on non-partition column (age)
+        ast = parse("SELECT * FROM data WHERE age > 30")
+        planner = QueryPlanner()
+        planner.optimize(ast, reader)
+
+        # Should NOT be pruned (filter doesn't reference partition columns)
+        assert not reader.partition_pruned
+
+        # But predicate pushdown should still work
+        assert len(reader.filter_conditions) > 0
