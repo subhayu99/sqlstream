@@ -154,10 +154,11 @@ class SQLShellApp(App):
     #right-panel {
         width: 100%;
         height: 100%;
+        layout: vertical;
     }
 
     #query-container {
-        height: 30%;
+        height: 12;
         border: solid $primary;
         background: $panel;
     }
@@ -168,7 +169,7 @@ class SQLShellApp(App):
     }
 
     #results-container {
-        height: 65%;
+        height: 1fr;
         border: solid $accent;
         margin-top: 1;
     }
@@ -178,11 +179,12 @@ class SQLShellApp(App):
     }
 
     #status-bar {
-        height: 1;
+        height: auto;
+        min-height: 3;
         background: $boost;
         color: $text;
-        padding: 0 0;
-        text-align: center;
+        content-align: center middle;
+        border: solid $primary;
     }
 
     .error {
@@ -269,8 +271,8 @@ class SQLShellApp(App):
                 with Container(id="results-container"):
                     yield ResultsViewer(id="results-viewer")
 
-        # Status Bar
-        yield StatusBar(id="status-bar")
+                # Status Bar
+                yield StatusBar(id="status-bar")
 
         yield Footer()
 
