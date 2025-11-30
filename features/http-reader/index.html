@@ -12,13 +12,9 @@
         <meta name="author" content="SQLStream Team">
       
       
-        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/api/query/">
+        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/features/http-reader/">
       
       
-        <link rel="prev" href="../overview/">
-      
-      
-        <link rel="next" href="../readers/">
       
       
         
@@ -29,7 +25,7 @@
     
     
       
-        <title>Query Class - SQLStream</title>
+        <title>HTTP Reader - SQLStream</title>
       
     
     
@@ -54,6 +50,8 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -80,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#query-api" class="md-skip">
+        <a href="#http-reader" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Query Class
+              HTTP Reader
             
           </span>
         </div>
@@ -272,7 +270,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../features/sql-support/" class="md-tabs__link">
+        <a href="../sql-support/" class="md-tabs__link">
           
   
   
@@ -308,13 +306,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../overview/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../api/overview/" class="md-tabs__link">
           
   
   
@@ -659,7 +655,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/sql-support/" class="md-nav__link">
+      <a href="../sql-support/" class="md-nav__link">
         
   
   
@@ -687,7 +683,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/type-system/" class="md-nav__link">
+      <a href="../type-system/" class="md-nav__link">
         
   
   
@@ -715,7 +711,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/data-sources/" class="md-nav__link">
+      <a href="../data-sources/" class="md-nav__link">
         
   
   
@@ -743,7 +739,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/s3-support/" class="md-nav__link">
+      <a href="../s3-support/" class="md-nav__link">
         
   
   
@@ -771,7 +767,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/joins/" class="md-nav__link">
+      <a href="../joins/" class="md-nav__link">
         
   
   
@@ -799,7 +795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/aggregations/" class="md-nav__link">
+      <a href="../aggregations/" class="md-nav__link">
         
   
   
@@ -827,7 +823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/pandas-backend/" class="md-nav__link">
+      <a href="../pandas-backend/" class="md-nav__link">
         
   
   
@@ -855,7 +851,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../features/inline-paths/" class="md-nav__link">
+      <a href="../inline-paths/" class="md-nav__link">
         
   
   
@@ -1058,31 +1054,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1100,7 +1091,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1118,7 +1109,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../overview/" class="md-nav__link">
+      <a href="../../api/overview/" class="md-nav__link">
         
   
   
@@ -1143,26 +1134,33 @@
                 
   
   
+  
+  
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+    
+    
+    
       
       
         
       
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
           
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
     
   
-    Query Class
+    API Reference
   
 
     
@@ -1170,188 +1168,19 @@
   
   
 
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
   
-  
-  <span class="md-ellipsis">
-    
-  
-    Query Class
+    API Reference
   
 
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sqlstreamquery" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sqlstream.query
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#query-class" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Query Class
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Query Class">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#__init__source-str" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__(source: str)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#sqlquery-str-backend-str-auto-queryresult" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sql(query: str, backend: str = "auto") -&gt; QueryResult
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#schema-optionalschema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        schema() -&gt; Optional[Schema]
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#queryinline-class" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        QueryInline Class
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="QueryInline Class">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sqlquery-str-backend-str-auto-queryresult_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        sql(query: str, backend: str = "auto") -&gt; QueryResult
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#queryresult-class" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        QueryResult Class
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="QueryResult Class">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#__iter__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __iter__()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#to_list-listdictstr-any" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        to_list() -&gt; List[Dict[str, Any]]
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#explain-str" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        explain() -&gt; str
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -1360,14 +1189,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../readers/" class="md-nav__link">
+      <a href="../../api/reference/cli/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Readers
+    CLI
   
 
     
@@ -1388,7 +1217,263 @@
   
   
     <li class="md-nav__item">
-      <a href="../advanced/" class="md-nav__link">
+      <a href="../../api/reference/operators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/optimizers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/query/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/readers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Readers API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/sql/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SQL Parser
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Type System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/guides/advanced/" class="md-nav__link">
         
   
   
@@ -1404,6 +1489,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1784,10 +1877,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sqlstreamquery" class="md-nav__link">
+  <a href="#features" class="md-nav__link">
     <span class="md-ellipsis">
       
-        sqlstream.query
+        Features
       
     </span>
   </a>
@@ -1795,22 +1888,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#query-class" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Query Class
+        Usage
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Query Class">
+    <nav class="md-nav" aria-label="Usage">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#__init__source-str" class="md-nav__link">
+  <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __init__(source: str)
+        Basic Usage
       
     </span>
   </a>
@@ -1818,10 +1911,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sqlquery-str-backend-str-auto-queryresult" class="md-nav__link">
+  <a href="#handling-extension-less-urls" class="md-nav__link">
     <span class="md-ellipsis">
       
-        sql(query: str, backend: str = "auto") -&gt; QueryResult
+        Handling Extension-less URLs
       
     </span>
   </a>
@@ -1829,10 +1922,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#schema-optionalschema" class="md-nav__link">
+  <a href="#caching" class="md-nav__link">
     <span class="md-ellipsis">
       
-        schema() -&gt; Optional[Schema]
+        Caching
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supported-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Formats
       
     </span>
   </a>
@@ -1845,50 +1949,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#queryinline-class" class="md-nav__link">
+  <a href="#advanced-usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        QueryInline Class
+        Advanced Usage
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="QueryInline Class">
+    <nav class="md-nav" aria-label="Advanced Usage">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#sqlquery-str-backend-str-auto-queryresult_1" class="md-nav__link">
+  <a href="#reading-specific-tables" class="md-nav__link">
     <span class="md-ellipsis">
       
-        sql(query: str, backend: str = "auto") -&gt; QueryResult
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#queryresult-class" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        QueryResult Class
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="QueryResult Class">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#__iter__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __iter__()
+        Reading Specific Tables
       
     </span>
   </a>
@@ -1896,21 +1972,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#to_list-listdictstr-any" class="md-nav__link">
+  <a href="#content-type-detection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        to_list() -&gt; List[Dict[str, Any]]
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#explain-str" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        explain() -&gt; str
+        Content-Type Detection
       
     </span>
   </a>
@@ -1942,40 +2007,52 @@
   
 
 
-<h1 id="query-api">Query API</h1>
-<p>The <code>Query</code> and <code>QueryInline</code> classes are the primary interfaces for executing SQL against data files.</p>
-<h2 id="sqlstreamquery"><code>sqlstream.query</code></h2>
-<p>A convenience function to create a <code>Query</code> object.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Query</span><span class="p">:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">...</span>
+<h1 id="http-reader">HTTP Reader</h1>
+<p>The HTTP Reader allows SQLStream to query data directly from HTTP and HTTPS URLs. It supports intelligent caching, streaming downloads, and automatic format detection.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>Direct Querying</strong>: Query data from any public URL.</li>
+<li><strong>Caching</strong>: Downloads are cached locally to speed up subsequent queries.</li>
+<li><strong>Format Detection</strong>: Automatically detects format from file extension, URL fragments, or content.</li>
+<li><strong>Streaming</strong>: Streams large files efficiently.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<h3 id="basic-usage">Basic Usage</h3>
+<p>Simply use a URL as the table source in your SQL query:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;https://raw.githubusercontent.com/datasets/population/master/data/population.csv&quot;</span><span class="p">;</span>
 </span></code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>source</code>: Path to the data file (local path, URL, or S3 URI).</p>
-<h2 id="query-class"><code>Query</code> Class</h2>
-<p>Represents a query builder for a specific data source.</p>
-<h3 id="__init__source-str"><code>__init__(source: str)</code></h3>
-<p>Initializes the query with a source file.</p>
-<h3 id="sqlquery-str-backend-str-auto-queryresult"><code>sql(query: str, backend: str = "auto") -&gt; QueryResult</code></h3>
-<p>Executes a SQL query on the source.</p>
-<p><strong>Arguments:</strong>
-- <code>query</code>: The SQL query string.
-- <code>backend</code>: Execution backend ("auto", "pandas", "python").</p>
-<p><strong>Returns:</strong>
-- <code>QueryResult</code>: An iterable object containing the results.</p>
-<h3 id="schema-optionalschema"><code>schema() -&gt; Optional[Schema]</code></h3>
-<p>Returns the inferred schema of the data source.</p>
-<h2 id="queryinline-class"><code>QueryInline</code> Class</h2>
-<p>Allows querying files specified directly in the SQL string.</p>
-<h3 id="sqlquery-str-backend-str-auto-queryresult_1"><code>sql(query: str, backend: str = "auto") -&gt; QueryResult</code></h3>
-<p>Executes a SQL query. The source files must be specified in the <code>FROM</code> clause (e.g., <code>FROM 'file.csv'</code>).</p>
-<h2 id="queryresult-class"><code>QueryResult</code> Class</h2>
-<p>Represents the result of a query execution. It is lazy and iterable.</p>
-<h3 id="__iter__"><code>__iter__()</code></h3>
-<p>Yields result rows as dictionaries.</p>
-<h3 id="to_list-listdictstr-any"><code>to_list() -&gt; List[Dict[str, Any]]</code></h3>
-<p>Materializes all results into a list.</p>
-<h3 id="explain-str"><code>explain() -&gt; str</code></h3>
-<p>Returns the execution plan for the query.</p>
+<h3 id="handling-extension-less-urls">Handling Extension-less URLs</h3>
+<p>For URLs that don't end in a standard file extension (like Pastebin or API endpoints), use the <a href="url-fragments.md">URL Fragment Syntax</a> to specify the format:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">-- Read CSV data from Pastebin</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;https://pastebin.com/raw/xxxxx#csv&quot;</span><span class="p">;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">-- Read Markdown table from a raw URL</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;https://pastebin.com/raw/cnkgQp1t#markdown&quot;</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="caching">Caching</h3>
+<p>Downloaded files are cached in the system's temporary directory (e.g., <code>/tmp/sqlstream_cache</code> on Linux). The cache key is based on the URL hash.</p>
+<ul>
+<li><strong>Persistent Cache</strong>: Files remain in cache until cleared.</li>
+<li><strong>Force Download</strong>: Currently, the CLI doesn't expose a flag to force download, but you can manually clear the cache directory.</li>
+</ul>
+<h3 id="supported-formats">Supported Formats</h3>
+<p>The HTTP Reader supports all formats supported by SQLStream, including:
+- CSV
+- Parquet
+- JSON
+- HTML (tables)
+- Markdown (tables)</p>
+<h2 id="advanced-usage">Advanced Usage</h2>
+<h3 id="reading-specific-tables">Reading Specific Tables</h3>
+<p>You can combine format specification with table selection for multi-table formats like HTML and Markdown:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">-- Read the second table from a remote Markdown file</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;https://example.com/data.md#markdown:1&quot;</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="content-type-detection">Content-Type Detection</h3>
+<p>The reader attempts to detect the format from the file content if the extension is missing or unknown. It checks for:
+- <strong>Parquet</strong>: Magic bytes <code>PAR1</code>.
+- <strong>HTML</strong>: Tags like <code>&lt;html&gt;</code>, <code>&lt;table&gt;</code>.
+- <strong>Markdown</strong>: Table syntax <code>| ... |</code> and <code>|---</code>.</p>
 
 
 

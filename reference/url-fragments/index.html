@@ -12,13 +12,9 @@
         <meta name="author" content="SQLStream Team">
       
       
-        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/api/readers/">
+        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/reference/url-fragments/">
       
       
-        <link rel="prev" href="../query/">
-      
-      
-        <link rel="next" href="../advanced/">
       
       
         
@@ -29,7 +25,7 @@
     
     
       
-        <title>Readers - SQLStream</title>
+        <title>URL Fragment Syntax - SQLStream</title>
       
     
     
@@ -54,6 +50,8 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -80,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#readers-api" class="md-skip">
+        <a href="#url-fragment-syntax" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Readers
+              URL Fragment Syntax
             
           </span>
         </div>
@@ -308,13 +306,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../overview/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../api/overview/" class="md-tabs__link">
           
   
   
@@ -1058,31 +1054,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1100,7 +1091,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1118,7 +1109,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../overview/" class="md-nav__link">
+      <a href="../../api/overview/" class="md-nav__link">
         
   
   
@@ -1145,52 +1136,31 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../query/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
     
-  
-    Query Class
-  
-
     
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+    
       
       
         
       
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
           
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
     
   
-    Readers
+    API Reference
   
 
     
@@ -1198,17 +1168,35 @@
   
   
 
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/cli/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Readers
+    CLI
   
 
     
@@ -1217,98 +1205,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#basereader" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        BaseReader
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="BaseReader">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#read_lazy-iteratordictstr-any" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        read_lazy() -&gt; Iterator[Dict[str, Any]]
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get_schema-optionalschema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_schema() -&gt; Optional[Schema]
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#csvreader" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CSVReader
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#parquetreader" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ParquetReader
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#httpreader" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        HTTPReader
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1321,7 +1217,263 @@
   
   
     <li class="md-nav__item">
-      <a href="../advanced/" class="md-nav__link">
+      <a href="../../api/reference/operators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/optimizers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/query/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/readers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Readers API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/sql/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SQL Parser
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Type System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/guides/advanced/" class="md-nav__link">
         
   
   
@@ -1337,6 +1489,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1717,33 +1877,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basereader" class="md-nav__link">
+  <a href="#syntax" class="md-nav__link">
     <span class="md-ellipsis">
       
-        BaseReader
+        Syntax
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="BaseReader">
+    <nav class="md-nav" aria-label="Syntax">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#read_lazy-iteratordictstr-any" class="md-nav__link">
+  <a href="#components" class="md-nav__link">
     <span class="md-ellipsis">
       
-        read_lazy() -&gt; Iterator[Dict[str, Any]]
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get_schema-optionalschema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_schema() -&gt; Optional[Schema]
+        Components
       
     </span>
   </a>
@@ -1756,10 +1905,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#csvreader" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CSVReader
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specifying-format-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specifying Format Only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifying-table-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specifying Table Only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifying-format-and-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specifying Format and Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Formats
       
     </span>
   </a>
@@ -1767,10 +1966,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parquetreader" class="md-nav__link">
+  <a href="#table-indexing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ParquetReader
+        Table Indexing
       
     </span>
   </a>
@@ -1778,10 +1977,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#httpreader" class="md-nav__link">
+  <a href="#error-handling" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HTTPReader
+        Error Handling
       
     </span>
   </a>
@@ -1808,28 +2007,88 @@
   
 
 
-<h1 id="readers-api">Readers API</h1>
-<p>Readers are responsible for abstracting data access from different file formats and storage systems.</p>
-<h2 id="basereader"><code>BaseReader</code></h2>
-<p>The abstract base class for all readers.</p>
-<h3 id="read_lazy-iteratordictstr-any"><code>read_lazy() -&gt; Iterator[Dict[str, Any]]</code></h3>
-<p>Yields rows one by one from the source.</p>
-<h3 id="get_schema-optionalschema"><code>get_schema() -&gt; Optional[Schema]</code></h3>
-<p>Returns the schema of the data source, if available.</p>
-<h2 id="csvreader"><code>CSVReader</code></h2>
-<p>Reads Comma-Separated Values files.</p>
+<h1 id="url-fragment-syntax">URL Fragment Syntax</h1>
+<p>SQLStream supports a powerful URL fragment syntax that allows you to specify the data format and table index directly in the source URL. This is particularly useful for URLs that don't have file extensions (like Pastebin) or files that contain multiple tables (like HTML or Markdown).</p>
+<h2 id="syntax">Syntax</h2>
+<p>The general syntax is:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>source_url#format:table
+</span></code></pre></div>
 <ul>
-<li><strong>Source</strong>: Local files, URLs, S3.</li>
-<li><strong>Features</strong>: Type inference, header detection.</li>
+<li><strong>source_url</strong>: The path to the file or HTTP URL.</li>
+<li><strong>format</strong>: (Optional) The data format (e.g., <code>csv</code>, <code>json</code>, <code>parquet</code>, <code>html</code>, <code>markdown</code>).</li>
+<li><strong>table</strong>: (Optional) The index of the table to read (0-indexed).</li>
 </ul>
-<h2 id="parquetreader"><code>ParquetReader</code></h2>
-<p>Reads Apache Parquet files.</p>
+<h3 id="components">Components</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>format</code></td>
+<td>Explicitly sets the parser to use. Overrides file extension detection.</td>
+<td><code>#csv</code>, <code>#html</code></td>
+</tr>
+<tr>
+<td><code>table</code></td>
+<td>Selects a specific table from a multi-table file.</td>
+<td><code>:0</code>, <code>:1</code>, <code>:-1</code></td>
+</tr>
+<tr>
+<td>Separator</td>
+<td>The <code>:</code> character separates format and table.</td>
+<td><code>#html:1</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="examples">Examples</h2>
+<h3 id="specifying-format-only">Specifying Format Only</h3>
+<p>Use this when the URL doesn't have a file extension or you want to override the detected format.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">-- Read raw text from Pastebin as CSV</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;https://pastebin.com/raw/xxxxx#csv&quot;</span><span class="p">;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">-- Force CSV parsing for a .txt file</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;data.txt#csv&quot;</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="specifying-table-only">Specifying Table Only</h3>
+<p>Use this when the format is correctly detected (e.g., by extension) but you want to read a specific table.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">-- Read the second table from an HTML file (index 1)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;data.html#:1&quot;</span><span class="p">;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1">-- Read the last table from a Markdown file</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;README.md#:-1&quot;</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="specifying-format-and-table">Specifying Format and Table</h3>
+<p>Use this for full control, especially for extension-less URLs containing multi-table formats.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Read the first table from a raw HTML URL</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;https://example.com/raw/data#html:0&quot;</span><span class="p">;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">-- Read the second table from a raw Markdown URL</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;https://pastebin.com/raw/cnkgQp1t#markdown:1&quot;</span><span class="p">;</span>
+</span></code></pre></div>
+<h2 id="supported-formats">Supported Formats</h2>
+<p>The following formats support the fragment syntax:</p>
 <ul>
-<li><strong>Source</strong>: Local files, URLs, S3.</li>
-<li><strong>Features</strong>: Column pruning (reads only requested columns), predicate pushdown (filters data at the storage level).</li>
+<li><strong>html</strong>: Supports table selection.</li>
+<li><strong>markdown</strong>: Supports table selection.</li>
+<li><strong>csv</strong>: Format specification only (table index ignored).</li>
+<li><strong>parquet</strong>: Format specification only.</li>
+<li><strong>json</strong>: Format specification only.</li>
 </ul>
-<h2 id="httpreader"><code>HTTPReader</code></h2>
-<p>Reads data from HTTP/HTTPS URLs. Usually wraps another reader (like CSVReader) to handle the content format.</p>
+<h2 id="table-indexing">Table Indexing</h2>
+<ul>
+<li><strong>Positive Index</strong>: <code>0</code> is the first table, <code>1</code> is the second, etc.</li>
+<li><strong>Negative Index</strong>: <code>-1</code> is the last table, <code>-2</code> is the second to last, etc.</li>
+</ul>
+<h2 id="error-handling">Error Handling</h2>
+<ul>
+<li>If the specified format is invalid, an error will be raised.</li>
+<li>If the table index is out of range (e.g., requesting table 5 when only 2 exist), a <code>ValueError</code> will be raised with a helpful message indicating the number of available tables.</li>
+</ul>
 
 
 

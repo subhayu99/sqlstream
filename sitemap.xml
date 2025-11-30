@@ -9,19 +9,43 @@
          <lastmod>2025-11-30</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/api/advanced/</loc>
-         <lastmod>2025-11-30</lastmod>
-    </url>
-    <url>
          <loc>https://subhayu99.github.io/sqlstream/api/overview/</loc>
          <lastmod>2025-11-30</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/api/query/</loc>
+         <loc>https://subhayu99.github.io/sqlstream/api/guides/advanced/</loc>
          <lastmod>2025-11-30</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/api/readers/</loc>
+         <loc>https://subhayu99.github.io/sqlstream/api/reference/cli/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/api/reference/operators/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/api/reference/optimizers/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/api/reference/query/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/api/reference/readers/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/api/reference/sql/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/api/reference/types/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/api/reference/utils/</loc>
          <lastmod>2025-11-30</lastmod>
     </url>
     <url>
@@ -69,11 +93,19 @@
          <lastmod>2025-11-30</lastmod>
     </url>
     <url>
+         <loc>https://subhayu99.github.io/sqlstream/features/advanced-formats/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
          <loc>https://subhayu99.github.io/sqlstream/features/aggregations/</loc>
          <lastmod>2025-11-30</lastmod>
     </url>
     <url>
          <loc>https://subhayu99.github.io/sqlstream/features/data-sources/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/features/http-reader/</loc>
          <lastmod>2025-11-30</lastmod>
     </url>
     <url>
@@ -110,6 +142,10 @@
     </url>
     <url>
          <loc>https://subhayu99.github.io/sqlstream/getting-started/quickstart/</loc>
+         <lastmod>2025-11-30</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/reference/url-fragments/</loc>
          <lastmod>2025-11-30</lastmod>
     </url>
 </urlset>
