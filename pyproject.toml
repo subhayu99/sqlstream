@@ -59,6 +59,8 @@ duckdb = [
 ]
 all = [
     "lxml>=4.8.0",
+    "html5lib>=1.1",
+    "beautifulsoup4>=4.14.3",
     "pandas>=2.0.0",
     "pyarrow>=14.0.0",
     "httpx>=0.27.0",
