@@ -13,7 +13,10 @@
 ## Quick Example
 
 ```bash
-# Query a CSV file
+# Query a CSV file (explicit source)
+$ sqlstream query data.csv "SELECT * FROM data WHERE age > 25"
+
+# Query with inline file path (source inferred from SQL)
 $ sqlstream query "SELECT * FROM 'data.csv' WHERE age > 25"
 
 # Query S3 files
@@ -103,6 +106,7 @@ Features:
 - **Tabbed Sidebar** (`F2`): Toggle between Schema browser and File explorer
 - **File Browser** (`Ctrl+O`): Browse and select files to query with tree structure
 - **Query History** (`Ctrl+Up/Down`): Navigate through previous queries (multiline supported)
+- **Word Deletion** (`Ctrl+Delete`/`Ctrl+Backspace`): Fast editing with word-aware deletion
 - **Execution Plan** (`F4`): View detailed query execution steps
 - **Smart Export** (`Ctrl+X`): Save results as CSV, JSON, or Parquet with custom filenames
 - **Live Filtering** (`Ctrl+F`): Search across all columns
@@ -116,15 +120,18 @@ Features:
 ```python
 from sqlstream import query
 
-# Execute query (lazy evaluation)
+# Execute query with explicit source
 results = query("data.csv").sql("SELECT * FROM data WHERE age > 25")
+
+# Execute query with inline source (extracted from SQL)
+results = query().sql("SELECT * FROM 'data.csv' WHERE age > 25")
 
 # Iterate over results
 for row in results:
     print(row)
 
 # Or convert to list
-results_list = query("data.csv").sql("SELECT * FROM data").to_list()
+results_list = query().sql("SELECT * FROM 'data.csv'").to_list()
 ```
 
 ## Documentation
@@ -168,6 +175,7 @@ SQLStream offers two execution backends:
 |---------|-------|----------|
 | Python | Baseline | Learning, small files (<100K rows) |
 | Pandas | **10-100x faster** | Production, large files (>100K rows) |
+| DuckDB | **100x+ faster** | Complex SQL, analytics, huge files |
 
 Benchmark (1M rows):
 

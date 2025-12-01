@@ -44,6 +44,9 @@ class QueryEditor(TextArea):
         Binding("ctrl+up", "history_prev", "Prev Query", priority=True),
         Binding("ctrl+down", "history_next", "Next Query", priority=True),
         Binding("ctrl+d", "app.quit", "Exit", priority=True),
+        # Word deletion shortcuts
+        Binding("ctrl+delete", "delete_word_forward", "Delete Word →", show=False),
+        Binding("ctrl+backspace", "delete_word_backward", "Delete Word ←", show=False),
     ]
 
     # SQL Keywords to suggest
@@ -155,6 +158,69 @@ class QueryEditor(TextArea):
     def action_history_next(self) -> None:
         """Show next query from history."""
         self.app.action_history_next()
+
+    def action_delete_word_backward(self) -> None:
+        """Delete word to the left of cursor (Ctrl+Backspace)."""
+        row, col = self.cursor_location
+        
+        if col == 0:
+            # At start of line, behave like normal backspace (join lines)
+            self.action_delete_left()
+            return
+
+        line = self.document.get_line(row)
+        
+        # Scan backwards
+        i = col - 1
+        
+        # 1. Consume whitespace if any
+        while i >= 0 and line[i].isspace():
+            i -= 1
+            
+        # 2. Consume word characters OR symbols (but not mixed)
+        if i >= 0:
+            if line[i].isalnum() or line[i] == '_':
+                # Word characters
+                while i >= 0 and (line[i].isalnum() or line[i] == '_'):
+                    i -= 1
+            else:
+                # Symbols
+                while i >= 0 and not (line[i].isalnum() or line[i] == '_' or line[i].isspace()):
+                    i -= 1
+                    
+        target_col = i + 1
+        self.delete(start=(row, target_col), end=(row, col))
+
+    def action_delete_word_forward(self) -> None:
+        """Delete word to the right of cursor (Ctrl+Delete)."""
+        row, col = self.cursor_location
+        line = self.document.get_line(row)
+        
+        if col >= len(line):
+            # At end of line, behave like normal delete (join next line)
+            self.action_delete_right()
+            return
+            
+        # Scan forwards
+        i = col
+        
+        # 1. Consume whitespace if any
+        while i < len(line) and line[i].isspace():
+            i += 1
+            
+        # 2. Consume word characters OR symbols
+        if i < len(line):
+            if line[i].isalnum() or line[i] == '_':
+                # Word characters
+                while i < len(line) and (line[i].isalnum() or line[i] == '_'):
+                    i += 1
+            else:
+                # Symbols
+                while i < len(line) and not (line[i].isalnum() or line[i] == '_' or line[i].isspace()):
+                    i += 1
+                    
+        target_col = i
+        self.delete(start=(row, col), end=(row, target_col))
 
     class ExecuteQuery(TextArea.Changed):
         """Message sent when user wants to execute a query."""
@@ -347,7 +413,7 @@ class SQLShellApp(App):
     }
 
     #right-panel {
-        width: 100%;
+        width: 1fr;  /* Take remaining space (was 100%, causing overflow) */
         height: 100%;
         layout: vertical;
     }
@@ -904,6 +970,15 @@ class SQLShellApp(App):
         else:
             container.add_class("visible")
             self._show_status("Sidebar visible")
+        
+        # Force layout refresh to prevent text overflow
+        self.refresh(layout=True)
+        # Also refresh the active editor to reflow text
+        try:
+            editor = self._get_active_editor()
+            editor.refresh()
+        except Exception:
+            pass  # Editor might not be ready yet
 
     def action_toggle_history(self) -> None:
         """Toggle query history panel."""

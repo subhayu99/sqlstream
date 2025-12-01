@@ -42,6 +42,9 @@ $ sqlstream query employees.csv "SELECT name, salary FROM employees WHERE depart
 
 # Sort by salary
 $ sqlstream query employees.csv "SELECT * FROM employees ORDER BY salary DESC LIMIT 3"
+
+# Query with inline file path (no source argument needed)
+$ sqlstream query "SELECT * FROM 'employees.csv' WHERE salary > 80000"
 ```
 
 ###  Python API
@@ -49,8 +52,11 @@ $ sqlstream query employees.csv "SELECT * FROM employees ORDER BY salary DESC LI
 ```python
 from sqlstream import query
 
-# Simple query
+# Simple query with explicit source
 results = query("employees.csv").sql("SELECT * FROM employees WHERE salary > 80000")
+
+# Query with inline source (extracted from SQL)
+results = query().sql("SELECT * FROM 'employees.csv' WHERE salary > 80000")
 
 # Print results
 for row in results:
@@ -190,6 +196,11 @@ Performance comparison:
 | 100K | 5.2s | 0.15s | **35x** |
 | 1M | 52s | 0.8s | **65x** |
 
+For complex SQL queries, use the DuckDB backend:
+```bash
+$ sqlstream query "SELECT * FROM 'data.parquet'" --backend duckdb
+```
+
 ---
 
 ## Step 6: Interactive Shell
@@ -203,6 +214,7 @@ $ sqlstream shell employees.csv
 This launches a powerful TUI (Terminal User Interface) with:
 
 - **Query Editor**: Multi-line editing with syntax highlighting and **multiple tabs** (`Ctrl+T` to add, `Ctrl+W` to close).
+- **Word Deletion**: Use `Ctrl+Delete` and `Ctrl+Backspace` for fast editing.
 - **Results Viewer**: Scrollable table with pagination.
 - **Sidebar**: Toggle between **Schema** and **Files** browser (`F2` to toggle, `Ctrl+O` to open files).
 - **Save Progress**: Save your work with `Ctrl+S`.

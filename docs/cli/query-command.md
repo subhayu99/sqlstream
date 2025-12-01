@@ -22,7 +22,7 @@ sqlstream query [FILE_OR_SQL] [SQL] [OPTIONS]
 
 ### Performance
 
-- `-b, --backend [auto|pandas|python]` - Execution backend (default: auto)
+- `-b, --backend [auto|pandas|python|duckdb]` - Execution backend (default: auto)
 - `-l, --limit N` - Limit displayed rows
 
 ### Display

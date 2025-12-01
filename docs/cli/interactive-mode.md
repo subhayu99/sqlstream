@@ -11,6 +11,7 @@ SQLStream includes a powerful interactive shell built with [Textual](https://tex
 - 💾 **State Persistence** - Automatically saves and restores tabs and queries between sessions
 - 📊 **Scrollable Results** - Zebra-striped table with smooth scrolling
 - 📜 **Query History** - Navigate previous queries with keyboard shortcuts
+- **Word Deletion** - Fast editing with `Ctrl+Delete` and `Ctrl+Backspace`
 - 🗂️ **Tabbed Sidebar** - Toggle between Schema browser and File explorer
 - 📁 **File Browser** - Tree-structured file navigation in sidebar
 - 📄 **Pagination** - Handle large result sets (100 rows per page)
@@ -71,6 +72,8 @@ sqlstream shell --history-file ~/.my_sqlstream_history
 | `Ctrl+Enter` | Execute Query | Run the query in editor |
 | `Ctrl+E` | Execute Query | Alternative execution key |
 | `Ctrl+L` | Clear Editor | Clear query text |
+| `Ctrl+Backspace` | Delete Word Left | Delete word to the left of cursor |
+| `Ctrl+Delete` | Delete Word Right | Delete word to the right of cursor |
 | `Ctrl+Q` | Exit | Close the shell (auto-saves state) |
 | `Ctrl+D` | Exit | Alternative exit key (auto-saves state) |
 | `Ctrl+T` | New Tab | Create a new query tab |
