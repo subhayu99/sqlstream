@@ -1229,41 +1229,29 @@ class SQLShellApp(App):
     def _save_state(self) -> None:
         """Save editor state to file."""
         try:
-            print("DEBUG: Starting save state...")
             tabs = self.query_one("#query-tabs", TabbedContent)
-            print(f"DEBUG: Tabs widget: {tabs}")
-            
             state = []
             
             # Strategy 1: ContentSwitcher children
             try:
                 switcher = tabs.query_one(ContentSwitcher)
-                print(f"DEBUG: ContentSwitcher found: {switcher}")
-                print(f"DEBUG: Switcher children: {len(switcher.children)}")
                 
                 for child in switcher.children:
-                    print(f"DEBUG: Child type: {type(child)}")
                     if isinstance(child, TabPane):
-                        print(f"DEBUG: Processing TabPane: {child._title}")
-                        # Try to find editor
                         editors = list(child.query(QueryEditor))
-                        print(f"DEBUG: Editors found in pane: {len(editors)}")
                         
                         if editors:
                             editor = editors[0]
-                            print(f"DEBUG: Editor content length: {len(editor.text)}")
                             state.append({
                                 "title": str(child._title),
                                 "content": editor.text
                             })
-            except Exception as e:
-                print(f"DEBUG: Strategy 1 failed: {e}")
+            except Exception:
+                pass
 
             # Strategy 2: Direct query if Strategy 1 found nothing
             if not state:
-                print("DEBUG: Strategy 1 yielded no state, trying Strategy 2 (recursive query)...")
                 for pane in tabs.query(TabPane):
-                    print(f"DEBUG: Found TabPane via query: {pane._title}")
                     editors = list(pane.query(QueryEditor))
                     if editors:
                         state.append({
@@ -1274,12 +1262,10 @@ class SQLShellApp(App):
             # Write to file
             path = Path(self.state_file)
             path.write_text(json.dumps(state))
-            print(f"Saved {len(state)} tabs to {path}")
-            self.notify(f"Saved {len(state)} tabs")
+            self.notify(f"Saved {len(state)} tabs", timeout=2)
             
         except Exception as e:
             self.notify(f"Failed to save state: {e}", severity="error")
-            print(f"Failed to save state: {e}")
 
     async def _load_state(self) -> None:
         """Load editor state from file."""
@@ -1298,6 +1284,7 @@ class SQLShellApp(App):
                             content=tab_data.get("content", ""),
                             title=tab_data.get("title")
                         )
+                        self.notify(f"Loaded {len(state)} tabs", timeout=2)
                     loaded = True
             except Exception as e:
                 self.notify(f"Failed to load state: {e}", severity="error")
