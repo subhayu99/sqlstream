@@ -309,7 +309,7 @@ class QueryResult:
         if target_backend == "auto":
             # Smart backend selection logic
 
-            # Case 1: AST already present (e.g. from QueryInline)
+            # Case 1: AST already present
             # This means custom parser already succeeded
             if self.ast:
                 if PANDAS_AVAILABLE:
@@ -432,7 +432,11 @@ class QueryResult:
             yield from self.executor.execute(self.ast, self.source or self.ast.source, right_source)
         else:
             # Python executor uses reader objects
-            yield from self.executor.execute(self.ast, self.reader, self.reader_factory)
+            # If no reader exists (sourceless query), create one from AST
+            reader = self.reader
+            if not reader and self.ast and self.ast.source:
+                reader = self.reader_factory(self.ast.source)
+            yield from self.executor.execute(self.ast, reader, self.reader_factory)
 
     @staticmethod
     def _get_sanitized_name_and_table_hint(source: str) -> Tuple[str, Optional[int]]:
@@ -590,119 +594,6 @@ class QueryResult:
         else:
             # Python executor explain
             return self.executor.explain(self.ast, self.reader, self.reader_factory)
-
-
-class QueryInline:
-    """
-    Query builder for inline file path mode
-
-    This class allows SQL queries with file paths embedded directly in the SQL,
-    instead of pre-specifying a source file.
-
-    Example:
-        >>> q = QueryInline()
-        >>> results = q.sql("SELECT * FROM 'data.csv' WHERE age > 25")
-        >>> for row in results:
-        ...     print(row)
-    """
-
-    def __init__(self):
-        """Initialize inline query (no source required)"""
-        pass
-
-    def _create_reader(self, source: str) -> BaseReader:
-        """
-        Auto-detect source type and create appropriate reader
-
-        Supports URL fragments: source#format:table
-
-        Args:
-            source: Path to data file or URL, optionally with #format:table fragment
-
-        Returns:
-            Reader instance for the source
-
-        Raises:
-            ValueError: If file format is not supported
-        """
-        from sqlstream.core.fragment_parser import parse_source_fragment
-
-        # Parse URL fragment if present
-        source_path, format_hint, table_hint = parse_source_fragment(source)
-
-        # Check if source is HTTP/HTTPS URL
-        if source_path.startswith(("http://", "https://")):
-            from sqlstream.readers.http_reader import HTTPReader
-
-            kwargs = {}
-            if format_hint:
-                kwargs['format'] = format_hint
-            if table_hint is not None:
-                kwargs['table'] = table_hint
-            return HTTPReader(source_path, **kwargs)
-
-        path = Path(source_path)
-
-        # Check file extension to determine format
-        suffix = path.suffix.lower()
-
-        # Explicit format from fragment takes precedence
-        if format_hint == 'html' or (not format_hint and suffix in ['.html', '.htm']):
-            from sqlstream.readers.html_reader import HTMLReader
-            table = table_hint if table_hint is not None else 0
-            return HTMLReader(source_path, table=table)
-
-        elif format_hint == 'markdown' or (not format_hint and suffix in ['.md', '.markdown']):
-            from sqlstream.readers.markdown_reader import MarkdownReader
-            table = table_hint if table_hint is not None else 0
-            return MarkdownReader(source_path, table=table)
-
-        elif format_hint == 'parquet' or (not format_hint and suffix == ".parquet"):
-            from sqlstream.readers.parquet_reader import ParquetReader
-            return ParquetReader(source_path)
-
-        elif format_hint == 'csv' or (not format_hint and suffix == ".csv"):
-            return CSVReader(source_path)
-
-        else:
-            # Try CSV as default
-            try:
-                return CSVReader(source_path)
-            except Exception as e:
-                raise ValueError(
-                    f"Unsupported file format: {suffix}. "
-                    f"Supported formats: .csv, .parquet, .html, .md"
-                ) from e
-
-    def sql(
-        self, query: str, backend: Optional[Literal["auto", "pandas", "python"]] = "auto"
-    ) -> "QueryResult":
-        """
-        Execute SQL query with inline file paths
-
-        The file paths are extracted from the SQL query itself (FROM and JOIN clauses).
-
-        Args:
-            query: SQL query string with inline file paths
-            backend: Execution backend to use
-
-        Returns:
-            QueryResult object that can be iterated over
-
-        Example:
-            >>> q = QueryInline()
-            >>> result = q.sql("SELECT * FROM 'data.csv' WHERE age > 25")
-            >>> # Multi-file JOIN
-            >>> result = q.sql("SELECT x.*, y.name FROM 'left.csv' x JOIN 'right.csv' y ON x.id = y.id")
-        """
-        # Parse SQL query to extract source file paths
-        ast = parse(query)
-
-        # Create reader for the main source
-        reader = self._create_reader(ast.source)
-
-        # Create QueryResult with inline mode (source extracted from AST)
-        return QueryResult(ast, reader, self._create_reader, ast.source, backend)
 
 
 # Convenience function for top-level API

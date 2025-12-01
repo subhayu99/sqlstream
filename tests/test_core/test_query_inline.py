@@ -1,14 +1,17 @@
 """
 Tests for inline file path support (Phase 7.6)
+
+These tests verify that Query() works with no source parameter,
+extracting sources directly from SQL queries.
 """
 
 import pytest
 
-from sqlstream.core.query import QueryInline
+from sqlstream.core.query import Query
 
 
 class TestQueryInline:
-    """Test inline file path support in SQL queries"""
+    """Test inline file path support in SQL queries using Query() with no source"""
 
     @pytest.fixture
     def sample_csv(self, tmp_path):
@@ -26,7 +29,7 @@ class TestQueryInline:
 
     def test_inline_simple_query(self, sample_csv):
         """Test simple query with inline file path"""
-        q = QueryInline()
+        q = Query()
         results = list(q.sql(f"SELECT * FROM '{sample_csv}'"))
 
         assert len(results) == 3
@@ -35,7 +38,7 @@ class TestQueryInline:
 
     def test_inline_with_where(self, sample_csv):
         """Test inline file path with WHERE clause"""
-        q = QueryInline()
+        q = Query()
         results = list(q.sql(f"SELECT * FROM '{sample_csv}' WHERE age > 25"))
 
         assert len(results) == 2
@@ -43,7 +46,7 @@ class TestQueryInline:
 
     def test_inline_unquoted_path(self, sample_csv):
         """Test inline file path without quotes (when path has no spaces)"""
-        q = QueryInline()
+        q = Query()
         results = list(q.sql(f"SELECT * FROM {sample_csv}"))
 
         assert len(results) == 3
@@ -51,7 +54,7 @@ class TestQueryInline:
 
     def test_inline_select_columns(self, sample_csv):
         """Test inline file path with column selection"""
-        q = QueryInline()
+        q = Query()
         results = list(q.sql(f"SELECT name, age FROM '{sample_csv}'"))
 
         assert len(results) == 3
@@ -61,14 +64,14 @@ class TestQueryInline:
 
     def test_inline_with_limit(self, sample_csv):
         """Test inline file path with LIMIT"""
-        q = QueryInline()
+        q = Query()
         results = list(q.sql(f"SELECT * FROM '{sample_csv}' LIMIT 2"))
 
         assert len(results) == 2
 
     def test_inline_with_order_by(self, sample_csv):
         """Test inline file path with ORDER BY"""
-        q = QueryInline()
+        q = Query()
         results = list(q.sql(f"SELECT * FROM '{sample_csv}' ORDER BY age DESC"))
 
         assert len(results) == 3
@@ -78,7 +81,7 @@ class TestQueryInline:
 
     def test_inline_join(self, sample_csv, second_csv):
         """Test inline file paths with JOIN"""
-        q = QueryInline()
+        q = Query()
         # Note: JOIN with inline paths needs both files quoted
         # Use unqualified column names in JOIN condition
         results = list(
@@ -95,7 +98,7 @@ class TestQueryInline:
 
     def test_inline_aggregates(self, sample_csv):
         """Test inline file path with aggregate functions"""
-        q = QueryInline()
+        q = Query()
         results = list(
             q.sql(f"SELECT city, COUNT(*) FROM '{sample_csv}' GROUP BY city")
         )
@@ -105,7 +108,7 @@ class TestQueryInline:
 
     def test_inline_file_not_found(self):
         """Test error handling for non-existent file"""
-        q = QueryInline()
+        q = Query()
         with pytest.raises(FileNotFoundError):
             list(q.sql("SELECT * FROM 'nonexistent.csv'"))
 
@@ -114,7 +117,7 @@ class TestQueryInline:
         try:
             import pandas  # noqa: F401
 
-            q = QueryInline()
+            q = Query()
             results = list(
                 q.sql(f"SELECT * FROM '{sample_csv}' WHERE age > 25", backend="pandas")
             )
@@ -126,7 +129,7 @@ class TestQueryInline:
 
     def test_inline_with_python_backend(self, sample_csv):
         """Test inline file path with pure Python backend"""
-        q = QueryInline()
+        q = Query()
         results = list(
             q.sql(f"SELECT * FROM '{sample_csv}' WHERE age > 25", backend="python")
         )
@@ -136,7 +139,7 @@ class TestQueryInline:
 
     def test_inline_double_quotes(self, sample_csv):
         """Test inline file path with double quotes"""
-        q = QueryInline()
+        q = Query()
         results = list(q.sql(f'SELECT * FROM "{sample_csv}"'))
 
         assert len(results) == 3
