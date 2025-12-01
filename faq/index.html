@@ -15,6 +15,10 @@
         <link rel="canonical" href="https://subhayu99.github.io/sqlstream/faq/">
       
       
+        <link rel="prev" href="../architecture/optimizations/">
+      
+      
+        <link rel="next" href="../limitations/">
       
       
         
@@ -25,7 +29,7 @@
     
     
       
-        <title>Frequently Asked Questions (FAQ) - SQLStream</title>
+        <title>FAQ - SQLStream</title>
       
     
     
@@ -116,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Frequently Asked Questions (FAQ)
+              FAQ
             
           </span>
         </div>
@@ -359,6 +363,46 @@
         </a>
       </li>
     
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  FAQ
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../limitations/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Limitations
+
+      </a>
+    </li>
   
 
       
@@ -831,6 +875,34 @@
     
   
     Pandas Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/duckdb-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DuckDB Backend (Full SQL)
   
 
     
@@ -1827,6 +1899,517 @@
       
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-is-sqlstream-different-from-duckdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How is SQLStream different from DuckDB?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-is-sqlstream-different-from-pandas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How is SQLStream different from pandas?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#can-i-use-this-in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Can I use this in production?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whats-the-maximum-file-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's the maximum file size?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#does-it-work-on-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Does it work on Windows?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#can-i-use-it-with-jupyter-notebooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Can I use it with Jupyter notebooks?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-do-i-report-bugs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I report bugs?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-do-i-request-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I request features?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#is-there-commercial-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Is there commercial support?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation &amp; Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation &amp; Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-dependencies-does-sqlstream-have" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What dependencies does SQLStream have?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-do-i-upgrade-sqlstream" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I upgrade SQLStream?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#can-i-query-multiple-files-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Can I query multiple files at once?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#can-i-use-aggregate-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Can I use aggregate functions?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#can-i-use-subqueries-or-ctes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Can I use subqueries or CTEs?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-do-i-specify-column-types-manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I specify column types manually?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#can-i-write-data-insert-update-delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Can I write data (INSERT, UPDATE, DELETE)?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance &amp; Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance &amp; Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-is-my-query-slow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why is my query slow?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-backends-are-supported" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What backends are supported?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-do-i-use-the-duckdb-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I use the DuckDB backend?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#does-duckdb-backend-support-all-file-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Does DuckDB backend support all file formats?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#should-i-use-csv-or-parquet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Should I use CSV or Parquet?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Messages
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Messages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-module-named-textual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No module named 'textual'"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-module-named-pandas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No module named 'pandas'"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-not-found-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "File not found" error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s3-authentication-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3 authentication errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contributing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-can-i-contribute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How can I contribute?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-should-i-start-as-a-new-contributor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where should I start as a new contributor?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../limitations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limitations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
   
   
     <li class="md-nav__item">
@@ -2467,9 +3050,12 @@
 <p><strong>By feature</strong>:
 - <code>sqlstream[parquet]</code> - Parquet support (pyarrow)
 - <code>sqlstream[pandas]</code> - Pandas backend (pandas)
+- <code>sqlstream[duckdb]</code> - DuckDB backend (duckdb)
 - <code>sqlstream[s3]</code> - S3 support (s3fs)
-- <code>sqlstream[cli]</code> - Interactive shell (textual)
-- <code>sqlstream[http]</code> - HTTP data sources (httpx)</p>
+- <code>sqlstream[cli]</code> - Basic CLI shell (click)
+- <code>sqlstream[interactive]</code> - Full blown TUI (textual)
+- <code>sqlstream[http]</code> - HTTP data sources (httpx)
+- <code>sqlstream[html]</code> - HTML parsing (lxml)</p>
 <hr />
 <h3 id="how-do-i-upgrade-sqlstream">How do I upgrade SQLStream?</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Upgrade to latest version</span>
@@ -2594,7 +3180,7 @@
 <li><strong>DuckDB (New!)</strong>: Uses DuckDB's engine for <strong>full SQL support</strong> (window functions, CTEs, etc.) and maximum performance. 10-1000x faster.</li>
 </ol>
 <h3 id="how-do-i-use-the-duckdb-backend">How do I use the DuckDB backend?</h3>
-<p>Install with <code>pip install duckdb</code> or <code>pip install "sqlstream[all]"</code>.</p>
+<p>Install with <code>pip install duckdb</code> or <code>pip install "sqlstream[duckdb]"</code>.</p>
 <p>Then use it in your code:
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;duckdb&quot;</span><span class="p">)</span>
 </span></code></pre></div></p>
