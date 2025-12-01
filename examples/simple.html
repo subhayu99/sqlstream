@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joinable Tables - Customers and Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .sql-section {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .sql-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .query-title {
+            color: #4CAF50;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Multi Table Example for SQLStream</h1>
+
+    <h2>Table 1: Customers</h2>
+    <table id="customers">
+        <thead>
+            <tr>
+                <th>customer_id</th>
+                <th>name</th>
+                <th>email</th>
+                <th>city</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>101</td>
+                <td>Alice Johnson</td>
+                <td>alice@email.com</td>
+                <td>New York</td>
+            </tr>
+            <tr>
+                <td>102</td>
+                <td>Bob Smith</td>
+                <td>bob@email.com</td>
+                <td>Los Angeles</td>
+            </tr>
+            <tr>
+                <td>103</td>
+                <td>Carol Davis</td>
+                <td>carol@email.com</td>
+                <td>Chicago</td>
+            </tr>
+            <tr>
+                <td>104</td>
+                <td>David Wilson</td>
+                <td>david@email.com</td>
+                <td>Houston</td>
+            </tr>
+            <tr>
+                <td>105</td>
+                <td>Emma Brown</td>
+                <td>emma@email.com</td>
+                <td>Phoenix</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Table 2: Orders</h2>
+    <table id="orders">
+        <thead>
+            <tr>
+                <th>order_id</th>
+                <th>customer_id</th>
+                <th>product</th>
+                <th>amount</th>
+                <th>order_date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1001</td>
+                <td>101</td>
+                <td>Laptop</td>
+                <td>1200.00</td>
+                <td>2024-01-15</td>
+            </tr>
+            <tr>
+                <td>1002</td>
+                <td>102</td>
+                <td>Mouse</td>
+                <td>25.50</td>
+                <td>2024-01-16</td>
+            </tr>
+            <tr>
+                <td>1003</td>
+                <td>101</td>
+                <td>Keyboard</td>
+                <td>75.00</td>
+                <td>2024-01-17</td>
+            </tr>
+            <tr>
+                <td>1004</td>
+                <td>103</td>
+                <td>Monitor</td>
+                <td>350.00</td>
+                <td>2024-01-18</td>
+            </tr>
+            <tr>
+                <td>1005</td>
+                <td>104</td>
+                <td>Headphones</td>
+                <td>89.99</td>
+                <td>2024-01-19</td>
+            </tr>
+            <tr>
+                <td>1006</td>
+                <td>102</td>
+                <td>Webcam</td>
+                <td>120.00</td>
+                <td>2024-01-20</td>
+            </tr>
+            <tr>
+                <td>1007</td>
+                <td>105</td>
+                <td>Desk Lamp</td>
+                <td>45.00</td>
+                <td>2024-01-21</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="sql-section">
+        <h2>📊 SQLStream DuckDB Queries</h2>
+        <p>Use these queries with SQLStream's DuckDB backend to analyze the data directly from GitHub URLs.</p>
+
+        <div class="query-title">Setup: Define Table URLs</div>
+        <pre># GitHub raw URL base
+BASE = 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html'
+
+# Table references using SQLStream HTML syntax
+customers = f'{BASE}#html:0'
+orders = f'{BASE}#html:1'</pre>
+
+        <div class="query-title">Query 1: Join Customers with Orders</div>
+        <pre>from sqlstream import query
+
+result = query(customers).sql(f"""
+    SELECT 
+        c.customer_id,
+        c.name,
+        c.email,
+        c.city,
+        o.order_id,
+        o.product,
+        o.amount,
+        o.order_date
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:0' c
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1' o ON c.customer_id = o.customer_id
+    ORDER BY c.customer_id, o.order_date
+""", backend="duckdb")
+
+for row in result:
+    print(row)</pre>
+
+        <div class="query-title">Query 2: Customer Order Summary</div>
+        <pre>result = query(customers).sql(f"""
+    SELECT 
+        c.customer_id,
+        c.name,
+        c.city,
+        COUNT(o.order_id) AS total_orders,
+        SUM(o.amount) AS total_spent,
+        AVG(o.amount) AS avg_order_value,
+        MIN(o.order_date) AS first_order,
+        MAX(o.order_date) AS last_order
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:0' c
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1' o ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.name, c.city
+    ORDER BY total_spent DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 3: High-Value Customers (>$200 total)</div>
+        <pre>result = query(customers).sql(f"""
+    SELECT 
+        c.name,
+        c.email,
+        SUM(o.amount) AS total_spent
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:0' c
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1' o ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.name, c.email
+    HAVING SUM(o.amount) > 200
+    ORDER BY total_spent DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 4: Orders by City</div>
+        <pre>result = query(orders).sql(f"""
+    SELECT 
+        c.city,
+        COUNT(o.order_id) AS order_count,
+        SUM(o.amount) AS total_revenue,
+        AVG(o.amount) AS avg_order_value
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1' o
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:0' c ON o.customer_id = c.customer_id
+    GROUP BY c.city
+    ORDER BY total_revenue DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 5: Customers with Multiple Orders</div>
+        <pre>result = query(customers).sql(f"""
+    SELECT 
+        c.customer_id,
+        c.name,
+        c.email,
+        COUNT(o.order_id) AS order_count,
+        STRING_AGG(o.product, ', ') AS products_ordered
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:0' c
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1' o ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.name, c.email
+    HAVING COUNT(o.order_id) > 1
+    ORDER BY order_count DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 6: Top Products by Revenue</div>
+        <pre>result = query(orders).sql(f"""
+    SELECT 
+        o.product,
+        COUNT(*) AS times_ordered,
+        SUM(o.amount) AS total_revenue,
+        AVG(o.amount) AS avg_price
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1' o
+    GROUP BY o.product
+    ORDER BY total_revenue DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 7: Orders Above Average Amount</div>
+        <pre>result = query(orders).sql(f"""
+    SELECT 
+        o.order_id,
+        c.name AS customer_name,
+        o.product,
+        o.amount,
+        o.order_date
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1' o
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:0' c ON o.customer_id = c.customer_id
+    WHERE o.amount > (SELECT AVG(amount) FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1')
+    ORDER BY o.amount DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 8: Customer Order Timeline</div>
+        <pre>result = query(orders).sql(f"""
+    SELECT 
+        c.name,
+        o.product,
+        o.amount,
+        o.order_date,
+        ROW_NUMBER() OVER (PARTITION BY c.customer_id ORDER BY o.order_date) AS order_number
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:1' o
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/simple.html#html:0' c ON o.customer_id = c.customer_id
+    ORDER BY c.name, o.order_date
+""", backend="duckdb")</pre>
+    </div>
+</body>
+</html>

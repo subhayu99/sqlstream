@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex Multi-Table Database with DuckDB SQL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        th {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .sql-section {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .sql-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .query-title {
+            color: #2196F3;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Complex Multi-Table Database Example for SQLStream</h1>
+    
+    <h2>Table 1: Customers</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>customer_id</th>
+                <th>first_name</th>
+                <th>last_name</th>
+                <th>email</th>
+                <th>city</th>
+                <th>state</th>
+                <th>country</th>
+                <th>signup_date</th>
+                <th>loyalty_tier</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1001</td><td>Alice</td><td>Johnson</td><td>alice.j@email.com</td><td>New York</td><td>NY</td><td>USA</td><td>2023-01-15</td><td>Gold</td></tr>
+            <tr><td>1002</td><td>Bob</td><td>Smith</td><td>bob.s@email.com</td><td>Los Angeles</td><td>CA</td><td>USA</td><td>2023-02-20</td><td>Silver</td></tr>
+            <tr><td>1003</td><td>Carol</td><td>Davis</td><td>carol.d@email.com</td><td>Chicago</td><td>IL</td><td>USA</td><td>2023-03-10</td><td>Bronze</td></tr>
+            <tr><td>1004</td><td>David</td><td>Wilson</td><td>david.w@email.com</td><td>Houston</td><td>TX</td><td>USA</td><td>2023-04-05</td><td>Gold</td></tr>
+            <tr><td>1005</td><td>Emma</td><td>Brown</td><td>emma.b@email.com</td><td>Phoenix</td><td>AZ</td><td>USA</td><td>2023-05-12</td><td>Silver</td></tr>
+            <tr><td>1006</td><td>Frank</td><td>Miller</td><td>frank.m@email.com</td><td>Toronto</td><td>ON</td><td>Canada</td><td>2023-06-18</td><td>Bronze</td></tr>
+            <tr><td>1007</td><td>Grace</td><td>Lee</td><td>grace.l@email.com</td><td>Vancouver</td><td>BC</td><td>Canada</td><td>2023-07-22</td><td>Gold</td></tr>
+            <tr><td>1008</td><td>Henry</td><td>Taylor</td><td>henry.t@email.com</td><td>Miami</td><td>FL</td><td>USA</td><td>2023-08-30</td><td>Silver</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Table 2: Categories</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>category_id</th>
+                <th>category_name</th>
+                <th>parent_category_id</th>
+                <th>commission_rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>10</td><td>Electronics</td><td></td><td>0.15</td></tr>
+            <tr><td>11</td><td>Computers</td><td>10</td><td>0.18</td></tr>
+            <tr><td>12</td><td>Accessories</td><td>10</td><td>0.12</td></tr>
+            <tr><td>20</td><td>Home & Garden</td><td></td><td>0.10</td></tr>
+            <tr><td>21</td><td>Furniture</td><td>20</td><td>0.14</td></tr>
+            <tr><td>30</td><td>Sports</td><td></td><td>0.13</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Table 3: Products</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>product_id</th>
+                <th>product_name</th>
+                <th>category_id</th>
+                <th>price</th>
+                <th>stock_quantity</th>
+                <th>supplier_id</th>
+                <th>weight_kg</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>5001</td><td>Laptop Pro 15</td><td>11</td><td>1299.99</td><td>45</td><td>201</td><td>2.1</td></tr>
+            <tr><td>5002</td><td>Wireless Mouse</td><td>12</td><td>29.99</td><td>150</td><td>202</td><td>0.1</td></tr>
+            <tr><td>5003</td><td>Mechanical Keyboard</td><td>12</td><td>89.99</td><td>80</td><td>202</td><td>0.8</td></tr>
+            <tr><td>5004</td><td>4K Monitor 27"</td><td>11</td><td>399.99</td><td>30</td><td>201</td><td>5.5</td></tr>
+            <tr><td>5005</td><td>USB-C Hub</td><td>12</td><td>49.99</td><td>200</td><td>203</td><td>0.2</td></tr>
+            <tr><td>5006</td><td>Office Chair Ergonomic</td><td>21</td><td>299.99</td><td>25</td><td>204</td><td>15.0</td></tr>
+            <tr><td>5007</td><td>Standing Desk</td><td>21</td><td>499.99</td><td>18</td><td>204</td><td>35.0</td></tr>
+            <tr><td>5008</td><td>Webcam HD</td><td>12</td><td>79.99</td><td>100</td><td>202</td><td>0.3</td></tr>
+            <tr><td>5009</td><td>Headphones Wireless</td><td>12</td><td>149.99</td><td>65</td><td>201</td><td>0.4</td></tr>
+            <tr><td>5010</td><td>Yoga Mat Premium</td><td>30</td><td>39.99</td><td>120</td><td>205</td><td>1.2</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Table 4: Orders</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>order_id</th>
+                <th>customer_id</th>
+                <th>order_date</th>
+                <th>ship_date</th>
+                <th>status</th>
+                <th>shipping_method</th>
+                <th>total_amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>2001</td><td>1001</td><td>2024-01-15</td><td>2024-01-17</td><td>Delivered</td><td>Express</td><td>1329.98</td></tr>
+            <tr><td>2002</td><td>1002</td><td>2024-01-16</td><td>2024-01-20</td><td>Delivered</td><td>Standard</td><td>119.98</td></tr>
+            <tr><td>2003</td><td>1001</td><td>2024-01-18</td><td>2024-01-19</td><td>Delivered</td><td>Express</td><td>439.98</td></tr>
+            <tr><td>2004</td><td>1003</td><td>2024-01-20</td><td>2024-01-24</td><td>Delivered</td><td>Standard</td><td>399.99</td></tr>
+            <tr><td>2005</td><td>1004</td><td>2024-01-22</td><td>2024-01-25</td><td>Shipped</td><td>Standard</td><td>799.98</td></tr>
+            <tr><td>2006</td><td>1002</td><td>2024-01-23</td><td></td><td>Processing</td><td>Express</td><td>179.97</td></tr>
+            <tr><td>2007</td><td>1005</td><td>2024-01-25</td><td>2024-01-27</td><td>Delivered</td><td>Express</td><td>1299.99</td></tr>
+            <tr><td>2008</td><td>1006</td><td>2024-01-26</td><td>2024-01-30</td><td>Delivered</td><td>Standard</td><td>299.99</td></tr>
+            <tr><td>2009</td><td>1007</td><td>2024-01-28</td><td></td><td>Processing</td><td>Standard</td><td>589.97</td></tr>
+            <tr><td>2010</td><td>1001</td><td>2024-01-29</td><td>2024-01-31</td><td>Shipped</td><td>Express</td><td>149.99</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Table 5: Order Items (Junction Table)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>order_item_id</th>
+                <th>order_id</th>
+                <th>product_id</th>
+                <th>quantity</th>
+                <th>unit_price</th>
+                <th>discount_percent</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>3001</td><td>2001</td><td>5001</td><td>1</td><td>1299.99</td><td>0</td></tr>
+            <tr><td>3002</td><td>2001</td><td>5002</td><td>1</td><td>29.99</td><td>0</td></tr>
+            <tr><td>3003</td><td>2002</td><td>5002</td><td>2</td><td>29.99</td><td>10</td></tr>
+            <tr><td>3004</td><td>2002</td><td>5003</td><td>1</td><td>89.99</td><td>10</td></tr>
+            <tr><td>3005</td><td>2003</td><td>5004</td><td>1</td><td>399.99</td><td>0</td></tr>
+            <tr><td>3006</td><td>2003</td><td>5005</td><td>1</td><td>49.99</td><td>20</td></tr>
+            <tr><td>3007</td><td>2004</td><td>5004</td><td>1</td><td>399.99</td><td>0</td></tr>
+            <tr><td>3008</td><td>2005</td><td>5004</td><td>2</td><td>399.99</td><td>0</td></tr>
+            <tr><td>3009</td><td>2006</td><td>5008</td><td>1</td><td>79.99</td><td>0</td></tr>
+            <tr><td>3010</td><td>2006</td><td>5005</td><td>2</td><td>49.99</td><td>0</td></tr>
+            <tr><td>3011</td><td>2007</td><td>5001</td><td>1</td><td>1299.99</td><td>0</td></tr>
+            <tr><td>3012</td><td>2008</td><td>5006</td><td>1</td><td>299.99</td><td>0</td></tr>
+            <tr><td>3013</td><td>2009</td><td>5007</td><td>1</td><td>499.99</td><td>0</td></tr>
+            <tr><td>3014</td><td>2009</td><td>5003</td><td>1</td><td>89.99</td><td>0</td></tr>
+            <tr><td>3015</td><td>2010</td><td>5009</td><td>1</td><td>149.99</td><td>0</td></tr>
+            <tr><td>3016</td><td>2005</td><td>5010</td><td>3</td><td>39.99</td><td>15</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Table 6: Product Reviews</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>review_id</th>
+                <th>product_id</th>
+                <th>customer_id</th>
+                <th>rating</th>
+                <th>review_date</th>
+                <th>verified_purchase</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>4001</td><td>5001</td><td>1001</td><td>5</td><td>2024-01-20</td><td>Yes</td></tr>
+            <tr><td>4002</td><td>5002</td><td>1002</td><td>4</td><td>2024-01-22</td><td>Yes</td></tr>
+            <tr><td>4003</td><td>5003</td><td>1002</td><td>5</td><td>2024-01-22</td><td>Yes</td></tr>
+            <tr><td>4004</td><td>5004</td><td>1003</td><td>4</td><td>2024-01-26</td><td>Yes</td></tr>
+            <tr><td>4005</td><td>5004</td><td>1001</td><td>5</td><td>2024-01-23</td><td>Yes</td></tr>
+            <tr><td>4006</td><td>5001</td><td>1005</td><td>5</td><td>2024-01-30</td><td>Yes</td></tr>
+            <tr><td>4007</td><td>5006</td><td>1006</td><td>4</td><td>2024-02-02</td><td>Yes</td></tr>
+            <tr><td>4008</td><td>5009</td><td>1001</td><td>5</td><td>2024-02-03</td><td>Yes</td></tr>
+            <tr><td>4009</td><td>5002</td><td>1001</td><td>4</td><td>2024-01-20</td><td>Yes</td></tr>
+            <tr><td>4010</td><td>5008</td><td>1008</td><td>3</td><td>2024-01-28</td><td>No</td></tr>
+        </tbody>
+    </table>
+
+    <div class="sql-section">
+        <h2>📊 SQLStream DuckDB Queries</h2>
+        <p>Use these queries with SQLStream's DuckDB backend to analyze the data. The queries use GitHub URLs with SQLStream's HTML table syntax.</p>
+        <code>from sqlstream import query</code>
+
+        <div class="query-title">Setup: Define Table URLs</div>
+        <pre># GitHub raw URL base
+BASE = 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html'
+
+# Table references using SQLStream HTML syntax
+customers = f'{BASE}#html:0'
+categories = f'{BASE}#html:1'
+products = f'{BASE}#html:2'
+orders = f'{BASE}#html:3'
+order_items = f'{BASE}#html:4'
+reviews = f'{BASE}#html:5'</pre>
+
+        <div class="query-title">Query 1: Complete Order Details with Customer and Product Info</div>
+        <pre>result = query(orders).sql(f"""
+    SELECT 
+        o.order_id,
+        o.order_date,
+        o.status,
+        c.first_name || ' ' || c.last_name AS customer_name,
+        c.email,
+        c.loyalty_tier,
+        p.product_name,
+        oi.quantity,
+        oi.unit_price,
+        oi.discount_percent,
+        (oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS line_total,
+        cat.category_name
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:3' o
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:0' c ON o.customer_id = c.customer_id
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON o.order_id = oi.order_id
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:2' p ON oi.product_id = p.product_id
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:1' cat ON p.category_id = cat.category_id
+    ORDER BY o.order_date DESC, o.order_id
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 2: Customer Purchase Summary</div>
+        <pre>result = query(customers).sql(f"""
+    SELECT 
+        c.customer_id,
+        c.first_name || ' ' || c.last_name AS customer_name,
+        c.loyalty_tier,
+        COUNT(DISTINCT o.order_id) AS total_orders,
+        SUM(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS total_spent,
+        AVG(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS avg_order_value
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:0' c
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:3' o ON c.customer_id = o.customer_id
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON o.order_id = oi.order_id
+    GROUP BY c.customer_id, c.first_name, c.last_name, c.loyalty_tier
+    ORDER BY total_spent DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 3: Product Performance with Ratings and Sales</div>
+        <pre>result = query(products).sql(f"""
+    SELECT 
+        p.product_id,
+        p.product_name,
+        cat.category_name,
+        p.price,
+        p.stock_quantity,
+        COUNT(DISTINCT oi.order_id) AS times_ordered,
+        SUM(oi.quantity) AS total_units_sold,
+        SUM(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS total_revenue,
+        AVG(r.rating) AS avg_rating,
+        COUNT(r.review_id) AS review_count
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:2' p
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:1' cat ON p.category_id = cat.category_id
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON p.product_id = oi.product_id
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:5' r ON p.product_id = r.product_id
+    GROUP BY p.product_id, p.product_name, cat.category_name, p.price, p.stock_quantity
+    ORDER BY total_revenue DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 4: Category Performance Analysis</div>
+        <pre>result = query(categories).sql(f"""
+    SELECT 
+        cat.category_name,
+        COUNT(DISTINCT p.product_id) AS product_count,
+        COUNT(DISTINCT oi.order_id) AS order_count,
+        SUM(oi.quantity) AS total_units_sold,
+        SUM(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS total_revenue,
+        AVG(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS avg_order_value
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:1' cat
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:2' p ON cat.category_id = p.category_id
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON p.product_id = oi.product_id
+    GROUP BY cat.category_id, cat.category_name
+    ORDER BY total_revenue DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 5: Customer Segmentation by Purchase Diversity</div>
+        <pre>result = query(customers).sql(f"""
+    SELECT 
+        c.customer_id,
+        c.first_name || ' ' || c.last_name AS customer_name,
+        c.loyalty_tier,
+        COUNT(DISTINCT cat.category_id) AS categories_purchased_from,
+        COUNT(DISTINCT p.product_id) AS unique_products_purchased,
+        SUM(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS total_spent
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:0' c
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:3' o ON c.customer_id = o.customer_id
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON o.order_id = oi.order_id
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:2' p ON oi.product_id = p.product_id
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:1' cat ON p.category_id = cat.category_id
+    GROUP BY c.customer_id, c.first_name, c.last_name, c.loyalty_tier
+    ORDER BY categories_purchased_from DESC, total_spent DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 6: Monthly Sales Trend</div>
+        <pre>result = query(orders).sql(f"""
+    SELECT 
+        strftime(o.order_date, '%Y-%m') AS month,
+        COUNT(DISTINCT o.order_id) AS order_count,
+        COUNT(DISTINCT o.customer_id) AS unique_customers,
+        SUM(oi.quantity) AS total_items_sold,
+        SUM(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS total_revenue
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:3' o
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON o.order_id = oi.order_id
+    GROUP BY strftime(o.order_date, '%Y-%m')
+    ORDER BY month
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 7: Products Needing Restock</div>
+        <pre>result = query(products).sql(f"""
+    SELECT 
+        p.product_id,
+        p.product_name,
+        cat.category_name,
+        p.stock_quantity,
+        COUNT(DISTINCT oi.order_id) AS times_ordered,
+        SUM(oi.quantity) AS total_units_sold,
+        CASE 
+            WHEN p.stock_quantity < 30 THEN 'Critical'
+            WHEN p.stock_quantity < 50 THEN 'Low'
+            ELSE 'Adequate'
+        END AS stock_status
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:2' p
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:1' cat ON p.category_id = cat.category_id
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON p.product_id = oi.product_id
+    GROUP BY p.product_id, p.product_name, cat.category_name, p.stock_quantity
+    HAVING p.stock_quantity < 50 AND COUNT(oi.order_id) > 0
+    ORDER BY p.stock_quantity ASC, total_units_sold DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 8: Customer Lifetime Value</div>
+        <pre>result = query(customers).sql(f"""
+    SELECT 
+        c.customer_id,
+        c.first_name || ' ' || c.last_name AS customer_name,
+        c.loyalty_tier,
+        MIN(o.order_date) AS first_purchase,
+        MAX(o.order_date) AS last_purchase,
+        COUNT(DISTINCT o.order_id) AS total_orders,
+        SUM(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS lifetime_value,
+        AVG(r.rating) AS avg_rating_given
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:0' c
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:3' o ON c.customer_id = o.customer_id
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON o.order_id = oi.order_id
+    LEFT JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:5' r ON c.customer_id = r.customer_id
+    GROUP BY c.customer_id, c.first_name, c.last_name, c.loyalty_tier
+    ORDER BY lifetime_value DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 9: Review Analysis (Verified vs Unverified)</div>
+        <pre>result = query(products).sql(f"""
+    SELECT 
+        p.product_name,
+        cat.category_name,
+        COUNT(CASE WHEN r.verified_purchase = 'Yes' THEN 1 END) AS verified_reviews,
+        COUNT(CASE WHEN r.verified_purchase = 'No' THEN 1 END) AS unverified_reviews,
+        AVG(CASE WHEN r.verified_purchase = 'Yes' THEN r.rating END) AS avg_verified_rating,
+        AVG(CASE WHEN r.verified_purchase = 'No' THEN r.rating END) AS avg_unverified_rating,
+        AVG(r.rating) AS overall_rating
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:2' p
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:1' cat ON p.category_id = cat.category_id
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:5' r ON p.product_id = r.product_id
+    GROUP BY p.product_id, p.product_name, cat.category_name
+    HAVING COUNT(r.review_id) >= 2
+    ORDER BY overall_rating DESC
+""", backend="duckdb")</pre>
+
+        <div class="query-title">Query 10: Order Status Funnel Analysis</div>
+        <pre>result = query(orders).sql(f"""
+    SELECT 
+        o.status,
+        COUNT(DISTINCT o.order_id) AS order_count,
+        COUNT(DISTINCT o.customer_id) AS unique_customers,
+        SUM(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS total_value,
+        AVG(oi.quantity * oi.unit_price * (1 - oi.discount_percent/100)) AS avg_order_value
+    FROM 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:3' o
+    JOIN 'https://github.com/subhayu99/sqlstream/raw/refs/heads/main/examples/complex.html#html:4' oi ON o.order_id = oi.order_id
+    GROUP BY o.status
+    ORDER BY 
+        CASE o.status
+            WHEN 'Processing' THEN 1
+            WHEN 'Shipped' THEN 2
+            WHEN 'Delivered' THEN 3
+        END
+""", backend="duckdb")</pre>
+    </div>
+</body>
+</html>
