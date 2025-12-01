@@ -42,11 +42,11 @@ except ImportError:
 def _can_parse_with_custom_parser(sql: str) -> bool:
     """
     Determine if SQL can be handled by the custom parser (Python/Pandas backends)
-    
+
     Returns True if SQL contains only basic features:
     - SELECT, FROM, WHERE, JOIN, GROUP BY, ORDER BY, LIMIT
     - Simple aggregates (COUNT, SUM, AVG, MIN, MAX)
-    
+
     Returns False if SQL requires DuckDB:
     - CTEs (WITH clause)
     - Window functions (OVER, PARTITION BY)
@@ -54,15 +54,15 @@ def _can_parse_with_custom_parser(sql: str) -> bool:
     - Subqueries
     - Set operations (UNION, INTERSECT, EXCEPT)
     - HAVING clause
-    
+
     Args:
         sql: SQL query string to analyze
-    
+
     Returns:
         True if custom parser can handle it, False if DuckDB is needed
     """
     sql_upper = sql.upper()
-    
+
     # Check for advanced SQL features that require DuckDB
     advanced_keywords = [
         'WITH',  # CTEs
@@ -82,11 +82,11 @@ def _can_parse_with_custom_parser(sql: str) -> bool:
         'LAG',  # Window functions
         'LEAD',  # Window functions
     ]
-    
+
     for keyword in advanced_keywords:
         if keyword in sql_upper:
             return False  # Needs DuckDB
-    
+
     # Check for subqueries - look for SELECT inside parentheses
     # This is a simple heuristic
     if '(' in sql:
@@ -96,7 +96,7 @@ def _can_parse_with_custom_parser(sql: str) -> bool:
         for content in paren_content:
             if 'SELECT' in content:
                 return False  # Has subquery, needs DuckDB
-    
+
     return True  # Can use custom parser
 
 
@@ -120,7 +120,7 @@ class Query:
             >>> query = Query("data.csv")
             >>> query = Query("/path/to/data.parquet")
             >>> query = Query("https://example.com/data.csv")
-            >>> 
+            >>>
             >>> # Without source - extracted from SQL
             >>> query = Query()
             >>> query.sql("SELECT * FROM 'data.csv' WHERE age > 25")
@@ -131,7 +131,7 @@ class Query:
     def _create_reader(self, source: str) -> BaseReader:
         """
         Auto-detect source type and create appropriate reader
-        
+
         Supports URL fragments: source#format:table
 
         Args:
@@ -144,10 +144,10 @@ class Query:
             ValueError: If file format is not supported
         """
         from sqlstream.core.fragment_parser import parse_source_fragment
-        
+
         # Parse URL fragment if present
         source_path, format_hint, table_hint = parse_source_fragment(source)
-        
+
         # Check if source is HTTP/HTTPS URL
         if source_path.startswith(("http://", "https://")):
             from sqlstream.readers.http_reader import HTTPReader
@@ -163,13 +163,13 @@ class Query:
 
         # Check file extension to determine format
         suffix = path.suffix.lower()
-        
+
         # Explicit format from fragment takes precedence
         if format_hint == 'html' or (not format_hint and suffix in ['.html', '.htm']):
             from sqlstream.readers.html_reader import HTMLReader
             table = table_hint if table_hint is not None else 0
             return HTMLReader(source_path, table=table)
-        
+
         elif format_hint == 'markdown' or (not format_hint and suffix in ['.md', '.markdown']):
             from sqlstream.readers.markdown_reader import MarkdownReader
             table = table_hint if table_hint is not None else 0
@@ -178,10 +178,10 @@ class Query:
         elif format_hint == 'parquet' or (not format_hint and suffix == ".parquet"):
             from sqlstream.readers.parquet_reader import ParquetReader
             return ParquetReader(source_path)
-        
+
         elif format_hint == 'csv' or (not format_hint and suffix == ".csv"):
             return CSVReader(source_path)
-        
+
         else:
             # Try CSV as default
             try:
@@ -302,13 +302,13 @@ class QueryResult:
 
     def _select_backend(self):
         """Select appropriate backend based on configuration"""
-        
+
         # Determine effective backend to use
         target_backend = self.backend
-        
+
         if target_backend == "auto":
             # Smart backend selection logic
-            
+
             # Case 1: AST already present (e.g. from QueryInline)
             # This means custom parser already succeeded
             if self.ast:
@@ -316,7 +316,7 @@ class QueryResult:
                     target_backend = "pandas"
                 else:
                     target_backend = "python"
-            
+
             # Case 2: No AST, analyze raw SQL
             elif self.raw_sql:
                 if _can_parse_with_custom_parser(self.raw_sql):
@@ -334,7 +334,7 @@ class QueryResult:
                         "This query requires advanced SQL features not supported by the basic parser. "
                         "Install `sqlstream[duckdb]`"
                     )
-            
+
             # Case 3: Fallback (shouldn't happen in normal usage)
             else:
                 if PANDAS_AVAILABLE:
@@ -355,7 +355,7 @@ class QueryResult:
             self.executor = DuckDBExecutor()
             self.use_duckdb = True
             self.use_pandas = False
-            
+
         elif target_backend == "pandas":
             # Force pandas backend
             if not PANDAS_AVAILABLE:
@@ -363,7 +363,7 @@ class QueryResult:
                     "Pandas backend requested but pandas is not installed. "
                     "Install `sqlstream[pandas]`"
                 )
-            
+
             # Ensure AST is parsed if not already present
             if not self.ast and self.raw_sql:
                 try:
@@ -375,19 +375,19 @@ class QueryResult:
                         self.use_duckdb = True
                         self.use_pandas = False
                         return
-                    
+
                     raise ValueError(
                         f"Failed to parse SQL query: {e}. "
                         "Consider installing DuckDB for full SQL support: pip install sqlstream[duckdb]"
                     ) from e
-            
+
             self.executor = PandasExecutor()
             self.use_pandas = True
             self.use_duckdb = False
-            
+
         elif target_backend == "python":
             # Force pure Python backend
-            
+
             # Ensure AST is parsed if not already present
             if not self.ast and self.raw_sql:
                 try:
@@ -399,7 +399,7 @@ class QueryResult:
                         self.use_duckdb = True
                         self.use_pandas = False
                         return
-                    
+
                     raise ValueError(f"Failed to parse SQL query: {e}") from e
 
             self.executor = Executor()
@@ -463,7 +463,7 @@ class QueryResult:
     def _discover_sources(self) -> Dict[str, str]:
         """
         Discover all table sources from raw SQL or AST
-        
+
         For DuckDB backend, this extracts all file paths from the SQL query.
         Handles multiple files in JOINs, subqueries, CTEs, etc.
         Properly handles URL fragments like #html:0
@@ -613,7 +613,7 @@ class QueryInline:
     def _create_reader(self, source: str) -> BaseReader:
         """
         Auto-detect source type and create appropriate reader
-        
+
         Supports URL fragments: source#format:table
 
         Args:
@@ -626,10 +626,10 @@ class QueryInline:
             ValueError: If file format is not supported
         """
         from sqlstream.core.fragment_parser import parse_source_fragment
-        
+
         # Parse URL fragment if present
         source_path, format_hint, table_hint = parse_source_fragment(source)
-        
+
         # Check if source is HTTP/HTTPS URL
         if source_path.startswith(("http://", "https://")):
             from sqlstream.readers.http_reader import HTTPReader
@@ -645,13 +645,13 @@ class QueryInline:
 
         # Check file extension to determine format
         suffix = path.suffix.lower()
-        
+
         # Explicit format from fragment takes precedence
         if format_hint == 'html' or (not format_hint and suffix in ['.html', '.htm']):
             from sqlstream.readers.html_reader import HTMLReader
             table = table_hint if table_hint is not None else 0
             return HTMLReader(source_path, table=table)
-        
+
         elif format_hint == 'markdown' or (not format_hint and suffix in ['.md', '.markdown']):
             from sqlstream.readers.markdown_reader import MarkdownReader
             table = table_hint if table_hint is not None else 0
@@ -660,10 +660,10 @@ class QueryInline:
         elif format_hint == 'parquet' or (not format_hint and suffix == ".parquet"):
             from sqlstream.readers.parquet_reader import ParquetReader
             return ParquetReader(source_path)
-        
+
         elif format_hint == 'csv' or (not format_hint and suffix == ".csv"):
             return CSVReader(source_path)
-        
+
         else:
             # Try CSV as default
             try:
@@ -721,12 +721,12 @@ def query(source: Optional[str] = None) -> Query:
 
     Example:
         >>> from sqlstream import query
-        >>> 
+        >>>
         >>> # With explicit source
         >>> results = query("data.csv").sql("SELECT * WHERE age > 25")
         >>> for row in results:
         ...     print(row)
-        >>> 
+        >>>
         >>> # Without source - extracted from SQL
         >>> results = query().sql("SELECT * FROM 'data.csv' WHERE age > 25")
         >>> for row in results:

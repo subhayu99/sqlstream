@@ -118,7 +118,7 @@ class PandasExecutor:
             else:
                 reader = HTTPReader(source_path)
             source_path = str(reader.local_path)
-            
+
             # If format not specified, detect from reader
             if not format:
                 delegate_type = type(reader.delegate_reader).__name__
@@ -156,7 +156,7 @@ class PandasExecutor:
                 return pd.DataFrame(reader.rows)
             else:  # csv
                 return pd.read_csv(source_path)
-        
+
         # Auto-detect from extension
         source_lower = source_path.lower()
         if source_lower.endswith(".parquet"):

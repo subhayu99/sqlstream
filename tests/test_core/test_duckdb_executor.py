@@ -5,7 +5,6 @@ Ensures DuckDB backend works correctly with full SQL support.
 """
 
 import pytest
-from pathlib import Path
 
 try:
     import duckdb
@@ -94,9 +93,9 @@ class TestDuckDBAdvancedFeatures:
         """Test window functions (ROW_NUMBER, AVG OVER)"""
         # Rank employees by salary within department
         sql = f"""
-            SELECT 
-                name, 
-                dept, 
+            SELECT
+                name,
+                dept,
                 salary,
                 ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) as rank
             FROM '{employees_csv}'
@@ -105,7 +104,7 @@ class TestDuckDBAdvancedFeatures:
         result = query(str(employees_csv)).sql(sql, backend="duckdb").to_list()
 
         assert len(result) == 5
-        
+
         # Check Engineering ranks
         eng = [r for r in result if r["dept"] == "Eng"]
         assert len(eng) == 3
@@ -150,18 +149,18 @@ class TestDuckDBJoins:
         """Test JOIN across two CSV files"""
         # Note: DuckDB requires quoted paths for files with special chars or extensions
         sql = f"""
-            SELECT c.name, o.amount 
+            SELECT c.name, o.amount
             FROM '{customers_csv}' c
             JOIN '{orders_csv}' o ON c.id = o.customer_id
             ORDER BY c.name
         """
-        
-        # We can pass either file as the 'source' to init query, 
+
+        # We can pass either file as the 'source' to init query,
         # but the SQL references both explicitly
         result = query(str(customers_csv)).sql(sql, backend="duckdb").to_list()
 
         assert len(result) == 3
-        
+
         # Alice has 2 orders (100, 150)
         alice_orders = [r for r in result if r["name"] == "Alice"]
         assert len(alice_orders) == 2
@@ -171,7 +170,7 @@ class TestDuckDBJoins:
 
 class TestBackendSelection:
     """Test backend selection logic"""
-    
+
     @pytest.fixture
     def sample_csv(self, tmp_path):
         csv_file = tmp_path / "data.csv"
@@ -189,7 +188,7 @@ class TestBackendSelection:
         """Test auto priority (Pandas > DuckDB > Python)"""
         # This depends on what is installed in the environment
         q = query(str(sample_csv)).sql(f"SELECT * FROM '{sample_csv}'", backend="auto")
-        
+
         if PANDAS_AVAILABLE:
             assert q.use_pandas is True
             assert q.use_duckdb is False

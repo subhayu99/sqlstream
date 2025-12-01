@@ -11,7 +11,6 @@ Supports:
 from __future__ import annotations
 
 import hashlib
-import os
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
@@ -143,11 +142,11 @@ class HTTPReader(BaseReader):
     def _create_delegate_reader(self) -> BaseReader:
         """Create appropriate reader based on file format"""
         format_to_use = self.explicit_format
-        
+
         # If no explicit format, try to detect from URL extension
         if not format_to_use:
             path_lower = str(self.local_path).lower()
-            
+
             if path_lower.endswith(".parquet"):
                 format_to_use = "parquet"
             elif path_lower.endswith(".csv"):
@@ -159,7 +158,7 @@ class HTTPReader(BaseReader):
             else:
                 # Try to detect from content
                 format_to_use = self._detect_format_from_content()
-        
+
         # Create appropriate reader based on detected/specified format
         if format_to_use == "parquet":
             if not PARQUET_AVAILABLE:
@@ -168,7 +167,7 @@ class HTTPReader(BaseReader):
                     "Install `sqlstream[parquet]`"
                 )
             return ParquetReader(str(self.local_path))
-        
+
         elif format_to_use == "html":
             try:
                 from sqlstream.readers.html_reader import HTMLReader
@@ -178,36 +177,39 @@ class HTTPReader(BaseReader):
                     "HTML reader requires pandas library. "
                     "Install `sqlstream[pandas]`"
                 )
-        
+
         elif format_to_use == "markdown":
             from sqlstream.readers.markdown_reader import MarkdownReader
             return MarkdownReader(str(self.local_path), **self.reader_kwargs)
-        
+
         else:  # csv or unknown - default to CSV
-            return CSVReader(str(self.local_path))
-    
+            try:
+                return CSVReader(str(self.local_path))
+            except Exception:
+                raise ValueError(f"Unknown file format: {format_to_use}")
+
     def _detect_format_from_content(self) -> str:
         """Try to detect format by peeking at file content"""
         try:
             with open(self.local_path, 'rb') as f:
                 # Read first few bytes
                 header = f.read(512)
-            
+
             # Check for HTML
             if b'<html' in header.lower() or b'<!doctype html' in header.lower() or b'<table' in header.lower():
                 return "html"
-            
+
             # Check for Markdown table (simple heuristic)
             if b'|' in header and b'---' in header:
                 return "markdown"
-            
+
             # Check for Parquet magic number
             if header.startswith(b'PAR1'):
                 return "parquet"
-            
+
             # Default to CSV
             return "csv"
-        
+
         except Exception:
             # If detection fails, default to CSV
             return "csv"

@@ -59,9 +59,9 @@ class TestQueryExecution:
 
     def test_query_execution(self, test_csv):
         """Test executing a query."""
-        from sqlstream.core.query import QueryInline
+        from sqlstream.core.query import Query
 
-        q = QueryInline()
+        q = Query()
         result = q.sql(f"SELECT * FROM '{test_csv}' WHERE age > 25")
         results = result.to_list()
 

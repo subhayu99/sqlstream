@@ -61,18 +61,18 @@ class QueryEditor(TextArea):
         # Get current line text
         line = self.document.get_line(self.cursor_location[0])
         col = self.cursor_location[1]
-        
+
         # Find start of word
         start = col
         while start > 0 and (line[start-1].isalnum() or line[start-1] == "_"):
             start -= 1
-            
+
         return line[start:col]
 
     def _show_suggestions(self, word: str):
         """Show the autocomplete popup if matches found."""
         matches = [k for k in self.KEYWORDS if k.startswith(word.upper())]
-        
+
         # Remove existing popup if it exists
         if self.autocomplete_popup:
             self.autocomplete_popup.remove()
@@ -87,10 +87,10 @@ class QueryEditor(TextArea):
 
         # Position the popup near the cursor
         x, y = self.cursor_screen_offset
-        
+
         # FIXED LINE: Use x, y directly as they are already screen coordinates
         popup_offset = Offset(x, y + 1)
-        
+
         self.autocomplete_popup.styles.offset = (popup_offset.x, popup_offset.y)
         self.autocomplete_popup.styles.width = 20
         self.autocomplete_popup.styles.height = min(len(matches) + 2, 10)
@@ -583,23 +583,23 @@ class SQLShellApp(App):
             column_key = column_key.value
         else:
             column_key = str(column_key)
-        
+
         if not self.last_results:
             return
-        
+
         # Toggle sort direction if clicking same column
         if self.sort_column == column_key:
             self.sort_reverse = not self.sort_reverse
         else:
             self.sort_column = column_key
             self.sort_reverse = False
-        
+
         # Reapply filter and sort
         self.filtered_results = self._apply_filter(self.last_results)
         self.filtered_results = self._apply_sort(self.filtered_results)
         self.current_page = 0
         self._refresh_displayed_results()
-        
+
         direction = "↓" if self.sort_reverse else "↑"
         self._show_status(f"Sorted by {column_key} {direction}")
 
@@ -634,7 +634,7 @@ class SQLShellApp(App):
         tabs = self.query_one("#query-tabs", TabbedContent)
         if not tabs.active:
             return self.query_one("#query-editor-1", QueryEditor)
-        
+
         active_pane = self.query_one(f"#{tabs.active}", TabPane)
         return active_pane.query_one(QueryEditor)
 
@@ -718,14 +718,14 @@ class SQLShellApp(App):
 
         # Apply filter if set
         self.filtered_results = self._apply_filter(results)
-        
+
         # Apply sort if set
         if self.sort_column:
             self.filtered_results = self._apply_sort(self.filtered_results)
-        
+
         # Reset to first page
         self.current_page = 0
-        
+
         # Display current page
         self._refresh_displayed_results(execution_time)
 
@@ -733,7 +733,7 @@ class SQLShellApp(App):
         """Apply filter text to results."""
         if not self.filter_text:
             return results
-        
+
         filtered = []
         filter_lower = self.filter_text.lower()
         for row in results:
@@ -746,7 +746,7 @@ class SQLShellApp(App):
         """Sort results by column."""
         if not self.sort_column or not results:
             return results
-        
+
         try:
             return sorted(
                 results,
@@ -806,7 +806,7 @@ class SQLShellApp(App):
         total_pages = (total_rows + self.page_size - 1) // self.page_size
         page_info = f"Page {self.current_page + 1}/{total_pages}"
         filter_info = f" (filtered from {len(self.last_results)})" if self.filter_text else ""
-        
+
         message = f"Showing {start_idx + 1}-{end_idx} of {total_rows} rows{filter_info} | {page_info}"
         status_bar.update_status(
             message,
@@ -1002,7 +1002,7 @@ class SQLShellApp(App):
         """Go to previous page of results."""
         if not self.filtered_results:
             return
-        
+
         if self.current_page > 0:
             self.current_page -= 1
             self._refresh_displayed_results()
@@ -1013,7 +1013,7 @@ class SQLShellApp(App):
         """Go to next page of results."""
         if not self.filtered_results:
             return
-        
+
         total_pages = (len(self.filtered_results) + self.page_size - 1) // self.page_size
         if self.current_page < total_pages - 1:
             self.current_page += 1
@@ -1134,10 +1134,10 @@ class SQLShellApp(App):
         container = self.query_one("#sidebar-container")
         if not container.has_class("visible"):
             container.add_class("visible")
-        
+
         # Switch to Files tab
         self.query_one("#sidebar-tabs", TabbedContent).active = "tab-files"
-        
+
         # Focus file browser
         self.query_one("#file-browser", FileBrowser).focus()
         self._show_status("Select a file from the sidebar")
@@ -1145,7 +1145,7 @@ class SQLShellApp(App):
     def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
         """Handle file selection from sidebar."""
         file_path = str(event.path)
-        
+
         # Get active editor
         editor = self._get_active_editor()
         current_text = editor.text.strip()
@@ -1172,7 +1172,7 @@ class SQLShellApp(App):
         # Move cursor to end
         lines = new_text.splitlines()
         editor.cursor_location = (len(lines) - 1, len(lines[-1]))
-        
+
         # Focus editor
         editor.focus()
 
@@ -1184,10 +1184,10 @@ class SQLShellApp(App):
         self.tab_counter += 1
         if not title:
             title = f"Query {self.tab_counter}"
-        
+
         tab_id = f"tab-query-{self.tab_counter}"
         editor_id = f"query-editor-{self.tab_counter}"
-        
+
         pane = TabPane(title, id=tab_id)
         editor = QueryEditor(
             id=editor_id,
@@ -1196,7 +1196,7 @@ class SQLShellApp(App):
             show_line_numbers=True,
             text=content
         )
-        
+
         tabs = self.query_one("#query-tabs", TabbedContent)
         await tabs.add_pane(pane)
         await pane.mount(editor)
@@ -1209,9 +1209,9 @@ class SQLShellApp(App):
         active_tab = tabs.active
         if not active_tab:
             return
-            
+
         await tabs.remove_pane(active_tab)
-        
+
         # If no tabs left, create a new one
         if not tabs.query(TabPane):
              await self.action_new_tab()
@@ -1231,15 +1231,15 @@ class SQLShellApp(App):
         try:
             tabs = self.query_one("#query-tabs", TabbedContent)
             state = []
-            
+
             # Strategy 1: ContentSwitcher children
             try:
                 switcher = tabs.query_one(ContentSwitcher)
-                
+
                 for child in switcher.children:
                     if isinstance(child, TabPane):
                         editors = list(child.query(QueryEditor))
-                        
+
                         if editors:
                             editor = editors[0]
                             state.append({
@@ -1262,8 +1262,8 @@ class SQLShellApp(App):
             # Write to file
             path = Path(self.state_file)
             path.write_text(json.dumps(state))
-            self.notify(f"Saved {len(state)} tabs", timeout=2)
-            
+            self.notify(f"Saved {len(state)} tabs", timeout=3)
+
         except Exception as e:
             self.notify(f"Failed to save state: {e}", severity="error")
 
@@ -1271,10 +1271,10 @@ class SQLShellApp(App):
         """Load editor state from file."""
         # Load history first
         self._load_history()
-        
+
         state_path = Path(self.state_file)
         loaded = False
-        
+
         if state_path.exists():
             try:
                 state = json.loads(state_path.read_text())
@@ -1288,7 +1288,7 @@ class SQLShellApp(App):
                     loaded = True
             except Exception as e:
                 self.notify(f"Failed to load state: {e}", severity="error")
-        
+
         if not loaded:
             # Create default tab
             await self.action_new_tab()

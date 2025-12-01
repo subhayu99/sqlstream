@@ -26,10 +26,10 @@ class MarkdownFormatter(BaseFormatter):
 
         # Get columns from first row
         columns = list(results[0].keys())
-        
+
         # Build header row
         header = "| " + " | ".join(columns) + " |"
-        
+
         # Build separator row with alignment
         # Default alignment is left, can be 'left', 'center', or 'right'
         align = kwargs.get("align", "left")
@@ -42,9 +42,9 @@ class MarkdownFormatter(BaseFormatter):
                 separators.append("---:")
             else:  # left or default
                 separators.append(":---")
-        
+
         separator = "| " + " | ".join(separators) + " |"
-        
+
         # Build data rows
         data_rows = []
         for row in results:
@@ -60,17 +60,17 @@ class MarkdownFormatter(BaseFormatter):
                 else:
                     formatted_val = str(val)
                 values.append(formatted_val)
-            
+
             data_rows.append("| " + " | ".join(values) + " |")
-        
+
         # Combine all parts
         table_lines = [header, separator] + data_rows
         output = "\n".join(table_lines)
-        
+
         # Add footer with row count if requested
         if kwargs.get("show_footer", True):
             row_count = len(results)
             footer = f"\n\n_{row_count} row{'s' if row_count != 1 else ''}_"
             output += footer
-        
+
         return output

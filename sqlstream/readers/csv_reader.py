@@ -281,21 +281,21 @@ class CSVReader(BaseReader):
         Convert to pandas DataFrame efficiently
         """
         import pandas as pd
-        
+
         # Use pandas read_csv for performance
         if self.is_s3:
             # For S3, use s3fs via storage_options or direct s3 path if supported
             # Since we already handle s3fs import in _get_file_handle, we can rely on pandas s3 support
             # which uses s3fs under the hood
             return pd.read_csv(
-                self.path_str, 
-                encoding=self.encoding, 
+                self.path_str,
+                encoding=self.encoding,
                 delimiter=self.delimiter,
                 storage_options={"anon": False}
             )
         else:
             return pd.read_csv(
-                self.path, 
-                encoding=self.encoding, 
+                self.path,
+                encoding=self.encoding,
                 delimiter=self.delimiter
             )

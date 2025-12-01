@@ -171,10 +171,10 @@ class BaseReader:
     def to_dataframe(self):
         """
         Convert reader content to pandas DataFrame
-        
+
         Returns:
             pandas.DataFrame containing all data
-            
+
         Note:
             Default implementation iterates over read_lazy() and creates DataFrame.
             Subclasses should override this for better performance (e.g. using read_csv/read_parquet).

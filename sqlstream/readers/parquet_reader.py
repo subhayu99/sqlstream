@@ -48,7 +48,7 @@ class ParquetReader(BaseReader):
         """
         self.path_str = path
         self.is_s3 = path.startswith("s3://")
-        
+
         filesystem = None
         path_to_open = path
 
@@ -659,7 +659,7 @@ class ParquetReader(BaseReader):
         Convert to pandas DataFrame efficiently
         """
         import pandas as pd
-        
+
         # Use pandas read_parquet for performance
         if self.is_s3:
             return pd.read_parquet(
