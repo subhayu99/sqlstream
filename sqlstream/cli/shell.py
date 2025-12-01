@@ -16,7 +16,7 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
-from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList, TabbedContent, TabPane, ContentSwitcher
+from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList, TabbedContent, TabPane, ContentSwitcher, Select
 from textual.geometry import Offset
 from textual.events import Key
 
@@ -239,17 +239,25 @@ class StatusBar(Static):
         self.row_count: Optional[int] = None
 
     def update_status(
-        self, message: str, execution_time: Optional[float] = None, row_count: Optional[int] = None
+        self, 
+        message: str, 
+        execution_time: Optional[float] = None, 
+        row_count: Optional[int] = None,
+        filter_info: str = ""
     ) -> None:
         """Update status bar with execution info."""
-        self.last_execution_time = execution_time
-        self.row_count = row_count
+        if execution_time is not None:
+            self.last_execution_time = execution_time
+        if row_count is not None:
+            self.row_count = row_count
 
         status_parts = [message]
-        if row_count is not None:
-            status_parts.append(f"{row_count} rows")
-        if execution_time is not None:
-            status_parts.append(f"{execution_time:.3f}s")
+        if filter_info:
+             status_parts.append(f"🔍 {filter_info}")
+        if self.row_count is not None:
+            status_parts.append(f"{self.row_count} rows")
+        if self.last_execution_time is not None:
+            status_parts.append(f"{self.last_execution_time:.3f}s")
 
         self.update(" | ".join(status_parts))
 
@@ -291,13 +299,26 @@ class SchemaBrowser(Tree):
                     file_node.add(f"[green]{col}[/green]: [dim]{dtype}[/dim]")
 
 
-class FilterDialog(ModalScreen[str]):
+class FilterDialog(ModalScreen[tuple]):
     """Modal dialog for entering filter text."""
+
+    def __init__(self, columns: List[str] = None) -> None:
+        super().__init__()
+        self.columns = columns or []
 
     def compose(self) -> ComposeResult:
         with Container(id="filter-dialog"):
-            yield Label("Filter Results (case-insensitive)")
+            yield Label("Filter Results")
+            
+            # Column selection
+            if self.columns:
+                options = [("All Columns", "")] + [(col, col) for col in self.columns]
+                yield Label("Column:")
+                yield Select(options, prompt="Select column...", id="filter-column", value="")
+            
+            yield Label("Search Text (case-insensitive):")
             yield Input(placeholder="Enter search text...", id="filter-input")
+            
             with Horizontal(id="dialog-buttons"):
                 yield Button("Filter", variant="primary", id="filter-btn")
                 yield Button("Clear", variant="default", id="clear-btn")
@@ -309,14 +330,25 @@ class FilterDialog(ModalScreen[str]):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "filter-btn":
             filter_text = self.query_one("#filter-input", Input).value
-            self.dismiss(filter_text)
+            column = ""
+            if self.columns:
+                select = self.query_one("#filter-column", Select)
+                if select.value != Select.BLANK:
+                    column = select.value
+            self.dismiss((filter_text, column))
         elif event.button.id == "clear-btn":
-            self.dismiss("")
+            self.dismiss(("", ""))
         else:
             self.dismiss(None)
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
-        self.dismiss(event.value)
+        filter_text = event.value
+        column = ""
+        if self.columns:
+            select = self.query_one("#filter-column", Select)
+            if select.value != Select.BLANK:
+                column = select.value
+        self.dismiss((filter_text, column))
 
 
 class ExplainDialog(ModalScreen):
@@ -580,6 +612,7 @@ class SQLShellApp(App):
 
         # Filter and sort state
         self.filter_text = ""
+        self.filter_column = None
         self.sort_column = None
         self.sort_reverse = False
 
@@ -802,10 +835,17 @@ class SQLShellApp(App):
 
         filtered = []
         filter_lower = self.filter_text.lower()
+        
         for row in results:
-            # Check if filter text appears in any column value
-            if any(filter_lower in str(v).lower() for v in row.values()):
-                filtered.append(row)
+            if self.filter_column:
+                # Filter specific column
+                val = row.get(self.filter_column, "")
+                if filter_lower in str(val).lower():
+                    filtered.append(row)
+            else:
+                # Check if filter text appears in any column value
+                if any(filter_lower in str(v).lower() for v in row.values()):
+                    filtered.append(row)
         return filtered
 
     def _apply_sort(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -1103,15 +1143,22 @@ class SQLShellApp(App):
             self._show_status("No results to filter", error=True)
             return
 
-        # Show filter dialog
-        filter_text = await self.push_screen_wait(FilterDialog())
+        # Get columns from first row
+        columns = list(self.last_results[0].keys()) if self.last_results else []
 
-        if filter_text is None:
+        # Show filter dialog
+        result = await self.push_screen_wait(FilterDialog(columns))
+
+        if result is None:
             # Cancelled
             return
-        elif filter_text == "":
+            
+        filter_text, filter_column = result
+        
+        if filter_text == "":
             # Clear filter
             self.filter_text = ""
+            self.filter_column = None
             self.filtered_results = self.last_results.copy()
             self.current_page = 0
             self._refresh_displayed_results()
@@ -1119,10 +1166,15 @@ class SQLShellApp(App):
         else:
             # Apply filter
             self.filter_text = filter_text
+            self.filter_column = filter_column
             self.filtered_results = self._apply_filter(self.last_results)
             self.current_page = 0
             self._refresh_displayed_results()
-            self._show_status(f"Filtered to {len(self.filtered_results)} rows")
+            
+            status_msg = f"Filtered to {len(self.filtered_results)} rows"
+            if filter_column:
+                status_msg += f" (in '{filter_column}')"
+            self._show_status(status_msg)
 
     @work
     async def action_export_results(self) -> None:
