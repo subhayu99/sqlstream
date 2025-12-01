@@ -355,3 +355,14 @@ class MarkdownReader(BaseReader):
             row_count = len(table['rows'])
             descriptions.append(f"Table {i}: {col_str} ({row_count} rows)")
         return descriptions
+
+    def to_dataframe(self):
+        """
+        Convert to pandas DataFrame
+        """
+        try:
+            import pandas as pd
+        except ImportError:
+            raise ImportError("Pandas is required for to_dataframe()")
+            
+        return pd.DataFrame(self.rows)

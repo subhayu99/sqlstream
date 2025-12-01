@@ -27,6 +27,14 @@ except ImportError:
     PANDAS_AVAILABLE = False
     PandasExecutor = None
 
+# Try to import duckdb executor
+try:
+    from sqlstream.core.duckdb_executor import DuckDBExecutor, is_duckdb_available
+    DUCKDB_AVAILABLE = is_duckdb_available()
+except ImportError:
+    DUCKDB_AVAILABLE = False
+    DuckDBExecutor = None
+
 
 class Query:
     """
@@ -115,7 +123,7 @@ class Query:
                 ) from e
 
     def sql(
-        self, query: str, backend: Optional[Literal["auto", "pandas", "python"]] = "auto"
+        self, query: str, backend: Optional[Literal["auto", "pandas", "python", "duckdb"]] = "auto"
     ) -> "QueryResult":
         """
         Execute SQL query on the data source
@@ -123,9 +131,10 @@ class Query:
         Args:
             query: SQL query string
             backend: Execution backend to use
-                - "auto": Use pandas if available, fallback to python
-                - "pandas": Force pandas backend (raises if not installed)
-                - "python": Force pure Python Volcano model
+                - "auto": Use DuckDB if available, else pandas, else python
+                - "duckdb": Force DuckDB backend (full SQL support)
+                - "pandas": Force pandas backend (10-100x faster than python)
+                - "python": Force pure Python Volcano model (educational)
 
         Returns:
             QueryResult object that can be iterated over
@@ -135,14 +144,18 @@ class Query:
             >>> for row in result:
             ...     print(row)
             >>>
-            >>> # Force pandas backend for performance
-            >>> result = query("data.csv").sql("SELECT * WHERE age > 25", backend="pandas")
+            >>> # Force DuckDB backend for full SQL support
+            >>> result = query("data.csv").sql(
+            ...     "SELECT *, ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) as rank "
+            ...     "FROM data",
+            ...     backend="duckdb"
+            ... )
         """
-        # Parse SQL query
-        ast = parse(query)
+        # Parse SQL query (for python/pandas backends)
+        ast = parse(query) if backend != "duckdb" else None
 
         # Create QueryResult with reader factory for JOIN support
-        return QueryResult(ast, self.reader, self._create_reader, self.source, backend)
+        return QueryResult(ast, self.reader, self._create_reader, self.source, backend, raw_sql=query)
 
     def schema(self) -> Optional[Schema]:
         """
@@ -174,29 +187,42 @@ class QueryResult:
         reader_factory: Callable[[str], BaseReader],
         source: str,
         backend: str = "auto",
+        raw_sql: str = None,
     ):
         """
         Initialize query result
 
         Args:
-            ast: Parsed SQL AST
+            ast: Parsed SQL AST (None for DuckDB backend)
             reader: Data source reader
             reader_factory: Factory function to create readers for JOIN tables
             source: Path to data source file
-            backend: Execution backend ("auto", "pandas", or "python")
+            backend: Execution backend ("auto", "pandas", "python", or "duckdb")
+            raw_sql: Original SQL query string (required for DuckDB)
         """
         self.ast = ast
         self.reader = reader
         self.reader_factory = reader_factory
         self.source = source
         self.backend = backend
+        self.raw_sql = raw_sql
 
         # Select executor based on backend
         self._select_backend()
 
     def _select_backend(self):
         """Select appropriate backend based on configuration"""
-        if self.backend == "pandas":
+        if self.backend == "duckdb":
+            # Force DuckDB backend
+            if not DUCKDB_AVAILABLE:
+                raise ImportError(
+                    "DuckDB backend requested but duckdb is not installed. "
+                    "Install with: pip install duckdb"
+                )
+            self.executor = DuckDBExecutor()
+            self.use_duckdb = True
+            self.use_pandas = False
+        elif self.backend == "pandas":
             # Force pandas backend
             if not PANDAS_AVAILABLE:
                 raise ImportError(
@@ -205,18 +231,26 @@ class QueryResult:
                 )
             self.executor = PandasExecutor()
             self.use_pandas = True
+            self.use_duckdb = False
         elif self.backend == "python":
             # Force pure Python backend
             self.executor = Executor()
             self.use_pandas = False
+            self.use_duckdb = False
         else:  # auto
-            # Use pandas if available, fallback to Python
+            # Prefer Pandas > DuckDB > Python (for backward compatibility)
             if PANDAS_AVAILABLE:
                 self.executor = PandasExecutor()
                 self.use_pandas = True
+                self.use_duckdb = False
+            elif DUCKDB_AVAILABLE:
+                self.executor = DuckDBExecutor()
+                self.use_duckdb = True
+                self.use_pandas = False
             else:
                 self.executor = Executor()
                 self.use_pandas = False
+                self.use_duckdb = False
 
     def __iter__(self) -> Iterator[Dict[str, Any]]:
         """
@@ -225,13 +259,84 @@ class QueryResult:
         Yields:
             Result rows as dictionaries
         """
-        if self.use_pandas:
+        if self.use_duckdb:
+            # DuckDB executor - pass raw SQL and discover tables
+            if not self.raw_sql:
+                raise ValueError("DuckDB backend requires raw SQL query")
+            
+            sources = self._discover_sources()
+            
+            # Use reader factory to create DataFrames efficiently
+            yield from self.executor.execute_raw(
+                self.raw_sql, 
+                sources, 
+                reader_factory=self.reader_factory
+            )
+        elif self.use_pandas:
             # Pandas executor takes file path directly
             right_source = self.ast.join.right_source if self.ast.join else None
             yield from self.executor.execute(self.ast, self.source, right_source)
         else:
             # Python executor uses reader objects
             yield from self.executor.execute(self.ast, self.reader, self.reader_factory)
+
+    def _discover_sources(self) -> Dict[str, str]:
+        """
+        Discover all table sources from raw SQL or AST
+        
+        For DuckDB backend, this extracts all file paths from the SQL query.
+        Handles multiple files in JOINs, subqueries, CTEs, etc.
+        """
+        import re
+        
+        sources = {}
+        
+        if self.raw_sql and self.use_duckdb:
+            # Extract file paths from raw SQL for DuckDB
+            # Pattern matches: FROM 'file.csv' or FROM "file.csv" or FROM table_name
+            # Also matches in JOINs: JOIN 'file.csv' or JOIN table_name
+            
+            # Pattern for quoted file paths
+            quoted_pattern = r"(?:FROM|JOIN)\s+['\"]([^'\"]+)['\"]"
+            matches = re.findall(quoted_pattern, self.raw_sql, re.IGNORECASE)
+            
+            for match in matches:
+                # Use filename without extension as table name
+                # Or keep full path if it looks like a file
+                if '.' in match or '/' in match or match.startswith('s3://') or match.startswith('http'):
+                    # It's a file path - extract base name for table
+                    import os
+                    base_name = os.path.splitext(os.path.basename(match))[0]
+                    # Clean up the name to be SQL-safe
+                    table_name = re.sub(r'[^a-zA-Z0-9_]', '_', base_name)
+                    sources[table_name] = match
+                else:
+                    # It's already a table name
+                    sources[match] = match
+            
+            # If no sources found from SQL, use the main source
+            if not sources and self.source:
+                clean_path, _, _ = parse_source_fragment(self.source)
+                import os
+                base_name = os.path.splitext(os.path.basename(clean_path))[0]
+                table_name = re.sub(r'[^a-zA-Z0-9_]', '_', base_name)
+                sources[table_name] = self.source
+        
+        elif self.ast:
+            # Extract from AST for Python/Pandas backends
+            # Main table
+            if hasattr(self.ast, 'table') and self.ast.table:
+                sources[self.ast.table] = self.source
+            else:
+                # If no explicit table name, use 'data' as default
+                sources['data'] = self.source
+            
+            # JOIN table
+            if self.ast.join:
+                join_table = self.ast.join.right_source
+                sources[join_table.strip("'\"")] = join_table.strip("'\"")
+        
+        return sources
 
     def to_list(self) -> List[Dict[str, Any]]:
         """

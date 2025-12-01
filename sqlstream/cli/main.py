@@ -48,9 +48,9 @@ def cli():
 @click.option(
     "--backend",
     "-b",
-    type=click.Choice(["auto", "pandas", "python"], case_sensitive=False),
+    type=click.Choice(["auto", "pandas", "python", "duckdb"], case_sensitive=False),
     default="auto",
-    help="Execution backend (default: auto)",
+    help="Execution backend (default: auto, tries pandas > duckdb > python)",
 )
 @click.option(
     "--limit",

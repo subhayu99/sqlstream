@@ -36,7 +36,7 @@ $ sqlstream shell data.csv
 - 🔢 **Type System** - Automatic schema inference with type checking
 - ☁️ **S3 Support** - Query files directly from Amazon S3
 - 🎨 **Beautiful Output** - Rich tables, JSON, CSV formatting
-- 🖥️ **Interactive Shell** - Full-featured TUI with modal dialogs, file browser, query plan visualization, multi-format export
+- 🖥️ **Interactive Shell** - Full-featured TUI with multiple tabs, state persistence, file browser, query plan visualization, multi-format export
 - 🔍 **Smart Optimizations** - Column pruning, predicate pushdown, lazy evaluation
 - 📦 **Lightweight** - Minimal dependencies, works everywhere
 
@@ -79,16 +79,18 @@ $ sqlstream shell
 ```
 
 Features:
-- **Modal Dialogs**: Professional UI for filtering, export, file selection
-- **File Browser** (`Ctrl+O`): Browse and select files to query
+- **Multiple Query Tabs** (`Ctrl+T`/`Ctrl+W`): Work with multiple queries simultaneously
+- **State Persistence**: Automatically saves and restores your tabs and queries between sessions
+- **Tabbed Sidebar** (`F2`): Toggle between Schema browser and File explorer
+- **File Browser** (`Ctrl+O`): Browse and select files to query with tree structure
 - **Query History** (`Ctrl+Up/Down`): Navigate through previous queries (multiline supported)
 - **Execution Plan** (`F4`): View detailed query execution steps
 - **Smart Export** (`Ctrl+X`): Save results as CSV, JSON, or Parquet with custom filenames
 - **Live Filtering** (`Ctrl+F`): Search across all columns
-- **Schema Browser** (`F2`): View file schemas with column types
 - **Pagination**: Handle large result sets (100 rows per page)
 - **Column Sorting**: Click headers to sort ascending/descending
-- **Syntax Highlighting**: Monokai theme for SQL queries
+- **Syntax Highlighting**: Dracula theme for SQL queries
+- **Exit & Save** (`Ctrl+Q` or `Ctrl+D`): Quit with automatic state saving
 
 ### Python API
 
@@ -121,7 +123,7 @@ Key sections:
 
 ## Development Status
 
-**Current Phase**: 8 (Type System & Schema Inference)
+**Current Phase**: 9 (Enhanced Interactive Shell - Complete!)
 
 - ✅ **Phase 0-2**: Core query engine with Volcano model
 - ✅ **Phase 3**: Parquet support
@@ -133,8 +135,9 @@ Key sections:
 - ✅ **Phase 7.5**: Interactive mode with Textual
 - ✅ **Phase 7.6**: Inline file path support
 - ✅ **Phase 8**: Type system & schema inference
-- 🚧 **Phase 9**: Error handling & user feedback
-- 🚧 **Phase 10**: Testing & documentation
+- ✅ **Phase 9**: Enhanced interactive shell (multiple tabs, state persistence, file browser, query plan)
+- 🚧 **Phase 10**: Error handling & user feedback
+- 🚧 **Phase 11**: Testing & documentation
 
 **Test Coverage**: 377 tests, 53% coverage
 

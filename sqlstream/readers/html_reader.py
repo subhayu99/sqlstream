@@ -200,3 +200,10 @@ class HTMLReader(BaseReader):
                 col_str += ", ..."
             descriptions.append(f"Table {i}: {col_str} ({len(table)} rows)")
         return descriptions
+
+    def to_dataframe(self):
+        """
+        Convert to pandas DataFrame efficiently
+        """
+        # HTMLReader already holds data as a DataFrame
+        return self.df

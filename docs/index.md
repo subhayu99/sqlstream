@@ -66,7 +66,7 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
 
     ---
 
-    Full-featured TUI with modal dialogs, file browser, query plan visualization.
+    Full-featured TUI with multiple tabs, state persistence, file browser, and query plan visualization.
 
 -   :material-file-search:{ .lg .middle } __Inline File Paths__
 
@@ -228,8 +228,9 @@ SQLStream is in **active development**. Current phase: **8**
 - ✅ Phase 7.6: Inline file path support
 - ✅ Phase 7.7: S3 Support for CSV and Parquet
 - ✅ Phase 8: Type system & schema inference
-- 🚧 Phase 9: Enhanced interactive shell (modal dialogs, file browser, query plan)
+- ✅ Phase 9: Enhanced interactive shell (multiple tabs, state persistence, file browser, query plan)
 - 🚧 Phase 10: Error handling & user feedback
+- 🚧 Phase 11: Testing & documentation
 
 ---
 

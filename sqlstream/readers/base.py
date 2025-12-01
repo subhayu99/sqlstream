@@ -167,3 +167,22 @@ class BaseReader:
     def __iter__(self):
         """Allow readers to be used directly in for loops"""
         return self.read_lazy()
+
+    def to_dataframe(self):
+        """
+        Convert reader content to pandas DataFrame
+        
+        Returns:
+            pandas.DataFrame containing all data
+            
+        Note:
+            Default implementation iterates over read_lazy() and creates DataFrame.
+            Subclasses should override this for better performance (e.g. using read_csv/read_parquet).
+        """
+        try:
+            import pandas as pd
+        except ImportError:
+            raise ImportError("Pandas is required for to_dataframe()")
+
+        # Default implementation: materialize iterator
+        return pd.DataFrame(list(self.read_lazy()))

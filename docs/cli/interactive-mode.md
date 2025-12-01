@@ -7,9 +7,12 @@ SQLStream includes a powerful interactive shell built with [Textual](https://tex
 ## Features
 
 - 🎨 **Syntax Highlighting** - Dracula theme for SQL queries
+- 📑 **Multiple Query Tabs** - Work on multiple queries simultaneously (`Ctrl+T` to add, `Ctrl+W` to close)
+- 💾 **State Persistence** - Automatically saves and restores tabs and queries between sessions
 - 📊 **Scrollable Results** - Zebra-striped table with smooth scrolling
 - 📜 **Query History** - Navigate previous queries with keyboard shortcuts
-- 🗂️ **Schema Browser** - View file schemas with column types
+- 🗂️ **Tabbed Sidebar** - Toggle between Schema browser and File explorer
+- 📁 **File Browser** - Tree-structured file navigation in sidebar
 - 📄 **Pagination** - Handle large result sets (100 rows per page)
 - 🔀 **Column Sorting** - Click headers to sort ascending/descending
 - 💾 **Multi-Format Export** - Save results as CSV, JSON, and Parquet
@@ -65,11 +68,15 @@ sqlstream shell --history-file ~/.my_sqlstream_history
 | `Ctrl+Enter` | Execute Query | Run the query in editor |
 | `Ctrl+E` | Execute Query | Alternative execution key |
 | `Ctrl+L` | Clear Editor | Clear query text |
-| `Ctrl+D` | Exit | Close the shell |
+| `Ctrl+Q` | Exit | Close the shell (auto-saves state) |
+| `Ctrl+D` | Exit | Alternative exit key (auto-saves state) |
+| `Ctrl+T` | New Tab | Create a new query tab |
+| `Ctrl+W` | Close Tab | Close current query tab |
+| `Ctrl+S` | Save State | Manually save current state |
 | `F1` | Help | Show help message |
-| `F2` | Toggle Schema | Show/hide schema browser |
+| `F2` | Toggle Sidebar | Show/hide tabbed sidebar (Schema/Files) |
 | `F4` | Explain Mode | Show query plan |
-| `Ctrl+O` | Open File | Browse files to add to query |
+| `Ctrl+O` | Open Files Tab | Switch to file browser in sidebar |
 | `Ctrl+X` | Export | Export with custom filename |
 | `Ctrl+F` | Filter | Filter current results |
 | `[` | Previous Page | Navigate to previous page |
@@ -141,9 +148,96 @@ The shell maintains a persistent history of your queries (up to 100 queries).
 - Each executed query is saved
 - Navigate through history without re-executing
 
-### 2. Schema Browser
+### 2. Multiple Query Tabs
 
-Press `F2` to toggle the schema browser panel.
+Work on multiple queries simultaneously without losing your work.
+
+**Creating Tabs**:
+- `Ctrl+T` - Create a new tab (automatically named "Query 1", "Query 2", etc.)
+- Each tab has its own independent query editor
+
+**Switching Tabs**:
+- Click on tab labels to switch between them
+- Each tab maintains its own query text
+
+**Closing Tabs**:
+- `Ctrl+W` - Close the current tab
+- If you close the last tab, a new empty one is created automatically
+
+**Features**:
+- Tabs are saved automatically when you exit
+- Restored when you restart the shell
+- Work on complex queries in one tab while exploring data in another
+
+**Example Workflow**:
+```
+Tab 1: "Query 1" - Exploratory SELECT * FROM 'data.csv' LIMIT 100
+Tab 2: "Query 2" - Complex aggregation with GROUP BY
+Tab 3: "Query 3" - JOIN query combining multiple files
+```
+
+### 3. State Persistence
+
+Your work is automatically saved and restored between sessions.
+
+**What's Saved**:
+- All open tabs (titles and content)
+- Query text in each tab
+- Tab order
+
+**Storage Location**: `~/.sqlstream_state`
+
+**Behavior**:
+- State saves automatically when you exit (`Ctrl+Q` or `Ctrl+D`)
+- Manual save available with `Ctrl+S`
+- State loads automatically on startup
+- If no saved state, starts with one empty tab
+
+**Benefits**:
+- Resume work exactly where you left off
+- Never lose in-progress queries
+- Maintain context across sessions
+
+### 4. Tabbed Sidebar
+
+The sidebar now has two tabs: Schema and Files.
+
+**Schema Tab**:
+- Shows all loaded data sources
+- Displays column names and types
+- Updates when new files are queried
+
+**Files Tab** (`Ctrl+O` to activate):
+- Tree-structured file browser
+- Navigate your filesystem
+- Click files to insert `SELECT * FROM 'file_path'` into active tab
+
+**Toggle**: Press `F2` to show/hide the entire sidebar
+
+### 5. File Browser
+
+Browse and select files directly from the UI.
+
+**Access**: `Ctrl+O` or click "Files" tab in sidebar
+
+**Features**:
+- Tree view starting from current directory (`./`)
+- Expand/collapse directories
+- Click any file to load it into the active query tab
+
+**Auto-Insert**: Selecting a file inserts:
+```sql
+SELECT * FROM 'path/to/file.csv'
+```
+
+**Behavior**:
+- Works with the currently active query tab
+- Inserts at cursor position if editor has existing content
+- Automatically shows sidebar if hidden
+
+### 6. Schema Browser
+
+Press `F2` to toggle the sidebar, then switch to the Schema tab.
 
 **Shows**:
 - All loaded files
@@ -151,7 +245,7 @@ Press `F2` to toggle the schema browser panel.
 - Data types (dim text)
 - Errors (red)
 
-**Example**:
+**Examples**:
 ```
 Data Sources
 ├─ employees.csv
@@ -170,7 +264,7 @@ Data Sources
 - Updates automatically when querying new files
 - Helps discover available columns before writing queries
 
-### 3. Pagination
+### 7. Pagination
 
 When a query returns more than 100 rows, results are automatically paginated.
 
@@ -189,7 +283,7 @@ Showing 101-200 of 450 rows | Page 2/5
 - Instant navigation between pages
 - Handles millions of rows efficiently
 
-### 4. Column Sorting
+### 8. Column Sorting
 
 Click any column header to sort results.
 
@@ -208,7 +302,7 @@ Sorted by salary ↓
 - Resets current page to 1
 - Works with filtered results
 
-### 5. Multi-Format Export
+### 9. Multi-Format Export
 
 Press `Ctrl+X` to export current results to multiple formats simultaneously.
 
@@ -229,7 +323,7 @@ Exported to: CSV (results_20241130_143022.csv),
 - Timestamped filenames prevent overwrites
 - Parquet export requires `pip install pyarrow`
 
-### 6. Filtering
+### 10. Filtering
 
 Press `Ctrl+F` to filter current results.
 
@@ -305,12 +399,16 @@ ORDER BY name
 
 ## Tips & Tricks
 
-1. **Large Datasets**: Use `LIMIT` to preview data quickly
-2. **S3 Performance**: Use partitioned Parquet files for best performance
-3. **History**: Use `Ctrl+Up` to quickly re-run previous queries
-4. **Sorting**: Click column headers to explore data patterns
-5. **Export**: Export to Parquet for best compression
-6. **Schema**: Press F2 before writing queries to see available columns
+1. **Multiple Tabs**: Use tabs to work on different queries simultaneously - one for exploration, one for final analysis
+2. **State Persistence**: Your tabs are automatically saved - feel confident closing the shell anytime
+3. **Large Datasets**: Use `LIMIT` to preview data quickly in a dedicated tab
+4. **S3 Performance**: Use partitioned Parquet files for best performance
+5. **History**: Use `Ctrl+Up` to quickly re-run previous queries in any tab
+6. **File Browser**: Use `Ctrl+O` to quickly add files to your query without typing paths
+7. **Sorting**: Click column headers to explore data patterns
+8. **Export**: Export to Parquet for best compression
+9. **Sidebar**: Toggle with `F2` to maximize editor space when needed
+10. **Manual Save**: Use `Ctrl+S` if you want to save state before experimenting
 
 ---
 

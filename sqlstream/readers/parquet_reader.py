@@ -653,3 +653,18 @@ class ParquetReader(BaseReader):
             "partition_columns": list(self.partition_columns),
             "partition_values": self.partition_values,
         }
+
+    def to_dataframe(self):
+        """
+        Convert to pandas DataFrame efficiently
+        """
+        import pandas as pd
+        
+        # Use pandas read_parquet for performance
+        if self.is_s3:
+            return pd.read_parquet(
+                self.path_str,
+                storage_options={"anon": False}
+            )
+        else:
+            return pd.read_parquet(self.path)
