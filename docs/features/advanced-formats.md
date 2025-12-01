@@ -324,10 +324,9 @@ reader.set_columns(['col1', 'col2'])
 
 ## Requirements
 
-- **HTML Support**: Requires `pandas` and `lxml` or `html5lib`
+- **HTML Support**: Requires `pandas`, `bs4` and `lxml` or `html5lib`
   ```bash
-  pip install sqlstream[pandas]
-  pip install lxml  # or html5lib
+  pip install sqlstream[html]
   ```
 
 - **Markdown Support**: No additional dependencies (built-in parser)

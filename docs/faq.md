@@ -212,9 +212,12 @@ pip install "sqlstream[all]"
 **By feature**:
 - `sqlstream[parquet]` - Parquet support (pyarrow)
 - `sqlstream[pandas]` - Pandas backend (pandas)
+- `sqlstream[duckdb]` - DuckDB backend (duckdb)
 - `sqlstream[s3]` - S3 support (s3fs)
-- `sqlstream[cli]` - Interactive shell (textual)
+- `sqlstream[cli]` - Basic CLI shell (click)
+- `sqlstream[interactive]` - Full blown TUI (textual)
 - `sqlstream[http]` - HTTP data sources (httpx)
+- `sqlstream[html]` - HTML parsing (lxml)
 
 ---
 
@@ -371,7 +374,7 @@ SQLStream supports three execution backends:
 
 ### How do I use the DuckDB backend?
 
-Install with `pip install duckdb` or `pip install "sqlstream[all]"`.
+Install with `pip install duckdb` or `pip install "sqlstream[duckdb]"`.
 
 Then use it in your code:
 ```python

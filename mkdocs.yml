@@ -91,6 +91,7 @@ nav:
       - JOIN Operations: features/joins.md
       - Aggregations: features/aggregations.md
       - Pandas Backend: features/pandas-backend.md
+      - DuckDB Backend (Full SQL): features/duckdb-backend.md
       - Inline File Paths: features/inline-paths.md
   - CLI Reference:
       - Overview: cli/overview.md
@@ -110,6 +111,8 @@ nav:
       - Design Overview: architecture/design.md
       - Volcano Model: architecture/volcano-model.md
       - Optimizations: architecture/optimizations.md
+  - FAQ: faq.md
+  - Limitations: limitations.md
   - Contributing: contributing.md
 
 extra:

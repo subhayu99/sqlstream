@@ -86,22 +86,38 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
 
 ## Installation
 
+### Using [`uv`](https://docs.astral.sh/uv/#installation) (recommended)
+
+=== "Basic (CSV only)"
+
+    ```bash
+    uv tool install sqlstream
+    ```
+
+=== "With Parquet and Pandas support"
+
+    ```bash
+    uv tool install "sqlstream[parquet,pandas]"
+    ```
+
+=== "All Features"
+
+    ```bash
+    uv tool install "sqlstream[all]"
+    ```
+
+=== "Multiple Sub Dependencies"
+
+    ```bash
+    uv tool install "sqlstream[interactive,pandas,s3,http,html,duckdb]"
+    ```
+
+### Using `pip`
+
 === "Basic (CSV only)"
 
     ```bash
     pip install sqlstream
-    ```
-
-=== "With Parquet"
-
-    ```bash
-    pip install "sqlstream[parquet]"
-    ```
-
-=== "With Pandas (10-100x faster)"
-
-    ```bash
-    pip install "sqlstream[pandas]"
     ```
 
 === "All Features"

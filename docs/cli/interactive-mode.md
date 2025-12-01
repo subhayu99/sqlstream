@@ -30,6 +30,9 @@ The interactive shell requires the `textual` library:
 # Install with CLI support
 pip install "sqlstream[cli]"
 
+# Install full TUI
+pip install "sqlstream[interactive]"
+
 # Or install all features
 pip install "sqlstream[all]"
 ```

@@ -42,12 +42,31 @@ $ sqlstream shell data.csv
 
 ## Installation
 
+### Using [`uv`](https://docs.astral.sh/uv/#installation) (recommended)
+
+**Basic (CSV only)**:
+```bash
+uv tool install sqlstream
+```
+
+**All features**:
+```bash
+uv tool install "sqlstream[all]"
+```
+
+**Multiple Sub Dependencies**:
+```bash
+uv tool install "sqlstream[interactive,pandas,s3,http,html,duckdb]"
+```
+
+### Using `pip`
+
 **Basic (CSV only)**:
 ```bash
 pip install sqlstream
 ```
 
-**All features** (recommended):
+**All features**:
 ```bash
 pip install "sqlstream[all]"
 ```
