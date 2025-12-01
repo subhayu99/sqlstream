@@ -8,8 +8,8 @@ This backend bypasses SQLStream's parser and uses DuckDB's native SQL engine.
 from __future__ import annotations
 
 from typing import Any, Callable, Dict, Iterator, Optional
-import tempfile
-import os
+
+from sqlstream.readers.base import BaseReader
 
 try:
     import duckdb
@@ -85,20 +85,73 @@ class DuckDBExecutor:
                 for table_name, file_path in sources.items():
                     self._register_source(table_name, file_path, read_only)
             
-            # Step 2: Execute query
-            result = self.conn.execute(sql)
+            # Step 2: Replace file paths in SQL with table names
+            transformed_sql = self._replace_sources_in_sql(sql, sources)
             
-            # Step 3: Fetch column names
+            # Step 3: Execute transformed query
+            result = self.conn.execute(transformed_sql)
+            
+            # Step 4: Fetch column names
             columns = [desc[0] for desc in result.description]
             
-            # Step 4: Yield results as dictionaries
+            # Step 5: Yield results as dictionaries
             for row in result.fetchall():
                 yield dict(zip(columns, row))
         
         except Exception as e:
             raise RuntimeError(f"DuckDB execution error: {e}") from e
 
-    def _register_sources_with_readers(self, sources: Dict[str, str], reader_factory):
+    def _replace_sources_in_sql(self, sql: str, sources: Dict[str, str]) -> str:
+        """
+        Replace file paths in SQL with registered table names
+        
+        Args:
+            sql: Original SQL query with file paths
+            sources: Dict mapping table names to file paths
+        
+        Returns:
+            Transformed SQL with quoted table names instead of file paths
+        
+        Example:
+            Input SQL: "SELECT * FROM 'https://example.com/data.csv#html:0'"
+            Input sources: {"data": "https://example.com/data.csv#html:0"}
+            Output SQL: "SELECT * FROM \"data\""
+        
+        Note:
+            Table names are quoted with double quotes to avoid conflicts with
+            SQL keywords (e.g., 'right', 'left', 'order', etc.)
+        """
+        import re
+        transformed_sql = sql
+        
+        # Sort by length (longest first) to avoid partial replacements
+        for table_name, file_path in sorted(sources.items(), key=lambda x: len(x[1]), reverse=True):
+            # Quote table name to avoid conflicts with SQL keywords
+            # DuckDB uses double quotes for identifiers
+            quoted_table = f'"{table_name}"'
+            
+            # Replace both quoted and unquoted versions of the file path
+            # Try single quotes first
+            if f"'{file_path}'" in transformed_sql:
+                transformed_sql = transformed_sql.replace(f"'{file_path}'", quoted_table)
+            # Try double quotes
+            if f'"{file_path}"' in transformed_sql:
+                transformed_sql = transformed_sql.replace(f'"{file_path}"', quoted_table)
+            
+            # Try unquoted - use lookahead/lookbehind to ensure we don't match partial paths
+            # This handles cases like: FROM /path/to/file.csv or JOIN file.csv
+            if file_path in transformed_sql:
+                # Match file_path when preceded/followed by whitespace or keywords
+                # Use negative lookbehind/lookahead to avoid matching inside other paths
+                escaped_path = re.escape(file_path)
+                # Pattern: match file path when NOT surrounded by alphanumeric/underscore/dot/slash
+                # This ensures we match complete paths
+                pattern = f'(?<![\\w/.])' + escaped_path + '(?![\\w/.])'
+                transformed_sql = re.sub(pattern, quoted_table, transformed_sql)
+        
+        return transformed_sql
+    
+    def _register_sources_with_readers(self, sources: Dict[str, str], reader_factory: Callable[[str], BaseReader]):
         """
         Register sources using Reader objects to get DataFrames
         """
@@ -252,8 +305,11 @@ class DuckDBExecutor:
         for table_name, file_path in sources.items():
             self._register_source(table_name, file_path)
         
+        # Replace file paths in SQL with table names
+        transformed_sql = self._replace_sources_in_sql(sql, sources)
+        
         # Get explain plan
-        result = self.conn.execute(f"EXPLAIN {sql}")
+        result = self.conn.execute(f"EXPLAIN {transformed_sql}")
         return "\n".join([str(row[0]) for row in result.fetchall()])
     
     def close(self):

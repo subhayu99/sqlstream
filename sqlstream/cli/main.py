@@ -160,8 +160,8 @@ def query(
         else:
             # New syntax: extract file from SQL
             # Use a temporary Query with inline mode
-            from sqlstream.core.query import QueryInline
-            q = QueryInline()
+            from sqlstream.core.query import Query
+            q = Query()
 
         # Execute query or show explain plan
         if explain:

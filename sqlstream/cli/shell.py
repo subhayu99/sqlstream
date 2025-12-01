@@ -21,7 +21,7 @@ from textual.geometry import Offset
 from textual.events import Key
 
 try:
-    from sqlstream.core.query import query, parse, QueryInline
+    from sqlstream.core.query import query, parse, Query
     from sqlstream.core.types import Schema
 except ImportError:
     # Fallback for development
@@ -505,7 +505,7 @@ class SQLShellApp(App):
         self.last_results: List[Dict[str, Any]] = []
         self.filtered_results: List[Dict[str, Any]] = []
         self.last_query = ""  # Store last executed query for explain
-        self.query_engine = QueryInline()
+        self.query_engine = Query()
         self.loaded_files: List[str] = []
 
         # Pagination state
@@ -683,10 +683,8 @@ class SQLShellApp(App):
             result = self.query_engine.sql(query_text)
 
             # Update loaded files
-            _parsed = parse(query_text)
-            self.loaded_files.append(_parsed.source)
-            if _parsed.join and _parsed.join.right_source:
-                self.loaded_files.append(_parsed.join.right_source)
+            _sources = result._discover_sources()
+            self.loaded_files.extend([f for f in _sources.values() if f and f not in self.loaded_files])
 
             # Update schema browser
             self._update_schema_browser()
@@ -882,6 +880,8 @@ class SQLShellApp(App):
         """Update the schema browser with loaded files."""
         schemas = {}
         for file in self.loaded_files:
+            if not file:
+                continue
             try:
                 # Use query() to get schema
                 q = query(file)
@@ -1284,7 +1284,7 @@ class SQLShellApp(App):
                             content=tab_data.get("content", ""),
                             title=tab_data.get("title")
                         )
-                        self.notify(f"Loaded {len(state)} tabs", timeout=2)
+                    self.notify(f"Loaded {len(state)} tabs", timeout=3)
                     loaded = True
             except Exception as e:
                 self.notify(f"Failed to load state: {e}", severity="error")
