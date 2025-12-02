@@ -12,13 +12,13 @@
         <meta name="author" content="SQLStream Team">
       
       
-        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/cli/output-formats/">
+        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/examples/markdown-tables/">
       
       
-        <link rel="prev" href="../interactive-mode/">
+        <link rel="prev" href="../html-tables/">
       
       
-        <link rel="next" href="../../api/overview/">
+        <link rel="next" href="../real-world/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Output Formats - SQLStream</title>
+        <title>Markdown Tables - SQLStream</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#output-formats" class="md-skip">
+        <a href="#querying-markdown-tables" class="md-skip">
           Skip to content
         </a>
       
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Output Formats
+              Markdown Tables
             
           </span>
         </div>
@@ -290,13 +290,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../overview/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../cli/overview/" class="md-tabs__link">
           
   
   
@@ -332,11 +330,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../examples/basic-queries/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../basic-queries/" class="md-tabs__link">
           
   
   
@@ -975,31 +975,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -1017,7 +1012,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1035,7 +1030,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../overview/" class="md-nav__link">
+      <a href="../../cli/overview/" class="md-nav__link">
         
   
   
@@ -1063,7 +1058,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../query-command/" class="md-nav__link">
+      <a href="../../cli/query-command/" class="md-nav__link">
         
   
   
@@ -1091,7 +1086,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../interactive-mode/" class="md-nav__link">
+      <a href="../../cli/interactive-mode/" class="md-nav__link">
         
   
   
@@ -1116,37 +1111,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Output Formats
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../cli/output-formats/" class="md-nav__link">
         
   
   
@@ -1162,109 +1130,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#specifying-output-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Specifying Output Format
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supported-formats" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported Formats
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Supported Formats">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#table-default" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Table (Default)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#csv" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CSV
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#json" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        JSON
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#markdown" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Markdown
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#interactive-shell-export" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Interactive Shell Export
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1740,26 +1605,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   
@@ -1777,7 +1647,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1795,7 +1665,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/basic-queries/" class="md-nav__link">
+      <a href="../basic-queries/" class="md-nav__link">
         
   
   
@@ -1823,7 +1693,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/joins/" class="md-nav__link">
+      <a href="../joins/" class="md-nav__link">
         
   
   
@@ -1851,7 +1721,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/aggregations/" class="md-nav__link">
+      <a href="../aggregations/" class="md-nav__link">
         
   
   
@@ -1879,7 +1749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/duckdb-backend/" class="md-nav__link">
+      <a href="../duckdb-backend/" class="md-nav__link">
         
   
   
@@ -1907,7 +1777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/parquet-files/" class="md-nav__link">
+      <a href="../parquet-files/" class="md-nav__link">
         
   
   
@@ -1935,7 +1805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/html-tables/" class="md-nav__link">
+      <a href="../html-tables/" class="md-nav__link">
         
   
   
@@ -1960,10 +1830,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../examples/markdown-tables/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Markdown Tables
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1979,6 +1876,65 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#selecting-specific-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selecting Specific Tables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Selecting Specific Tables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-querying-the-first-table-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: Querying the First Table (Inventory)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-querying-the-second-table-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: Querying the Second Table (Events)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1991,7 +1947,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/real-world/" class="md-nav__link">
+      <a href="../real-world/" class="md-nav__link">
         
   
   
@@ -2357,33 +2313,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#specifying-output-format" class="md-nav__link">
+  <a href="#selecting-specific-tables" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Specifying Output Format
+        Selecting Specific Tables
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supported-formats" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported Formats
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Supported Formats">
+    <nav class="md-nav" aria-label="Selecting Specific Tables">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#table-default" class="md-nav__link">
+  <a href="#example-1-querying-the-first-table-inventory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Table (Default)
+        Example 1: Querying the First Table (Inventory)
       
     </span>
   </a>
@@ -2391,32 +2336,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#csv" class="md-nav__link">
+  <a href="#example-2-querying-the-second-table-events" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CSV
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#json" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        JSON
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#markdown" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Markdown
+        Example 2: Querying the Second Table (Events)
       
     </span>
   </a>
@@ -2425,17 +2348,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#interactive-shell-export" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Interactive Shell Export
-      
-    </span>
-  </a>
   
 </li>
       
@@ -2459,56 +2371,31 @@
   
 
 
-<h1 id="output-formats">Output Formats</h1>
-<p>The SQLStream CLI supports multiple output formats to suit different needs, from human-readable tables to machine-parsable JSON.</p>
-<h2 id="specifying-output-format">Specifying Output Format</h2>
-<p>Use the <code>--format</code> option with the <code>query</code> command.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39;&quot;</span><span class="w"> </span>--format<span class="w"> </span>&lt;format&gt;
+<h1 id="querying-markdown-tables">Querying Markdown Tables</h1>
+<p>Markdown files often contain structured data in tables. SQLStream can extract these tables and run SQL queries on them.</p>
+<p><strong>Data Source</strong>: <a href="https://github.com/subhayu99/sqlstream/raw/main/examples/sample_data.md">sample_data.md</a></p>
+<h2 id="selecting-specific-tables">Selecting Specific Tables</h2>
+<p>When a file contains multiple tables, SQLStream assigns them indices starting at 0. You can specify the table using the fragment syntax <code>#markdown:&lt;index&gt;</code>.</p>
+<h3 id="example-1-querying-the-first-table-inventory">Example 1: Querying the First Table (Inventory)</h3>
+<p>The file contains an "Inventory" table first (Index 0).</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;https://github.com/subhayu99/sqlstream/raw/main/examples/sample_data.md#markdown:0&#39; WHERE quantity &lt; 50&quot;</span>
 </span></code></pre></div>
-<h2 id="supported-formats">Supported Formats</h2>
-<h3 id="table-default">Table (Default)</h3>
-<p>Displays results in a formatted ASCII table using the <code>rich</code> library. Best for human inspection.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT name, age FROM &#39;users.csv&#39;&quot;</span>
+<h3 id="example-2-querying-the-second-table-events">Example 2: Querying the Second Table (Events)</h3>
+<p>Query the "Recent Events" table (Index 1) to find high-severity issues.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream</span><span class="w"> </span><span class="kn">import</span> <span class="n">query</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/subhayu99/sqlstream/raw/main/examples/sample_data.md&quot;</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Use #markdown:1 to target the second table</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="p">()</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s2">    SELECT event_id, description </span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="s2">    FROM &#39;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">#markdown:1&#39; </span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="s2">    WHERE severity = &#39;High&#39;</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Alert: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<p><strong>Output:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┏━━━━━━┳━━━━━┓
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>┃ name ┃ age ┃
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>┡━━━━━━╇━━━━━┩
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│ Alice│ 30  │
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│ Bob  │ 25  │
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>└──────┴─────┘
-</span></code></pre></div></p>
-<h3 id="csv">CSV</h3>
-<p>Outputs standard Comma-Separated Values. Useful for piping to other tools or saving to files.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39;&quot;</span><span class="w"> </span>--format<span class="w"> </span>csv
-</span></code></pre></div>
-<p><strong>Output:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>name,age
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Alice,30
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Bob,25
-</span></code></pre></div></p>
-<h3 id="json">JSON</h3>
-<p>Outputs a JSON array of objects. Ideal for web applications or processing with <code>jq</code>.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39;&quot;</span><span class="w"> </span>--format<span class="w"> </span>json
-</span></code></pre></div>
-<p><strong>Output:</strong>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">[</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;age&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">},</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Bob&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;age&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">}</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">]</span>
-</span></code></pre></div></p>
-<h3 id="markdown">Markdown</h3>
-<p>Outputs a Markdown-formatted table. Great for generating documentation.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39;&quot;</span><span class="w"> </span>--format<span class="w"> </span>markdown
-</span></code></pre></div>
-<p><strong>Output:</strong>
-<div class="language-markdown highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>| name | age |
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>|------|-----|
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>| Alice| 30  |
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>| Bob  | 25  |
-</span></code></pre></div></p>
-<h2 id="interactive-shell-export">Interactive Shell Export</h2>
-<p>In the interactive shell (<code>sqlstream shell</code>), you can export results using <code>Ctrl+X</code>. This automatically exports the current result set to <strong>CSV</strong>, <strong>JSON</strong>, and <strong>Parquet</strong> (if available) simultaneously, saving them with a timestamped filename.</p>
 
 
 
