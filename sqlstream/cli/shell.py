@@ -16,9 +16,11 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
-from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList, TabbedContent, TabPane, ContentSwitcher, Select
+from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList, TabbedContent, TabPane, ContentSwitcher, Select, Switch
 from textual.geometry import Offset
 from textual.events import Key
+from textual.theme import BUILTIN_THEMES as _BUILTIN_THEMES
+from textual._text_area_theme import _BUILTIN_THEMES as _TEXT_AREA_BUILTIN_THEMES
 
 try:
     from sqlstream.core.query import query, parse, Query
@@ -26,6 +28,10 @@ try:
 except ImportError:
     # Fallback for development
     from sqlstream import query
+
+
+APP_THEMES = [(' '.join(y.title() for y in x.split('-')), x) for x in _BUILTIN_THEMES.keys()]
+TEXT_AREA_THEMES = [(' '.join(y.title() for y in x.split('-')), x) for x in _TEXT_AREA_BUILTIN_THEMES.keys()]
 
 
 class SQLAutoComplete(OptionList):
@@ -93,7 +99,7 @@ class QueryEditor(TextArea):
         # Combine keywords with schema suggestions
         all_suggestions = self.KEYWORDS + self._get_schema_suggestions()
         matches = [s for s in all_suggestions if s.upper().startswith(word.upper())]
-        
+
         # Remove duplicates while preserving order
         seen = set()
         unique_matches = []
@@ -188,21 +194,21 @@ class QueryEditor(TextArea):
     def action_delete_word_backward(self) -> None:
         """Delete word to the left of cursor (Ctrl+Backspace)."""
         row, col = self.cursor_location
-        
+
         if col == 0:
             # At start of line, behave like normal backspace (join lines)
             self.action_delete_left()
             return
 
         line = self.document.get_line(row)
-        
+
         # Scan backwards
         i = col - 1
-        
+
         # 1. Consume whitespace if any
         while i >= 0 and line[i].isspace():
             i -= 1
-            
+
         # 2. Consume word characters OR symbols (but not mixed)
         if i >= 0:
             if line[i].isalnum() or line[i] == '_':
@@ -213,7 +219,7 @@ class QueryEditor(TextArea):
                 # Symbols
                 while i >= 0 and not (line[i].isalnum() or line[i] == '_' or line[i].isspace()):
                     i -= 1
-                    
+
         target_col = i + 1
         self.delete(start=(row, target_col), end=(row, col))
 
@@ -221,19 +227,19 @@ class QueryEditor(TextArea):
         """Delete word to the right of cursor (Ctrl+Delete)."""
         row, col = self.cursor_location
         line = self.document.get_line(row)
-        
+
         if col >= len(line):
             # At end of line, behave like normal delete (join next line)
             self.action_delete_right()
             return
-            
+
         # Scan forwards
         i = col
-        
+
         # 1. Consume whitespace if any
         while i < len(line) and line[i].isspace():
             i += 1
-            
+
         # 2. Consume word characters OR symbols
         if i < len(line):
             if line[i].isalnum() or line[i] == '_':
@@ -244,7 +250,7 @@ class QueryEditor(TextArea):
                 # Symbols
                 while i < len(line) and not (line[i].isalnum() or line[i] == '_' or line[i].isspace()):
                     i += 1
-                    
+
         target_col = i
         self.delete(start=(row, col), end=(row, target_col))
 
@@ -265,9 +271,9 @@ class StatusBar(Static):
         self.row_count: Optional[int] = None
 
     def update_status(
-        self, 
-        message: str, 
-        execution_time: Optional[float] = None, 
+        self,
+        message: str,
+        execution_time: Optional[float] = None,
         row_count: Optional[int] = None,
         filter_info: str = "",
         backend_info: str = ""
@@ -328,56 +334,129 @@ class SchemaBrowser(Tree):
                     file_node.add(f"[green]{col}[/green]: [dim]{dtype}[/dim]")
 
 
-class FilterDialog(ModalScreen[tuple]):
-    """Modal dialog for entering filter text."""
-
-    def __init__(self, columns: List[str] = None) -> None:
-        super().__init__()
-        self.columns = columns or []
+class FilterSidebar(Container):
+    """Right sidebar for context-aware filtering."""
 
     def compose(self) -> ComposeResult:
-        with Container(id="filter-dialog"):
-            yield Label("Filter Results")
-            
-            # Column selection
-            if self.columns:
-                options = [("All Columns", "")] + [(col, col) for col in self.columns]
-                yield Label("Column:")
-                yield Select(options, prompt="Select column...", id="filter-column", value="")
-            
-            yield Label("Search Text (case-insensitive):")
-            yield Input(placeholder="Enter search text...", id="filter-input")
-            
-            with Horizontal(id="dialog-buttons"):
-                yield Button("Filter", variant="primary", id="filter-btn")
-                yield Button("Clear", variant="default", id="clear-btn")
-                yield Button("Cancel", variant="default", id="cancel-btn")
+        yield Label("Filter Data", classes="filter-label")
 
-    def on_mount(self) -> None:
-        self.query_one("#filter-input", Input).focus()
+        # 1. Column Selector
+        yield Label("Column:")
+        yield Select([], prompt="Select Column", id="fs-column")
+
+        # 2. Operator Selector (Populated dynamically)
+        yield Label("Operator:")
+        yield Select([], prompt="Select Operator", id="fs-operator", disabled=True)
+
+        # 3. Value Inputs (Swapped dynamically)
+        yield Label("Value:")
+        with Container(id="fs-input-container"):
+            yield Input(placeholder="Select a column first...", id="fs-value-1", disabled=True)
+            # Secondary input for "Between" operations (hidden by default)
+            yield Input(placeholder="And...", id="fs-value-2", classes="hidden")
+
+        # 4. Actions
+        with Horizontal(id="filter-actions"):
+            yield Button("Clear", variant="error", id="fs-clear")
+            yield Button("Apply", variant="primary", id="fs-apply")
+
+    def update_columns(self, columns: List[str]) -> None:
+        """Called by App when results change."""
+        select = self.query_one("#fs-column", Select)
+        # Preserve "Global Search" as first option
+        options = [("Global Search (All)", "global")] + [(c, c) for c in columns]
+        select.set_options(options)
+        select.value = "global"
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        """Handle column or operator changes."""
+        if event.select.id == "fs-column":
+            self._on_column_changed(event.value)
+        elif event.select.id == "fs-operator":
+            self._on_operator_changed(event.value)
+
+    def _on_column_changed(self, column: str) -> None:
+        """Update operators based on column type."""
+        op_select = self.query_one("#fs-operator", Select)
+        val_input = self.query_one("#fs-value-1", Input)
+        val_input_2 = self.query_one("#fs-value-2", Input)
+
+        # Reset inputs
+        val_input.value = ""
+        val_input_2.value = ""
+        val_input_2.add_class("hidden")
+        val_input.disabled = False
+        op_select.disabled = False
+
+        if column == "global":
+            op_select.set_options([("Contains", "contains")])
+            op_select.value = "contains"
+            op_select.disabled = True
+            return
+
+        # Infer Data Type from App's last results
+        # We peek at the first row of data
+        col_type = str
+        if self.app.last_results:
+            first_val = self.app.last_results[0].get(column)
+            if isinstance(first_val, (int, float)):
+                col_type = float
+            elif isinstance(first_val, bool):
+                col_type = bool
+            # Simple date detection could go here if data is Python datetime objects
+
+        # Populate Operators based on Type
+        if col_type == float: # Numbers
+            ops = [
+                ("Equals (=)", "eq"),
+                ("Greater Than (>)", "gt"),
+                ("Less Than (<)", "lt"),
+                ("Between (Range)", "between")
+            ]
+            op_select.set_options(ops)
+            op_select.value = "eq"
+
+        elif col_type == bool: # Booleans
+            ops = [("Is", "is")]
+            op_select.set_options(ops)
+            op_select.value = "is"
+
+        else: # Strings (Default)
+            ops = [
+                ("Contains", "contains"),
+                ("Equals", "eq"),
+                ("Starts With", "startswith"),
+                ("Ends With", "endswith"),
+                ("Regex", "regex")
+            ]
+            op_select.set_options(ops)
+            op_select.value = "contains"
+
+    def _on_operator_changed(self, operator: str) -> None:
+        """Show/Hide secondary input for 'between' operator."""
+        val_2 = self.query_one("#fs-value-2", Input)
+        if operator == "between":
+            val_2.remove_class("hidden")
+        else:
+            val_2.add_class("hidden")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "filter-btn":
-            filter_text = self.query_one("#filter-input", Input).value
-            column = ""
-            if self.columns:
-                select = self.query_one("#filter-column", Select)
-                if select.value != Select.BLANK:
-                    column = select.value
-            self.dismiss((filter_text, column))
-        elif event.button.id == "clear-btn":
-            self.dismiss(("", ""))
-        else:
-            self.dismiss(None)
+        if event.button.id == "fs-apply":
+            self._trigger_filter()
+        elif event.button.id == "fs-clear":
+            self.app.action_clear_filter()
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
-        filter_text = event.value
-        column = ""
-        if self.columns:
-            select = self.query_one("#filter-column", Select)
-            if select.value != Select.BLANK:
-                column = select.value
-        self.dismiss((filter_text, column))
+        self._trigger_filter()
+
+    def _trigger_filter(self) -> None:
+        """Gather values and tell App to filter."""
+        col = self.query_one("#fs-column", Select).value
+        op = self.query_one("#fs-operator", Select).value
+        val1 = self.query_one("#fs-value-1", Input).value
+        val2 = self.query_one("#fs-value-2", Input).value
+
+        self.app.apply_advanced_filter(col, op, val1, val2)
 
 
 class ExplainDialog(ModalScreen):
@@ -398,79 +477,6 @@ class ExplainDialog(ModalScreen):
         self.dismiss()
 
 
-class SaveFileDialog(ModalScreen[tuple]):
-    """Modal dialog for saving files with format selection."""
-
-    def __init__(self, default_name: str = "", **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.default_name = default_name
-        # Extract format from default name if present
-        if default_name.endswith('.json'):
-            self.default_format = 'json'
-        elif default_name.endswith('.parquet'):
-            self.default_format = 'parquet'
-        else:
-            self.default_format = 'csv'
-
-    def compose(self) -> ComposeResult:
-        with Container(id="save-dialog"):
-            yield Label("Export Results", id="save-title")
-            
-            yield Label("Format:")
-            format_options = [
-                ("CSV - Comma-separated values", "csv"),
-                ("JSON - JavaScript Object Notation", "json"),
-                ("Parquet - Apache Parquet (binary)", "parquet")
-            ]
-            yield Select(format_options, prompt="Select format...", id="format-select", value=self.default_format)
-            
-            yield Label("Filename:")
-            yield Input(value=self.default_name, placeholder="Enter filename...", id="filename-input")
-            
-            with Horizontal(id="dialog-buttons"):
-                yield Button("Export", variant="primary", id="save-btn")
-                yield Button("Cancel", variant="default", id="cancel-btn")
-
-    def on_mount(self) -> None:
-        input_widget = self.query_one("#filename-input", Input)
-        input_widget.focus()
-        # Select the filename part (before extension)
-        if "." in self.default_name:
-            input_widget.cursor_position = self.default_name.rindex(".")
-
-    def on_select_changed(self, event: Select.Changed) -> None:
-        """Update filename extension when format changes."""
-        if event.select.id == "format-select":
-            input_widget = self.query_one("#filename-input", Input)
-            current_name = input_widget.value
-            
-            # Remove existing extension
-            if current_name:
-                base_name = current_name.rsplit('.', 1)[0] if '.' in current_name else current_name
-                new_ext = event.value
-                input_widget.value = f"{base_name}.{new_ext}"
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "save-btn":
-            filename = self.query_one("#filename-input", Input).value
-            format_val = self.query_one("#format-select", Select).value
-            if filename and format_val != Select.BLANK:
-                # Ensure filename has correct extension
-                base_name = filename.rsplit('.', 1)[0] if '.' in filename else filename
-                filename = f"{base_name}.{format_val}"
-                self.dismiss((filename, format_val))
-        else:
-            self.dismiss(None)
-
-    def on_input_submitted(self, event: Input.Submitted) -> None:
-        if event.value:
-            format_val = self.query_one("#format-select", Select).value
-            if format_val != Select.BLANK:
-                base_name = event.value.rsplit('.', 1)[0] if '.' in event.value else event.value
-                filename = f"{base_name}.{format_val}"
-                self.dismiss((filename, format_val))
-
-
 class FileBrowser(DirectoryTree):
     """Side panel for browsing files."""
 
@@ -478,6 +484,325 @@ class FileBrowser(DirectoryTree):
         super().__init__(path, **kwargs)
         self.border_title = "Files"
 
+
+class OverwriteConfirmDialog(ModalScreen[bool]):
+    """Modal to confirm file overwrite."""
+
+    def __init__(self, filename: str, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.filename = filename
+
+    def compose(self) -> ComposeResult:
+        with Container(classes="confirm-dialog"):
+            yield Label("⚠️ File Already Exists", classes="confirm-header")
+
+            with Container(classes="confirm-body"):
+                yield Label("The file below already exists:")
+                yield Label(self.filename, classes="confirm-filename")
+                yield Label("\nDo you want to overwrite it?")
+
+            with Horizontal(classes="confirm-footer"):
+                yield Button("Cancel", variant="default", id="no-btn")
+                yield Button("Overwrite", variant="error", id="yes-btn")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "yes-btn":
+            self.dismiss(True)
+        else:
+            self.dismiss(False)
+
+
+class ExportSidebar(Container):
+    """Right sidebar for exporting data."""
+
+    def compose(self) -> ComposeResult:
+        with Vertical(classes="sidebar-pane"):
+            yield Label("Export Data", classes="filter-label")
+            yield Label("Ready to export 0 rows", id="export-info")
+
+            # 1. Format Selection
+            yield Label("Format:")
+            format_options = [
+                ("CSV", "csv"),
+                ("JSON", "json"),
+                ("Parquet", "parquet")
+            ]
+            yield Select(format_options, allow_blank=False, value="csv", id="ex-format")
+
+            # 2. Directory Browser
+            yield Label("Save Location:")
+            yield DirectoryTree("./", id="export-tree")
+
+            # 3. Filename Input
+            yield Label("Filename:")
+            yield Input(placeholder="filename.csv", id="ex-filename")
+
+            # 4. Actions
+            with Horizontal(id="export-actions"):
+                yield Button("Export", variant="primary", id="ex-btn")
+
+    def on_mount(self) -> None:
+        # Generate default filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Use configured default format
+        fmt = self.app.default_export_fmt
+        self.query_one("#ex-format", Select).value = fmt
+        self.query_one("#ex-filename").value = f"results_{timestamp}.{fmt}"
+
+    def update_info(self, row_count: int) -> None:
+        """Update the row count label."""
+        self.query_one("#export-info").update(f"Ready to export {row_count:,} rows")
+
+    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
+        """When user clicks a file, adopt its name but keep our format extension."""
+        selected_path = Path(event.path)
+
+        # Get current selected format
+        fmt = self.query_one("#ex-format", Select).value
+
+        # Get the stem (filename without extension)
+        stem = selected_path.stem
+
+        # Set the input value
+        self.query_one("#ex-filename").value = f"{stem}.{fmt}"
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        """Update extension if format changes."""
+        if event.select.id == "ex-format":
+            inp = self.query_one("#ex-filename", Input)
+            current = inp.value
+            if current and "." in current:
+                stem = current.rsplit(".", 1)[0]
+                inp.value = f"{stem}.{event.value}"
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "ex-btn":
+            self._initiate_export()
+
+    def _initiate_export(self) -> None:
+        """Validate and trigger export process."""
+        filename = self.query_one("#ex-filename", Input).value
+        fmt = self.query_one("#ex-format", Select).value
+
+        if not filename:
+            self.app.notify("Please enter a filename", severity="error")
+            return
+
+        # Determine directory:
+        # If a node is selected in tree, use its parent (if file) or itself (if dir)
+        # Fallback to current working directory of the tree
+        tree = self.query_one("#export-tree", DirectoryTree)
+        cursor_node = tree.cursor_node
+
+        target_dir = Path(tree.path) # Default to root of tree
+
+        if cursor_node and cursor_node.data:
+            node_path = cursor_node.data.path
+            if node_path.is_dir():
+                target_dir = node_path
+            else:
+                target_dir = node_path.parent
+
+        full_path = target_dir / filename
+
+        # Check overwrite
+        if full_path.exists():
+            # PASS filename.name HERE
+            self.app.push_screen(
+                OverwriteConfirmDialog(filename),
+                lambda should_overwrite: self._finish_export(full_path, fmt) if should_overwrite else None
+            )
+        else:
+            self._finish_export(full_path, fmt)
+
+    def _finish_export(self, path: Path, fmt: str) -> None:
+        """Call the main app to perform the write."""
+        self.app.perform_export(path, fmt)
+
+
+class ConfigSidebar(Container):
+    """Sidebar tab for application configuration."""
+
+    def compose(self) -> ComposeResult:
+        with VerticalScroll(id="config-form"):
+            yield Label("System Configuration", classes="filter-label")
+
+            # --- SECTION 1: BEHAVIOR (Functional) ---
+            with Vertical(classes="config-group"):
+                yield Label("Behavior", classes="config-label")
+
+                # Confirm Exit
+                with Horizontal(classes="switch-row"):
+                    yield Label("Confirm on Exit:")
+                    yield Switch(value=False, id="cfg-confirm-exit")
+
+                # History Limit
+                yield Label("History Size (Queries):", classes="config-sublabel")
+                yield Input(value="100", type="integer", id="cfg-history-size")
+
+                # Default Export Format
+                yield Label("Default Export Format:", classes="config-sublabel")
+                yield Select(
+                    [("CSV", "csv"), ("JSON", "json"), ("Parquet", "parquet")],
+                    value="csv",
+                    id="cfg-export-fmt",
+                    allow_blank=False
+                )
+
+            # --- SECTION 2: EXECUTION ---
+            with Vertical(classes="config-group"):
+                yield Label("Execution", classes="config-label")
+
+                yield Label("Default Backend:", classes="config-sublabel")
+                yield Select(
+                    [("Auto", "auto"), ("DuckDB", "duckdb"), ("Pandas", "pandas")],
+                    value="auto",
+                    id="cfg-backend",
+                    allow_blank=False
+                )
+
+                yield Label("Page Size (Rows):", classes="config-sublabel")
+                yield Input(value="100", type="integer", id="cfg-pagesize")
+
+            # --- SECTION 3: APPEARANCE ---
+            with Vertical(classes="config-group"):
+                yield Label("Appearance", classes="config-label")
+
+                yield Label("UI Theme:", classes="config-sublabel")
+                yield Select(APP_THEMES, id="cfg-app-theme", allow_blank=False)
+
+                yield Label("SQL Syntax Theme:", classes="config-sublabel")
+                yield Select(TEXT_AREA_THEMES, id="cfg-editor-theme", allow_blank=False)
+
+            # --- SECTION 4: DISPLAY SETTINGS ---
+            with Vertical(classes="config-group"):
+                yield Label("Display Options", classes="config-label")
+
+                with Horizontal(classes="switch-row"):
+                    yield Label("Line Numbers:")
+                    yield Switch(value=True, id="cfg-linenums")
+
+                with Horizontal(classes="switch-row"):
+                    yield Label("Soft Wrap:")
+                    yield Switch(value=False, id="cfg-softwrap")
+
+                with Horizontal(classes="switch-row"):
+                    yield Label("Zebra Stripes:")
+                    yield Switch(value=True, id="cfg-zebra")
+
+                with Horizontal(classes="switch-row"):
+                    yield Label("Compact Results:")
+                    yield Switch(value=False, id="cfg-compact")
+
+            yield Button("Save & Apply", variant="primary", id="config-save-btn")
+
+    def on_mount(self) -> None:
+        """Load current values from App."""
+        app = self.app
+
+        # Behavior
+        self.query_one("#cfg-confirm-exit", Switch).value = app.confirm_exit
+        self.query_one("#cfg-history-size", Input).value = str(app.max_history)
+        self.query_one("#cfg-export-fmt", Select).value = app.default_export_fmt
+
+        # Execution
+        self.query_one("#cfg-backend", Select).value = app.backend
+        self.query_one("#cfg-pagesize", Input).value = str(app.page_size)
+
+        # Appearance
+        self.query_one("#cfg-app-theme", Select).value = app.theme
+        self.query_one("#cfg-editor-theme", Select).value = app.editor_theme
+
+        # Display
+        self.query_one("#cfg-linenums", Switch).value = app.editor_linenums
+        self.query_one("#cfg-softwrap", Switch).value = app.editor_soft_wrap
+        self.query_one("#cfg-zebra", Switch).value = app.results_zebra
+        self.query_one("#cfg-compact", Switch).value = app.results_compact
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "config-save-btn":
+            self._save_settings()
+
+    def _save_settings(self) -> None:
+        """Apply settings to App and save to disk."""
+        app = self.app
+
+        # 1. Gather Values
+        confirm_exit = self.query_one("#cfg-confirm-exit", Switch).value
+        try:
+            history_size = int(self.query_one("#cfg-history-size", Input).value)
+        except ValueError:
+            history_size = 100
+        export_fmt = self.query_one("#cfg-export-fmt", Select).value
+
+        backend = self.query_one("#cfg-backend", Select).value
+        try:
+            page_size = int(self.query_one("#cfg-pagesize", Input).value)
+        except ValueError:
+            page_size = 100
+
+        app_theme = self.query_one("#cfg-app-theme", Select).value
+        editor_theme = self.query_one("#cfg-editor-theme", Select).value
+
+        linenums = self.query_one("#cfg-linenums", Switch).value
+        softwrap = self.query_one("#cfg-softwrap", Switch).value
+        zebra = self.query_one("#cfg-zebra", Switch).value
+        compact = self.query_one("#cfg-compact", Switch).value
+
+        # 2. Apply to App State
+        app.confirm_exit = confirm_exit
+        app.max_history = history_size
+        app.default_export_fmt = export_fmt
+
+        app.backend = backend
+        app.page_size = page_size
+        app.theme = app_theme
+
+        app.editor_theme = editor_theme
+        app.editor_linenums = linenums
+        app.editor_soft_wrap = softwrap
+
+        app.results_zebra = zebra
+        app.results_compact = compact
+
+        # 3. Apply to Active Widgets
+        for editor in app.query(QueryEditor):
+            editor.theme = editor_theme
+            editor.show_line_numbers = linenums
+            editor.soft_wrap = softwrap
+
+        results = app.query_one(ResultsViewer)
+        results.zebra_stripes = zebra
+        if compact:
+            results.add_class("compact")
+        else:
+            results.remove_class("compact")
+
+        if app.last_results:
+            app._refresh_displayed_results()
+
+        # 4. Persist
+        app.save_config_file()
+        app.notify("Configuration Saved & Applied!")
+
+
+class ConfirmExitDialog(ModalScreen[bool]):
+    """Modal to confirm application exit."""
+
+    def compose(self) -> ComposeResult:
+        with Container(classes="confirm-dialog"):
+            yield Label("Confirm Exit", classes="confirm-header")
+            with Container(classes="confirm-body"):
+                yield Label("Are you sure you want to quit?")
+            with Horizontal(classes="confirm-footer"):
+                yield Button("Cancel", variant="default", id="cancel-btn")
+                yield Button("Exit", variant="error", id="exit-btn")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "exit-btn":
+            self.dismiss(True)
+        else:
+            self.dismiss(False)
 
 
 class SQLShellApp(App):
@@ -493,15 +818,17 @@ class SQLShellApp(App):
         background: $surface;
     }
 
+    /* --- Main Layout --- */
     #main-container {
         width: 100%;
         height: 100%;
     }
 
+    /* Left Sidebar (Files/Schema) */
     #sidebar-container {
-        width: 25%;
+        width: 20%;
         height: 100%;
-        border: solid $primary;
+        border-right: solid $primary;
         background: $panel;
         display: none;
     }
@@ -510,42 +837,175 @@ class SQLShellApp(App):
         display: block;
     }
 
-    #right-panel {
-        width: 1fr;  /* Take remaining space (was 100%, causing overflow) */
+    /* Center Panel */
+    #center-panel {
+        width: 1fr;
         height: 100%;
         layout: vertical;
     }
 
-    #query-container {
-        height: 12;
+    /* Right Sidebar (Tools) */
+    #tools-sidebar {
+        width: 20%;
+        height: 100%;
+        border-left: solid $primary;
+        background: $surface;
+        display: none;
+    }
+
+    #tools-sidebar.visible {
+        display: block;
+    }
+
+    /* --- Sidebar Internals --- */
+    #tools-tabs {
+        height: 100%;
+    }
+
+    .sidebar-pane {
+        padding: 1;
+        height: 100%;
+    }
+
+    /* Filter Styles */
+    .filter-label {
+        color: $accent;
+        text-style: bold;
+        margin-bottom: 1;
+        margin-top: 1;
+    }
+
+    #filter-actions, #export-actions {
+        height: auto;
+        margin-top: 2;
+        align: center middle;
+    }
+
+    #filter-actions Button, #export-actions Button {
+        width: 1fr;
+        margin: 0 1;
+    }
+
+    /* Export Styles */
+    #export-tree {
+        height: 1fr; /* Takes available space */
         border: solid $primary;
+        margin-bottom: 1;
         background: $panel;
+    }
+
+    #export-info {
+        text-align: center;
+        color: $accent;
+        margin-bottom: 1;
+    }
+
+    .confirm-dialog {
+        width: 50;
+        height: auto;
+        background: $surface;
+        border: thick $error;
+        padding: 0;
+    }
+
+    .confirm-header {
+        width: 100%;
+        background: $error;
+        color: white;
+        text-align: center;
+        text-style: bold;
+        padding: 1;
+    }
+
+    .confirm-body {
+        width: 100%;
+        padding: 2;
+        text-align: center;
+    }
+
+    .confirm-filename {
+        color: $accent;
+        text-style: bold;
+    }
+
+    .confirm-footer {
+        width: 100%;
+        padding: 1;
+        align: center middle;
+        background: $surface-darken-1;
+    }
+
+    .confirm-footer Button {
+        margin: 0 1;
+    }
+
+    #query-container {
+        border-bottom: solid $primary;
+        background: $surface;
+        height: 12; /* Default height */
     }
 
     #query-editor {
         height: 100%;
         border: none;
+        background: $surface;
     }
 
     #results-container {
         height: 1fr;
-        border: solid $accent;
-        margin-top: 1;
+        background: $surface;
     }
 
     #results-viewer {
         height: 100%;
     }
 
+    #file-browser {
+        height: 1fr;
+        border: none;
+    }
+
     #status-bar {
-        height: auto;
-        min-height: 3;
-        background: $boost;
+        height: 1;
+        background: $primary;
         color: $text;
         content-align: center middle;
+    }
+
+    /* --- Filter Sidebar Specifics --- */
+    .filter-group {
+        margin-bottom: 2;
+        background: $panel;
+        padding: 1;
         border: solid $primary;
     }
 
+    .filter-label {
+        color: $accent;
+        text-style: bold;
+        margin-bottom: 1;
+    }
+
+    #filter-sidebar Select, #filter-sidebar Input {
+        margin-bottom: 1;
+    }
+
+    #filter-actions {
+        height: auto;
+        margin-top: 2;
+        align: center middle;
+    }
+
+    #filter-actions Button {
+        width: 1fr;
+        margin: 0 1;
+    }
+
+    /* --- Utility Classes --- */
+    .hidden { display: none !important; }
+    .maximized { height: 1fr !important; }
+
+    /* RESTORED: Status Bar Colors */
     .error {
         background: $error;
         color: $text;
@@ -556,75 +1016,186 @@ class SQLShellApp(App):
         color: $text;
     }
 
-    /* Dialog styles */
-    #filter-dialog, #save-dialog, #open-dialog, #explain-dialog {
+    /* --- Dialog / Modal Styling (The Overhaul) --- */
+    ModalScreen {
         align: center middle;
+        background: rgba(0,0,0,0.5); /* Dim background */
+    }
+
+    .dialog-container {
         width: 60;
         height: auto;
-        background: $panel;
+        background: $surface;
         border: thick $primary;
-        padding: 1 2;
+        padding: 0;
     }
 
-    #filter-dialog Label, #save-dialog Label, #open-dialog Label {
+    .dialog-header {
         width: 100%;
-        text-align: center;
-        margin-bottom: 1;
+        height: 3;
+        background: $primary;
+        color: $text;
+        content-align: center middle;
+        text-style: bold;
+        border-bottom: solid $surface-lighten-1;
     }
 
-    #filter-input, #filename-input {
-        width: 100%;
-        margin-bottom: 1;
-    }
-
-    #format-hint {
-        color: $text-muted;
-        text-align: center;
-        margin-bottom: 1;
-    }
-
-    #dialog-buttons {
+    .dialog-body {
         width: 100%;
         height: auto;
-        align: center middle;
+        padding: 1 2;
+        layout: vertical;
     }
 
-    #dialog-buttons Button {
-        margin: 0 1;
+    .dialog-footer {
+        width: 100%;
+        height: auto;
+        padding: 1 2;
+        align: right middle;
+        background: $surface-darken-1;
     }
 
+    .dialog-label {
+        margin-top: 1;
+        margin-bottom: 0;
+        color: $text-muted;
+    }
+
+    .dialog-info {
+        margin: 1 0;
+        color: $accent;
+        text-align: center;
+    }
+
+    /* Input/Select styling within dialogs */
+    .dialog-body Input, .dialog-body Select {
+        margin-bottom: 1;
+    }
+
+    /* Button Styling */
+    Button {
+        margin-left: 1;
+    }
+
+    .btn-primary {
+        background: $primary;
+        color: $text;
+    }
+
+    .btn-default {
+        background: $surface-lighten-1;
+    }
+
+    /* RESTORED: Explain Dialog Styles (Legacy ID support) */
     #explain-dialog {
         width: 80;
         height: 30;
+        background: $surface;
+        border: thick $primary;
     }
 
     #explain-title {
         text-style: bold;
         text-align: center;
         margin-bottom: 1;
+        background: $primary;
+        color: $text;
+        padding: 1;
     }
 
     #explain-content {
         height: 1fr;
         border: solid $accent;
         margin-bottom: 1;
+        margin: 1;
     }
 
     #explain-text {
         padding: 1;
     }
 
-    #file-browser {
-        height: 1fr;
-        border: none;
-    }
-
+    /* --- Autocomplete Popup --- */
     .autocomplete-popup {
         layer: overlay;
-        background: $panel;
-        border: $accent;
+        background: $surface-lighten-1;
+        border: solid $accent;
         display: block;
-        position: absolute; /* Crucial for floating */
+        position: absolute;
+    }
+
+    /* --- Config Sidebar Styles --- */
+    #config-form {
+        height: 1fr;
+        padding: 1;
+        scrollbar-gutter: stable; /* Prevent layout shift */
+    }
+
+    .config-group {
+        height: auto;
+        margin-bottom: 2;
+        background: $panel;
+        padding: 1;
+        border: solid $primary;
+        layout: vertical; /* CRITICAL: Ensures children stack */
+    }
+
+    .config-label {
+        color: $accent;
+        text-style: bold;
+        margin-top: 1;
+        margin-bottom: 0; /* Tighten up label to input */
+    }
+
+    .config-sublabel {
+        color: $text;
+        height: 1;
+        margin-top: 1;
+    }
+
+    .config-description {
+        color: $text-muted;
+        text-style: italic;
+        margin-bottom: 1;
+        height: auto;
+    }
+
+    /* Ensure inputs/selects have space */
+    #config-form Select, #config-form Input {
+        margin-bottom: 1;
+        height: auto;
+    }
+
+    /* Switch rows */
+    .switch-row {
+        height: auto;
+        margin-bottom: 1;
+        align: left middle;
+    }
+
+    .switch-row Label {
+        width: 1fr;
+    }
+
+    #config-save-btn {
+        width: 100%;
+        margin-top: 1;
+        margin-bottom: 2;
+    }
+
+    /* --- Compact Mode for DataTable --- */
+    DataTable.compact .datatable--header {
+        height: 1;
+        padding: 0 1;
+    }
+
+    DataTable.compact .datatable--cursor {
+        background: $accent 20%;
+    }
+
+    /* Reduce padding in cells for compact mode */
+    DataTable.compact > .datatable--header-hover,
+    DataTable.compact > .datatable--header {
+        padding: 0 1;
     }
     """
 
@@ -632,19 +1203,24 @@ class SQLShellApp(App):
         Binding("f1", "show_help", "Help"),
         Binding("f2", "toggle_sidebar", "Sidebar"),
         Binding("f3", "toggle_history", "History", show=False),
-        Binding("f4", "toggle_explain", "Explain"),
-        Binding("f5", "cycle_backend", "Backend"),
-        Binding("ctrl+o", "open_file", "Files"),
+        Binding("f4", "toggle_explain", "Explain", show=False),
+        Binding("f5", "cycle_backend", "Backend", show=False),
+
+        # --- NEW BINDINGS ---
+        Binding("f6", "cycle_layout", "Layout"),
+        Binding("alt+up", "resize_query(-1)", "Shrink Edit", show=False),
+        Binding("alt+down", "resize_query(1)", "Grow Edit", show=False),
+        # --------------------
+
+        Binding("ctrl+b", "cycle_backend", "Backend", show=True),
+        Binding("ctrl+o", "open_file", "Files", priority=True),
+        Binding("ctrl+f", "toggle_tools('filter')", "Filter", priority=True),
+        Binding("ctrl+x", "toggle_tools('export')", "Export", priority=True),
         Binding("ctrl+q", "quit", "Exit", priority=True),
         Binding("ctrl+d", "quit", "Exit", priority=True),
         Binding("ctrl+s", "save_state", "Save State"),
-        Binding("ctrl+x", "export_results", "Export"),
-        Binding("ctrl+f", "filter_results", "Filter"),
-        # NOTE: The ctrl+p overrides the default palette binding
-        # Binding("ctrl+p", "prev_page", "Prev Page", priority=True),
-        # Binding("ctrl+n", "next_page", "Next Page", priority=True),
-        Binding("ctrl+t", "new_tab", "New Tab"),
-        Binding("ctrl+w", "close_tab", "Close Tab"),
+        Binding("ctrl+t", "new_tab", "New Tab", priority=True),
+        Binding("ctrl+w", "close_tab", "Close Tab", priority=True),
         Binding("[", "prev_page", "◀ Prev", show=True, priority=True),
         Binding("]", "next_page", "Next ▶", show=True, priority=True),
     ]
@@ -655,24 +1231,28 @@ class SQLShellApp(App):
         history_file: Optional[str] = None,
         **kwargs,
     ):
-        """
-        Initialize the SQL shell.
-
-        Args:
-            initial_file: Optional file to load on startup
-            history_file: Path to query history file
-        """
         super().__init__(**kwargs)
         self.initial_file = initial_file
         self.history_file = history_file or str(Path.home() / ".sqlstream_history")
+        self.query_engine = Query()
+        self.backend = "auto"
         self.query_history: List[str] = []
         self.history_index = -1
         self.last_results: List[Dict[str, Any]] = []
-        self.filtered_results: List[Dict[str, Any]] = []
-        self.last_query = ""  # Store last executed query for explain
-        self.query_engine = Query()
-        self.backend = "auto"  # Default backend
+        self.last_query = ""
         self.loaded_files: List[str] = []
+        self.config_file = str(Path.home() / ".sqlstream_config")
+
+        # Configuration Defaults
+        self.confirm_exit = False
+        self.max_history = 100
+        self.default_export_fmt = "csv"
+
+        self.editor_theme = "dracula"
+        self.editor_linenums = True
+        self.editor_soft_wrap = False
+        self.results_zebra = True
+        self.results_compact = False
 
         # Pagination state
         self.page_size = 100
@@ -681,66 +1261,147 @@ class SQLShellApp(App):
         # Filter and sort state
         self.filter_text = ""
         self.filter_column = None
+        self.filter_mode = "contains"
+        self.filter_active = False
+        self.filtered_results: List[Dict[str, Any]] = []
         self.sort_column = None
         self.sort_reverse = False
 
         self.state_file = str(Path.home() / ".sqlstream_state")
         self.tab_counter = 0
 
+        # --- Layout State ---
+        self.layout_mode = 0  # 0: Split, 1: Max Editor, 2: Max Results
+        self.query_height = 12 # Default height
+        # --------------------
+
         if initial_file:
             self.loaded_files.append(initial_file)
 
     def compose(self) -> ComposeResult:
-        """Compose the application layout."""
         yield Header(show_clock=True)
 
         with Horizontal(id="main-container"):
-            # Sidebar (Hidden by default)
+            # Left Sidebar
             with Container(id="sidebar-container"):
                 with TabbedContent(id="sidebar-tabs"):
                     with TabPane("Schema", id="tab-schema"):
                         yield SchemaBrowser(id="schema-browser")
                     with TabPane("Files", id="tab-files"):
                         yield FileBrowser("./", id="file-browser")
+                    with TabPane("Config", id="tab-config"):
+                        yield ConfigSidebar(id="config-sidebar")
 
-            # Main Content
-            with Vertical(id="right-panel"):
-                # Query Editor Container
+            # Center Panel
+            with Vertical(id="center-panel"):
                 with Container(id="query-container"):
                     with TabbedContent(id="query-tabs"):
-                        # Tabs will be loaded dynamically
                         pass
 
-                # Results Viewer Container
                 with Container(id="results-container"):
                     yield ResultsViewer(id="results-viewer")
 
-                # Status Bar
                 yield StatusBar(id="status-bar")
+
+            # Right Sidebar (Tools)
+            with Container(id="tools-sidebar"):
+                with TabbedContent(id="tools-tabs"):
+                    with TabPane("Filter", id="tab-filter"):
+                        yield FilterSidebar(id="filter-sidebar")
+                    with TabPane("Export", id="tab-export"):
+                        yield ExportSidebar(id="export-sidebar")
 
         yield Footer()
 
     async def on_mount(self) -> None:
         """Initialize the shell on mount."""
         self.title = "SQLStream Interactive Shell"
-        self.sub_title = "Press Ctrl+Enter to execute query, Ctrl+D to exit"
+        self.sub_title = "Ctrl+Enter: Run | F6: Layout | Alt+Up/Down: Resize"
 
-        # Load state (tabs)
+        # Apply initial height
+        self.query_one("#query-container").styles.height = self.query_height
+
+        # 1. Load Config
+        self.load_config_file()
+
+        # 2. Apply Config to Static Widgets (ResultsViewer)
+        results = self.query_one(ResultsViewer)
+        results.zebra_stripes = self.results_zebra
+        if self.results_compact:
+            results.add_class("compact")
+
+        # 3. Load State
         await self._load_state()
 
-        # Show welcome message
         status_bar = self.query_one(StatusBar)
         status_bar.update_status(
-            "Welcome to SQLStream! Type your SQL query and press Ctrl+Enter to execute."
+            "Welcome! Type SQL and press Ctrl+Enter. Use F6 to toggle layout."
         )
 
-        # Focus the active query editor
         self._get_active_editor().focus()
 
-        # Load initial file if provided
         if self.initial_file:
             self._load_initial_file()
             self._update_schema_browser()
+
+    def action_cycle_layout(self) -> None:
+        """Cycle between Split, Max Editor, and Max Results views."""
+        self.layout_mode = (self.layout_mode + 1) % 3
+
+        query_container = self.query_one("#query-container")
+        results_container = self.query_one("#results-container")
+
+        # Reset classes
+        query_container.remove_class("hidden", "maximized")
+        results_container.remove_class("hidden", "maximized")
+
+        if self.layout_mode == 0:
+            # Split View (Default)
+            # Restore the fixed height
+            query_container.styles.height = self.query_height
+            self._show_status("Layout: Split View")
+
+        elif self.layout_mode == 1:
+            # Maximize Editor
+            # IMPORTANT: Clear the fixed height so the CSS '1fr' takes effect
+            query_container.styles.height = None
+            query_container.add_class("maximized")
+            results_container.add_class("hidden")
+            self._show_status("Layout: Editor Fullscreen")
+
+        elif self.layout_mode == 2:
+            # Maximize Results
+            # Clear height here as well to ensure it hides cleanly
+            query_container.styles.height = None
+            query_container.add_class("hidden")
+            results_container.add_class("maximized")
+            self._show_status("Layout: Results Fullscreen")
+
+        # Force a refresh of the active editor to handle resize
+        try:
+            self._get_active_editor().refresh()
+        except Exception:
+            pass
+
+    def action_resize_query(self, amount: int) -> None:
+        """Resize the query editor height (only in Split View)."""
+        if self.layout_mode != 0:
+            self._show_status("Cannot resize in fullscreen mode", error=True)
+            return
+
+        # Update height
+        new_height = self.query_height + amount
+
+        # Enforce limits (min 3 lines, max 80% of screen approx)
+        if 3 <= new_height <= 50:
+            self.query_height = new_height
+            self.query_one("#query-container").styles.height = self.query_height
+            self._show_status(f"Editor Height: {self.query_height}")
+
+    # --------------------------
+
+    # ... (Keep all other existing methods: on_data_table_header_selected, action_history_prev, etc.) ...
+    # ... (Copy the rest of the methods from your previous code here) ...
 
     def on_data_table_header_selected(self, event: DataTable.HeaderSelected) -> None:
         """Handle column header clicks for sorting."""
@@ -800,8 +1461,11 @@ class SQLShellApp(App):
         """Get the currently active query editor."""
         tabs = self.query_one("#query-tabs", TabbedContent)
         if not tabs.active:
-            return self.query_one("#query-editor-1", QueryEditor)
-
+            # Fallback if no tabs exist yet or logic fails
+            try:
+                return self.query_one(QueryEditor)
+            except Exception:
+                pass
         active_pane = self.query_one(f"#{tabs.active}", TabPane)
         return active_pane.query_one(QueryEditor)
 
@@ -849,9 +1513,12 @@ class SQLShellApp(App):
             start_time = datetime.now()
             result = self.query_engine.sql(query_text, backend=self.backend)
 
-            # Update loaded files
-            _sources = result._discover_sources()
-            self.loaded_files.extend([f for f in _sources.values() if f and f not in self.loaded_files])
+            # Safe source discovery
+            try:
+                _sources = result._discover_sources()
+                self.loaded_files.extend([f for f in _sources.values() if f and f not in self.loaded_files])
+            except Exception:
+                pass
 
             # Update schema browser
             self._update_schema_browser()
@@ -876,9 +1543,6 @@ class SQLShellApp(App):
 
     def _display_results(self, results: List[Dict[str, Any]], execution_time: float) -> None:
         """Display query results in the DataTable with pagination."""
-        results_viewer = self.query_one(ResultsViewer)
-        status_bar = self.query_one(StatusBar)
-
         # Get column names from first row
         if not results:
             return
@@ -897,23 +1561,44 @@ class SQLShellApp(App):
         self._refresh_displayed_results(execution_time)
 
     def _apply_filter(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Apply filter text to results."""
+        """Apply filter text to results with specific modes."""
         if not self.filter_text:
             return results
 
         filtered = []
         filter_lower = self.filter_text.lower()
-        
+        mode = getattr(self, "filter_mode", "contains")
+
         for row in results:
+            # Determine values to check
             if self.filter_column:
-                # Filter specific column
-                val = row.get(self.filter_column, "")
-                if filter_lower in str(val).lower():
-                    filtered.append(row)
+                values_to_check = [str(row.get(self.filter_column, ""))]
             else:
-                # Check if filter text appears in any column value
-                if any(filter_lower in str(v).lower() for v in row.values()):
-                    filtered.append(row)
+                values_to_check = [str(v) for v in row.values()]
+
+            match_found = False
+            for val in values_to_check:
+                val_str = val.lower()
+
+                if mode == "exact":
+                    if val_str == filter_lower:
+                        match_found = True
+                elif mode == "startswith":
+                    if val_str.startswith(filter_lower):
+                        match_found = True
+                elif mode == "endswith":
+                    if val_str.endswith(filter_lower):
+                        match_found = True
+                else: # contains
+                    if filter_lower in val_str:
+                        match_found = True
+
+                if match_found:
+                    break
+
+            if match_found:
+                filtered.append(row)
+
         return filtered
 
     def _apply_sort(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -991,14 +1676,12 @@ class SQLShellApp(App):
         # Update status with pagination info
         total_pages = (total_rows + self.page_size - 1) // self.page_size
         page_info = f"Page {self.current_page + 1}/{total_pages}"
-        filter_info = f" (filtered from {len(self.last_results)})" if self.filter_text else ""
+
+        # FIX: Check filter_active flag
+        filter_info = f" (filtered from {len(self.last_results)})" if self.filter_active else ""
 
         message = f"Showing {start_idx + 1}-{end_idx} of {total_rows} rows{filter_info} | {page_info}"
-        status_bar.update_status(
-            message,
-            execution_time=execution_time,
-            row_count=total_rows
-        )
+        status_bar.update_status(message, execution_time=execution_time, row_count=total_rows)
         status_bar.remove_class("error")
         status_bar.add_class("success")
 
@@ -1013,16 +1696,18 @@ class SQLShellApp(App):
     def _show_status(self, message: str, error: bool = False) -> None:
         """Show a status message."""
         status_bar = self.query_one(StatusBar)
-        
+
         # Construct filter info if active
         filter_info = ""
-        if self.filter_text:
-            filter_info = f"'{self.filter_text}'"
+        # FIX: Check filter_active flag
+        if self.filter_active:
+            filter_mode = "equals" if self.filter_mode == "exact" else self.filter_mode
             if self.filter_column:
-                filter_info += f" in {self.filter_column}"
-        
+                filter_info = f"`{self.filter_column}` {filter_mode} "
+            filter_info += f"'{self.filter_text}'"
+
         status_bar.update_status(message, filter_info=filter_info, backend_info=self.backend.upper())
-        
+
         if error:
             status_bar.remove_class("success")
             status_bar.add_class("error")
@@ -1059,16 +1744,60 @@ class SQLShellApp(App):
                 pass  # Silently ignore history loading errors
 
     def _save_history(self) -> None:
-        """Save query history to file."""
         try:
             history_path = Path(self.history_file)
             history_path.parent.mkdir(parents=True, exist_ok=True)
-            # Keep last 100 queries
-            history_to_save = self.query_history[-100:]
-            # Use special delimiter to separate queries (preserves multiline)
+            # Use configurable limit
+            history_to_save = self.query_history[-self.max_history:]
             history_path.write_text("\n===\n".join(history_to_save))
         except Exception:
-            pass  # Silently ignore history saving errors
+            pass
+
+    def save_config_file(self) -> None:
+        config = {
+            "confirm_exit": self.confirm_exit,
+            "max_history": self.max_history,
+            "default_export_fmt": self.default_export_fmt,
+            "app_theme": self.theme,
+            "backend": self.backend,
+            "page_size": self.page_size,
+            "editor_theme": self.editor_theme,
+            "editor_linenums": self.editor_linenums,
+            "editor_soft_wrap": self.editor_soft_wrap,
+            "results_zebra": self.results_zebra,
+            "results_compact": self.results_compact
+        }
+        try:
+            Path(self.config_file).write_text(json.dumps(config, indent=2))
+        except Exception as e:
+            self.notify(f"Failed to save config: {e}", severity="error")
+
+    def load_config_file(self) -> None:
+        try:
+            path = Path(self.config_file)
+            if not path.exists():
+                return
+
+            config = json.loads(path.read_text())
+
+            # Functional
+            self.confirm_exit = config.get("confirm_exit", False)
+            self.max_history = int(config.get("max_history", 100))
+            self.default_export_fmt = config.get("default_export_fmt", "csv")
+
+            # Appearance & Execution
+            if "app_theme" in config:
+                self.theme = config["app_theme"]
+            self.backend = config.get("backend", "auto")
+            self.page_size = int(config.get("page_size", 100))
+            self.editor_theme = config.get("editor_theme", "dracula")
+            self.editor_linenums = config.get("editor_linenums", True)
+            self.editor_soft_wrap = config.get("editor_soft_wrap", False)
+            self.results_zebra = config.get("results_zebra", True)
+            self.results_compact = config.get("results_compact", False)
+
+        except Exception as e:
+            self.notify(f"Failed to load config: {e}", severity="error")
 
     @work(thread=True)
     def _update_schema_browser(self) -> None:
@@ -1088,7 +1817,7 @@ class SQLShellApp(App):
 
     def action_show_help(self) -> None:
         """Show help dialog."""
-        self._show_status("Tab=Switch| Ctrl+E=Execute | Ctrl+L=Clear | F2=Schema | Ctrl+X=Export | [=Prev Page | ]=Next Page | Click headers to sort")
+        self._show_status("F6=Layout | Alt+Up/Down=Resize | Ctrl+Enter=Run | F2=Schema")
 
     def action_toggle_sidebar(self) -> None:
         """Toggle sidebar panel."""
@@ -1099,7 +1828,7 @@ class SQLShellApp(App):
         else:
             container.add_class("visible")
             self._show_status("Sidebar visible")
-        
+
         # Force layout refresh to prevent text overflow
         self.refresh(layout=True)
         # Also refresh the active editor to reflow text
@@ -1108,6 +1837,104 @@ class SQLShellApp(App):
             editor.refresh()
         except Exception:
             pass  # Editor might not be ready yet
+
+    def action_toggle_tools(self, tab: str = "filter") -> None:
+        """Toggle the right tools sidebar and select specific tab."""
+        sidebar = self.query_one("#tools-sidebar")
+        tabs = self.query_one("#tools-tabs", TabbedContent)
+
+        # If sidebar is hidden, show it and select tab
+        if not sidebar.has_class("visible"):
+            sidebar.add_class("visible")
+            tabs.active = f"tab-{tab}"
+            self._refresh_tools_data()
+        else:
+            # If sidebar is visible...
+            if tabs.active == f"tab-{tab}":
+                # And we clicked the same key, hide it
+                sidebar.remove_class("visible")
+            else:
+                # If we clicked a different key, just switch tab
+                tabs.active = f"tab-{tab}"
+                self._refresh_tools_data()
+
+    def _refresh_tools_data(self) -> None:
+        """Update filter columns and export counts based on current results."""
+        if not self.last_results:
+            return
+
+        # Update Filter Sidebar
+        try:
+            cols = list(self.last_results[0].keys())
+            self.query_one(FilterSidebar).update_columns(cols)
+        except: pass
+
+        # Update Export Sidebar
+        try:
+            # FIX: Check filter_active flag
+            count = len(self.filtered_results) if self.filter_active else len(self.last_results)
+            self.query_one(ExportSidebar).update_info(count)
+        except: pass
+
+    # Renamed from action_export_results to perform_export (called by sidebar)
+    def perform_export(self, path: Path, fmt: str) -> None:
+        """Execute the file write."""
+        if not self.last_results:
+            self._show_status("No results to export", error=True)
+            return
+
+        # FIX: Check filter_active flag explicitly
+        results_to_export = self.filtered_results if self.filter_active else self.last_results
+
+        try:
+            row_count = len(results_to_export)
+            filename = str(path)
+
+            if fmt == 'csv':
+                import csv
+                with open(filename, "w", newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=results_to_export[0].keys())
+                    writer.writeheader()
+                    export_rows = []
+                    for row in results_to_export:
+                        export_row = {k: self._prepare_value_for_export(v) for k, v in row.items()}
+                        export_rows.append(export_row)
+                    writer.writerows(export_rows)
+                self._show_status(f"✓ Exported {row_count} rows to CSV: {filename}")
+
+            elif fmt == 'json':
+                import json
+                export_rows = []
+                for row in results_to_export:
+                    export_row = {k: self._prepare_value_for_export(v) for k, v in row.items()}
+                    export_rows.append(export_row)
+                with open(filename, "w") as f:
+                    json.dump(export_rows, f, indent=2)
+                self._show_status(f"✓ Exported {row_count} rows to JSON: {filename}")
+
+            elif fmt == 'parquet':
+                try:
+                    import pyarrow as pa
+                    import pyarrow.parquet as pq
+                    table = pa.Table.from_pylist(results_to_export)
+                    pq.write_table(table, filename)
+                    self._show_status(f"✓ Exported {row_count} rows to Parquet: {filename}")
+                except ImportError:
+                    self._show_status("pyarrow not installed", error=True)
+
+            # Close sidebar on success
+            self.query_one("#tools-sidebar").remove_class("visible")
+
+        except Exception as e:
+            self._show_status(f"Export failed: {e}", error=True)
+
+    def action_clear_filter(self) -> None:
+        """Clear active filters."""
+        self.filter_active = False
+        self.filtered_results = self.last_results.copy()
+        self.current_page = 0
+        self._refresh_displayed_results()
+        self._show_status("Filter cleared")
 
     def action_toggle_history(self) -> None:
         """Toggle query history panel."""
@@ -1121,7 +1948,7 @@ class SQLShellApp(App):
             next_idx = (current_idx + 1) % len(backends)
         except ValueError:
             next_idx = 0
-        
+
         self.backend = backends[next_idx]
         self._show_status(f"Switched backend to: {self.backend.upper()}")
 
@@ -1237,115 +2064,95 @@ class SQLShellApp(App):
         else:
             self._show_status("Already on last page")
 
-    @work
-    async def action_filter_results(self) -> None:
-        """Show filter dialog for current results."""
+    def apply_advanced_filter(self, col: str, op: str, val1: str, val2: str) -> None:
+        """Apply filter logic based on sidebar inputs."""
         if not self.last_results:
-            self._show_status("No results to filter", error=True)
             return
 
-        # Get columns from first row
-        columns = list(self.last_results[0].keys()) if self.last_results else []
+        self.filtered_results = []
 
-        # Show filter dialog
-        result = await self.push_screen_wait(FilterDialog(columns))
+        # Helper to safely cast types
+        def safe_cast(val, target_type):
+            try:
+                if target_type is float:
+                    return float(val)
+                if target_type is bool:
+                    return val.lower() == "true"
+                return str(val).lower()
+            except Exception:
+                return None
 
-        if result is None:
-            # Cancelled
-            return
-            
-        filter_text, filter_column = result
-        
-        if filter_text == "":
-            # Clear filter
-            self.filter_text = ""
-            self.filter_column = None
-            self.filtered_results = self.last_results.copy()
-            self.current_page = 0
-            self._refresh_displayed_results()
-            self._show_status("Filter cleared")
-        else:
-            # Apply filter
-            self.filter_text = filter_text
-            self.filter_column = filter_column
-            self.filtered_results = self._apply_filter(self.last_results)
-            self.current_page = 0
-            self._refresh_displayed_results()
-            
-            status_msg = f"Filtered to {len(self.filtered_results)} rows"
-            if filter_column:
-                status_msg += f" (in '{filter_column}')"
-            self._show_status(status_msg)
+        for row in self.last_results:
+            # 1. Determine Row Value
+            if col == "global":
+                # Global search is always string match
+                row_vals = [str(v).lower() for v in row.values()]
+                if any(val1.lower() in rv for rv in row_vals):
+                    self.filtered_results.append(row)
+                continue
 
-    @work
-    async def action_export_results(self) -> None:
-        """Export current results with file dialog."""
-        if not self.last_results:
-            self._show_status("No results to export", error=True)
-            return
+            # Specific Column Search
+            raw_val = row.get(col)
 
-        # Use filtered results if available
-        results_to_export = self.filtered_results if self.filter_text else self.last_results
+            # Determine type based on the raw value in the row
+            target_type = str
+            if isinstance(raw_val, (int, float)):
+                target_type = float
+            elif isinstance(raw_val, bool):
+                target_type = bool
 
-        # Show save dialog with default filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        default_name = f"results_{timestamp}.csv"
-        result = await self.push_screen_wait(SaveFileDialog(default_name))
+            # Cast row value and input value
+            row_val = safe_cast(raw_val, target_type)
+            input_val = safe_cast(val1, target_type)
 
-        if result is None:
-            return  # Cancelled
+            if row_val is None or input_val is None:
+                continue # Skip invalid data
 
-        filename, fmt = result
+            match = False
 
-        # Validate filename
-        filename = filename.strip()
-        if not filename:
-            self._show_status("No filename provided", error=True)
-            return
-
-        try:
-            # Export based on selected format
-            row_count = len(results_to_export)
-            
-            if fmt == 'csv':
-                import csv
-                with open(filename, "w", newline="") as f:
-                    writer = csv.DictWriter(f, fieldnames=results_to_export[0].keys())
-                    writer.writeheader()
-                    # Prepare values for export (preserve types, fix floats)
-                    export_rows = []
-                    for row in results_to_export:
-                        export_row = {k: self._prepare_value_for_export(v) for k, v in row.items()}
-                        export_rows.append(export_row)
-                    writer.writerows(export_rows)
-                self._show_status(f"✓ Exported {row_count} rows to CSV: {filename}")
-
-            elif fmt == 'json':
-                import json
-                # Prepare values for JSON export
-                export_rows = []
-                for row in results_to_export:
-                    export_row = {k: self._prepare_value_for_export(v) for k, v in row.items()}
-                    export_rows.append(export_row)
-                with open(filename, "w") as f:
-                    json.dump(export_rows, f, indent=2)
-                self._show_status(f"✓ Exported {row_count} rows to JSON: {filename}")
-
-            elif fmt == 'parquet':
+            # 2. Apply Operator Logic
+            if op == "eq":
+                match = row_val == input_val
+            elif op == "contains":
+                match = str(input_val) in str(row_val)
+            elif op == "startswith":
+                match = str(row_val).startswith(str(input_val))
+            elif op == "endswith":
+                match = str(row_val).endswith(str(input_val))
+            elif op == "gt":
+                match = row_val > input_val
+            elif op == "lt":
+                match = row_val < input_val
+            elif op == "between":
+                input_val_2 = safe_cast(val2, target_type)
+                if input_val_2 is not None:
+                    match = input_val <= row_val <= input_val_2
+            elif op == "is":
+                # For booleans, input_val is already cast to bool
+                match = row_val is input_val
+            elif op == "regex":
+                import re
                 try:
-                    import pyarrow as pa
-                    import pyarrow.parquet as pq
+                    if re.search(str(input_val), str(row_val), re.IGNORECASE):
+                        match = True
+                except Exception:
+                    pass
 
-                    table = pa.Table.from_pylist(results_to_export)
-                    pq.write_table(table, filename)
-                    self._show_status(f"✓ Exported {row_count} rows to Parquet: {filename}")
-                except ImportError:
-                    self._show_status("pyarrow not installed. Install with: pip install pyarrow", error=True)
-            else:
-                self._show_status(f"Unknown format: {fmt}", error=True)
+            if match:
+                self.filtered_results.append(row)
 
-        except Exception as e:
-            self._show_status(f"Export failed: {e}", error=True)
+         # Update state so Export and Status Bar know a filter is active
+        self.filter_active = True
+        self.filter_column = col
+        self.filter_mode = op
+        self.filter_text = str(val1) # Store value for display/logic
+        # ------------------------------------------------
+
+        self.current_page = 0
+        self._refresh_displayed_results()
+        self._refresh_tools_data() # Update the export sidebar count immediately
+        self._show_status(f"Filtered: {col} {op} {val1}")
+
 
     def action_open_file(self) -> None:
         """Switch to file browser tab and show sidebar."""
@@ -1363,6 +2170,10 @@ class SQLShellApp(App):
 
     def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
         """Handle file selection from sidebar."""
+        # FIX: Ignore events from the export tree to prevent overwriting the query
+        if event.control.id == "export-tree":
+            return
+
         file_path = str(event.path)
 
         # Get active editor
@@ -1411,8 +2222,9 @@ class SQLShellApp(App):
         editor = QueryEditor(
             id=editor_id,
             language="sql",
-            theme="dracula",
-            show_line_numbers=True,
+            theme=self.editor_theme,
+            show_line_numbers=self.editor_linenums,
+            soft_wrap=self.editor_soft_wrap,
             text=content
         )
 
@@ -1436,9 +2248,16 @@ class SQLShellApp(App):
              await self.action_new_tab()
 
     def action_quit(self) -> None:
-        """Save state and exit."""
-        self._save_state()
-        self.exit()
+        """Save state and exit, optionally confirming."""
+        if self.confirm_exit:
+            self.push_screen(ConfirmExitDialog(), self._finish_quit)
+        else:
+            self._finish_quit(True)
+
+    def _finish_quit(self, should_quit: bool) -> None:
+        if should_quit:
+            self._save_state()
+            self.exit()
 
     def action_save_state(self) -> None:
         """Manual save state action."""
