@@ -72,20 +72,46 @@ class QueryEditor(TextArea):
 
         return line[start:col]
 
+    def _get_schema_suggestions(self) -> list[str]:
+        """Get column names and table names from the app's schema."""
+        suggestions = []
+        try:
+            # Access parent app's schema
+            if hasattr(self.app, 'schemas') and self.app.schemas:
+                for source_name, schema in self.app.schemas.items():
+                    # Add table/source name
+                    suggestions.append(source_name)
+                    # Add column names
+                    for col in schema.columns:
+                        suggestions.append(col.name)
+        except Exception:
+            pass  # Silently fail if schema not available
+        return suggestions
+
     def _show_suggestions(self, word: str):
         """Show the autocomplete popup if matches found."""
-        matches = [k for k in self.KEYWORDS if k.startswith(word.upper())]
+        # Combine keywords with schema suggestions
+        all_suggestions = self.KEYWORDS + self._get_schema_suggestions()
+        matches = [s for s in all_suggestions if s.upper().startswith(word.upper())]
+        
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_matches = []
+        for m in matches:
+            if m.upper() not in seen:
+                seen.add(m.upper())
+                unique_matches.append(m)
 
         # Remove existing popup if it exists
         if self.autocomplete_popup:
             self.autocomplete_popup.remove()
             self.autocomplete_popup = None
 
-        if not matches or not word:
+        if not unique_matches or not word:
             return
 
         # Create and mount the popup
-        self.autocomplete_popup = SQLAutoComplete(matches)
+        self.autocomplete_popup = SQLAutoComplete(unique_matches[:10])  # Limit to 10 suggestions
         self.screen.mount(self.autocomplete_popup)
 
         # Position the popup near the cursor
@@ -95,8 +121,8 @@ class QueryEditor(TextArea):
         popup_offset = Offset(x, y + 1)
 
         self.autocomplete_popup.styles.offset = (popup_offset.x, popup_offset.y)
-        self.autocomplete_popup.styles.width = 20
-        self.autocomplete_popup.styles.height = min(len(matches) + 2, 10)
+        self.autocomplete_popup.styles.width = 25  # Increased width for column names
+        self.autocomplete_popup.styles.height = min(len(unique_matches) + 2, 10)
 
     def on_text_area_changed(self) -> None:
         """Called when text changes."""
@@ -243,7 +269,8 @@ class StatusBar(Static):
         message: str, 
         execution_time: Optional[float] = None, 
         row_count: Optional[int] = None,
-        filter_info: str = ""
+        filter_info: str = "",
+        backend_info: str = ""
     ) -> None:
         """Update status bar with execution info."""
         if execution_time is not None:
@@ -254,6 +281,8 @@ class StatusBar(Static):
         status_parts = [message]
         if filter_info:
              status_parts.append(f"🔍 {filter_info}")
+        if backend_info:
+            status_parts.append(f"⚙️ {backend_info}")
         if self.row_count is not None:
             status_parts.append(f"{self.row_count} rows")
         if self.last_execution_time is not None:
@@ -369,20 +398,37 @@ class ExplainDialog(ModalScreen):
         self.dismiss()
 
 
-class SaveFileDialog(ModalScreen[str]):
-    """Modal dialog for saving files."""
+class SaveFileDialog(ModalScreen[tuple]):
+    """Modal dialog for saving files with format selection."""
 
     def __init__(self, default_name: str = "", **kwargs) -> None:
         super().__init__(**kwargs)
         self.default_name = default_name
+        # Extract format from default name if present
+        if default_name.endswith('.json'):
+            self.default_format = 'json'
+        elif default_name.endswith('.parquet'):
+            self.default_format = 'parquet'
+        else:
+            self.default_format = 'csv'
 
     def compose(self) -> ComposeResult:
         with Container(id="save-dialog"):
-            yield Label("Save Results")
+            yield Label("Export Results", id="save-title")
+            
+            yield Label("Format:")
+            format_options = [
+                ("CSV - Comma-separated values", "csv"),
+                ("JSON - JavaScript Object Notation", "json"),
+                ("Parquet - Apache Parquet (binary)", "parquet")
+            ]
+            yield Select(format_options, prompt="Select format...", id="format-select", value=self.default_format)
+            
+            yield Label("Filename:")
             yield Input(value=self.default_name, placeholder="Enter filename...", id="filename-input")
-            yield Label("(Formats: .csv, .json, .parquet)", id="format-hint")
+            
             with Horizontal(id="dialog-buttons"):
-                yield Button("Save", variant="primary", id="save-btn")
+                yield Button("Export", variant="primary", id="save-btn")
                 yield Button("Cancel", variant="default", id="cancel-btn")
 
     def on_mount(self) -> None:
@@ -392,17 +438,37 @@ class SaveFileDialog(ModalScreen[str]):
         if "." in self.default_name:
             input_widget.cursor_position = self.default_name.rindex(".")
 
+    def on_select_changed(self, event: Select.Changed) -> None:
+        """Update filename extension when format changes."""
+        if event.select.id == "format-select":
+            input_widget = self.query_one("#filename-input", Input)
+            current_name = input_widget.value
+            
+            # Remove existing extension
+            if current_name:
+                base_name = current_name.rsplit('.', 1)[0] if '.' in current_name else current_name
+                new_ext = event.value
+                input_widget.value = f"{base_name}.{new_ext}"
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "save-btn":
             filename = self.query_one("#filename-input", Input).value
-            if filename:
-                self.dismiss(filename)
+            format_val = self.query_one("#format-select", Select).value
+            if filename and format_val != Select.BLANK:
+                # Ensure filename has correct extension
+                base_name = filename.rsplit('.', 1)[0] if '.' in filename else filename
+                filename = f"{base_name}.{format_val}"
+                self.dismiss((filename, format_val))
         else:
             self.dismiss(None)
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         if event.value:
-            self.dismiss(event.value)
+            format_val = self.query_one("#format-select", Select).value
+            if format_val != Select.BLANK:
+                base_name = event.value.rsplit('.', 1)[0] if '.' in event.value else event.value
+                filename = f"{base_name}.{format_val}"
+                self.dismiss((filename, format_val))
 
 
 class FileBrowser(DirectoryTree):
@@ -567,6 +633,7 @@ class SQLShellApp(App):
         Binding("f2", "toggle_sidebar", "Sidebar"),
         Binding("f3", "toggle_history", "History", show=False),
         Binding("f4", "toggle_explain", "Explain"),
+        Binding("f5", "cycle_backend", "Backend"),
         Binding("ctrl+o", "open_file", "Files"),
         Binding("ctrl+q", "quit", "Exit", priority=True),
         Binding("ctrl+d", "quit", "Exit", priority=True),
@@ -604,6 +671,7 @@ class SQLShellApp(App):
         self.filtered_results: List[Dict[str, Any]] = []
         self.last_query = ""  # Store last executed query for explain
         self.query_engine = Query()
+        self.backend = "auto"  # Default backend
         self.loaded_files: List[str] = []
 
         # Pagination state
@@ -779,7 +847,7 @@ class SQLShellApp(App):
 
             # Execute query
             start_time = datetime.now()
-            result = self.query_engine.sql(query_text)
+            result = self.query_engine.sql(query_text, backend=self.backend)
 
             # Update loaded files
             _sources = result._discover_sources()
@@ -879,6 +947,18 @@ class SQLShellApp(App):
         else:
             return str(value)
 
+    def _prepare_value_for_export(self, value: Any) -> Any:
+        """Prepare a value for export, preserving proper data types."""
+        if value is None:
+            return None
+        elif isinstance(value, float):
+            # Convert near-zero values to 0.0 to avoid scientific notation in exports
+            if abs(value) < 1e-10 and value != 0:
+                return 0.0
+            return value
+        else:
+            return value
+
     def _refresh_displayed_results(self, execution_time: Optional[float] = None) -> None:
         """Refresh the displayed results with current page."""
         results_viewer = self.query_one(ResultsViewer)
@@ -933,7 +1013,16 @@ class SQLShellApp(App):
     def _show_status(self, message: str, error: bool = False) -> None:
         """Show a status message."""
         status_bar = self.query_one(StatusBar)
-        status_bar.update_status(message)
+        
+        # Construct filter info if active
+        filter_info = ""
+        if self.filter_text:
+            filter_info = f"'{self.filter_text}'"
+            if self.filter_column:
+                filter_info += f" in {self.filter_column}"
+        
+        status_bar.update_status(message, filter_info=filter_info, backend_info=self.backend.upper())
+        
         if error:
             status_bar.remove_class("success")
             status_bar.add_class("error")
@@ -1023,6 +1112,18 @@ class SQLShellApp(App):
     def action_toggle_history(self) -> None:
         """Toggle query history panel."""
         self._show_status("Query history - Coming soon!")
+
+    def action_cycle_backend(self) -> None:
+        """Cycle through available execution backends."""
+        backends = ["auto", "duckdb", "pandas", "python"]
+        try:
+            current_idx = backends.index(self.backend)
+            next_idx = (current_idx + 1) % len(backends)
+        except ValueError:
+            next_idx = 0
+        
+        self.backend = backends[next_idx]
+        self._show_status(f"Switched backend to: {self.backend.upper()}")
 
     @work
     async def action_toggle_explain(self) -> None:
@@ -1183,74 +1284,65 @@ class SQLShellApp(App):
             self._show_status("No results to export", error=True)
             return
 
+        # Use filtered results if available
+        results_to_export = self.filtered_results if self.filter_text else self.last_results
+
         # Show save dialog with default filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         default_name = f"results_{timestamp}.csv"
-        filename = await self.push_screen_wait(SaveFileDialog(default_name))
+        result = await self.push_screen_wait(SaveFileDialog(default_name))
 
-        if filename is None:
+        if result is None:
             return  # Cancelled
 
-        # Determine format from extension
+        filename, fmt = result
+
+        # Validate filename
         filename = filename.strip()
         if not filename:
             self._show_status("No filename provided", error=True)
             return
 
-        # Get file extension
-        file_lower = filename.lower()
-
         try:
-            # Export based on extension
-            if file_lower.endswith('.csv'):
+            # Export based on selected format
+            row_count = len(results_to_export)
+            
+            if fmt == 'csv':
                 import csv
                 with open(filename, "w", newline="") as f:
-                    writer = csv.DictWriter(f, fieldnames=self.last_results[0].keys())
+                    writer = csv.DictWriter(f, fieldnames=results_to_export[0].keys())
                     writer.writeheader()
-                    # Use formatted values for export
-                    formatted_rows = []
-                    for row in self.last_results:
-                        formatted_row = {k: self._format_value(v) for k, v in row.items()}
-                        formatted_rows.append(formatted_row)
-                    writer.writerows(formatted_rows)
-                self._show_status(f"Exported to CSV: {filename}")
+                    # Prepare values for export (preserve types, fix floats)
+                    export_rows = []
+                    for row in results_to_export:
+                        export_row = {k: self._prepare_value_for_export(v) for k, v in row.items()}
+                        export_rows.append(export_row)
+                    writer.writerows(export_rows)
+                self._show_status(f"✓ Exported {row_count} rows to CSV: {filename}")
 
-            elif file_lower.endswith('.json'):
+            elif fmt == 'json':
                 import json
-                # Format values for JSON export
-                formatted_rows = []
-                for row in self.last_results:
-                    formatted_row = {k: self._format_value(v) for k, v in row.items()}
-                    formatted_rows.append(formatted_row)
+                # Prepare values for JSON export
+                export_rows = []
+                for row in results_to_export:
+                    export_row = {k: self._prepare_value_for_export(v) for k, v in row.items()}
+                    export_rows.append(export_row)
                 with open(filename, "w") as f:
-                    json.dump(formatted_rows, f, indent=2)
-                self._show_status(f"Exported to JSON: {filename}")
+                    json.dump(export_rows, f, indent=2)
+                self._show_status(f"✓ Exported {row_count} rows to JSON: {filename}")
 
-            elif file_lower.endswith('.parquet'):
+            elif fmt == 'parquet':
                 try:
                     import pyarrow as pa
                     import pyarrow.parquet as pq
 
-                    table = pa.Table.from_pylist(self.last_results)
+                    table = pa.Table.from_pylist(results_to_export)
                     pq.write_table(table, filename)
-                    self._show_status(f"Exported to Parquet: {filename}")
+                    self._show_status(f"✓ Exported {row_count} rows to Parquet: {filename}")
                 except ImportError:
                     self._show_status("pyarrow not installed. Install with: pip install pyarrow", error=True)
-
             else:
-                # Default to CSV if no recognized extension
-                if not file_lower.endswith(('.csv', '.json', '.parquet')):
-                    filename = filename + '.csv'
-                import csv
-                with open(filename, "w", newline="") as f:
-                    writer = csv.DictWriter(f, fieldnames=self.last_results[0].keys())
-                    writer.writeheader()
-                    formatted_rows = []
-                    for row in self.last_results:
-                        formatted_row = {k: self._format_value(v) for k, v in row.items()}
-                        formatted_rows.append(formatted_row)
-                    writer.writerows(formatted_rows)
-                self._show_status(f"Exported to CSV: {filename}")
+                self._show_status(f"Unknown format: {fmt}", error=True)
 
         except Exception as e:
             self._show_status(f"Export failed: {e}", error=True)

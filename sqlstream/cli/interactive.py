@@ -29,7 +29,7 @@ def should_use_interactive(
     force: bool = False,
     no_interactive: bool = False,
     output_file: str = None,
-    format: str = "table",
+    fmt: str = "table",
 ) -> bool:
     """
     Determine if interactive mode should be used.
@@ -39,7 +39,7 @@ def should_use_interactive(
         force: Force interactive mode (--interactive flag)
         no_interactive: Disable interactive mode (--no-interactive flag)
         output_file: Output file path (if set, disable interactive)
-        format: Output format (only use interactive for table format)
+        fmt: Output format (only use interactive for table format)
 
     Returns:
         True if interactive mode should be used, False otherwise
@@ -49,7 +49,7 @@ def should_use_interactive(
         return True
 
     # Never use interactive if:
-    if no_interactive or output_file or format != "table":
+    if no_interactive or output_file or fmt != "table":
         return False
 
     # Not a TTY (piped output)

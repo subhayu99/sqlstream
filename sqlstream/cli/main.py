@@ -2,8 +2,8 @@
 SQLStream CLI - Query CSV/Parquet files with SQL
 
 Usage:
-    sqlstream query <file> <sql> [options]
-    sqlstream interactive <file>  # Future: Textual TUI
+    sqlstream query [file] <sql> [options]  # file is optional if SQL contains inline paths
+    sqlstream shell [file]  # Launch interactive TUI
 """
 
 import sys
@@ -140,6 +140,8 @@ def query(
         # Save results to file
         $ sqlstream query data.csv "SELECT * FROM data" -f csv -o results.csv
     """
+    fmt = format
+    del format
     try:
         start_time = time.time()
 
@@ -158,10 +160,8 @@ def query(
             # Old syntax: single file provided
             q = query_fn(file)
         else:
-            # New syntax: extract file from SQL
-            # Use a temporary Query with inline mode
-            from sqlstream.core.query import Query
-            q = Query()
+            # New syntax: sourceless query (file paths in SQL)
+            q = query_fn()
 
         # Execute query or show explain plan
         if explain:
@@ -172,6 +172,18 @@ def query(
             # Execute query
             result = q.sql(sql_query, backend=backend)
             results_list = list(result)
+
+            # Auto-detect format from output file extension if not explicitly specified
+            output_format = fmt
+            if output and fmt == "table":
+                # User provided -o but not -f, infer format from extension
+                if output.endswith('.json'):
+                    output_format = "json"
+                elif output.endswith('.csv'):
+                    output_format = "csv"
+                elif output.endswith('.md'):
+                    output_format = "markdown"
+                # Otherwise keep as table format
 
             # Apply display limit if specified (doesn't affect query LIMIT)
             if limit is not None:
@@ -185,7 +197,7 @@ def query(
                 force=interactive,
                 no_interactive=no_interactive,
                 output_file=output,
-                format=format,
+                fmt=output_format,
             ):
                 # Launch interactive TUI
                 try:
@@ -196,7 +208,7 @@ def query(
                     sys.exit(1)
             else:
                 # Use standard formatter
-                formatter = get_formatter(format)
+                formatter = get_formatter(output_format)
                 output_text = formatter.format(
                     results_list,
                     no_color=no_color or (not sys.stdout.isatty()),
@@ -207,7 +219,7 @@ def query(
                 if show_time:
                     elapsed = time.time() - start_time
                     time_text = f"\nExecution time: {elapsed:.3f}s"
-                    if format == "table" and not no_color:
+                    if output_format == "table" and not no_color:
                         # Add colored time for table format
                         try:
                             from rich.console import Console
@@ -225,7 +237,7 @@ def query(
                 if output:
                     with open(output, "w") as f:
                         f.write(output_text)
-                    click.echo(f"Results written to {output}", err=True)
+                    click.echo(f"Results written to {output} ({output_format} format)", err=True)
                 else:
                     click.echo(output_text)
 
@@ -256,15 +268,15 @@ def shell(file: Optional[str], history_file: Optional[str]):
 
     Examples:
 
-        \\b
+        \b
         # Launch empty shell
         $ sqlstream shell
 
-        \\b
+        \b
         # Launch with initial file loaded
         $ sqlstream shell employees.csv
 
-        \\b
+        \b
         # Use custom history file
         $ sqlstream shell --history-file ~/.my_history
     """
@@ -274,34 +286,7 @@ def shell(file: Optional[str], history_file: Optional[str]):
         launch_shell(initial_file=file, history_file=history_file)
     except ImportError as e:
         click.echo(
-            f"Error: {e}\\n"
-            "Interactive shell requires textual library.\\n"
-            "Install with: pip install sqlstream[cli]",
-            err=True,
-        )
-        sys.exit(1)
-
-
-@cli.command()
-@click.argument("file", type=str)
-def interactive(file: str):
-    """
-    Launch interactive query interface
-
-    DEPRECATED: Use 'sqlstream shell' instead.
-
-    This will open a Textual-based TUI for exploring data interactively.
-    """
-    click.echo("⚠️  The 'interactive' command is deprecated.", err=True)
-    click.echo("   Use 'sqlstream shell' instead for the full interactive experience.", err=True)
-    click.echo(f"\nLaunching shell with {file}...\n")
-
-    try:
-        from sqlstream.cli.shell import launch_shell
-
-        launch_shell(initial_file=file)
-    except ImportError:
-        click.echo(
+            f"Error: {e}\n"
             "Interactive shell requires textual library.\n"
             "Install with: pip install sqlstream[cli]",
             err=True,
