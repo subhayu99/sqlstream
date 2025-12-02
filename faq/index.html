@@ -1724,6 +1724,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../examples/duckdb-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DuckDB Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../examples/real-world/" class="md-nav__link">
         
   
@@ -2919,10 +2947,11 @@
 - ✅ Learning and prototyping</p>
 <p><strong>Considerations</strong>:
 - 🚧 API may change between versions
-- 🚧 Limited SQL feature set (no WINDOW functions, CTEs, etc.)
+- ✅ Full SQL support with DuckDB backend (CTEs, window functions, subqueries)
+- 🚧 Limited SQL with Python/Pandas backends
 - 🚧 No transaction support (read-only)
 - ✅ Good test coverage (377 tests, 53%)</p>
-<p><strong>Recommendation</strong>: Use for non-critical workloads or alongside other tools. Consider DuckDB for mission-critical production systems.</p>
+<p><strong>Recommendation</strong>: Use DuckDB backend for production workloads requiring complex SQL. Python/Pandas backends suitable for simple queries and learning.</p>
 <hr />
 <h3 id="whats-the-maximum-file-size">What's the maximum file size?</h3>
 <p><strong>Python Backend</strong>:
@@ -3027,7 +3056,7 @@
 - See <a href="../index.md#project-status">Development Status</a> for roadmap
 - Phase 10: Error handling &amp; user feedback
 - Phase 11: Testing &amp; documentation
-- Future: WINDOW functions, CTEs, subqueries</p>
+- Future: Enhanced Python/Pandas backend SQL support (window functions, CTEs currently available in DuckDB backend)</p>
 <hr />
 <h3 id="is-there-commercial-support">Is there commercial support?</h3>
 <p><strong>Currently</strong>: No commercial support or SLA.</p>
@@ -3101,16 +3130,33 @@
 <strong>Not yet</strong>: <code>COUNT(DISTINCT)</code>, <code>STDDEV</code>, <code>VARIANCE</code>, custom aggregates</p>
 <hr />
 <h3 id="can-i-use-subqueries-or-ctes">Can I use subqueries or CTEs?</h3>
-<p><strong>Not yet.</strong> Currently not supported:
-- ❌ Subqueries in FROM clause
-- ❌ Common Table Expressions (WITH clause)
-- ❌ Correlated subqueries
-- ❌ Subqueries in WHERE clause</p>
-<p><strong>Workarounds</strong>:
-1. Save intermediate results
-2. Use temporary files
-3. Use pandas for complex queries</p>
-<p><strong>Planned</strong>: Future roadmap item</p>
+<p><strong>Yes, with the DuckDB backend!</strong></p>
+<p><strong>Supported (DuckDB backend)</strong>:
+- ✅ Subqueries in FROM clause
+- ✅ Common Table Expressions (WITH clause)
+- ✅ Correlated subqueries
+- ✅ Subqueries in WHERE clause</p>
+<p><strong>Example</strong>:
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream</span><span class="w"> </span><span class="kn">import</span> <span class="n">query</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># Use CTEs with DuckDB backend</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="p">()</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="s2">    WITH high_earners AS (</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="s2">        SELECT * FROM &#39;employees.csv&#39;</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="s2">        WHERE salary &gt; 100000</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="s2">    )</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="s2">    SELECT </span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="s2">        department,</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="s2">        AVG(salary) as avg_salary</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="s2">    FROM high_earners</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="s2">    GROUP BY department</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;duckdb&quot;</span><span class="p">)</span>
+</span></code></pre></div></p>
+<p><strong>Not supported (Python/Pandas backends)</strong>:
+- ❌ Python backend: Limited SQL support
+- ❌ Pandas backend: Basic queries only</p>
+<p><strong>Recommendation</strong>: Use <code>--backend duckdb</code> for complex SQL features.</p>
+<p>See <a href="../features/duckdb-backend/">DuckDB Backend Guide</a> for full details.</p>
 <hr />
 <h3 id="how-do-i-specify-column-types-manually">How do I specify column types manually?</h3>
 <p><strong>Currently</strong>: Types are inferred automatically.</p>
@@ -3164,13 +3210,13 @@
 <li>Solution: Convert to Parquet for better performance</li>
 </ol>
 <p><strong>Example optimization</strong>:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Slow (Python backend, all columns, all rows)</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>large.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM large&quot;</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Fast (pandas, filtered, specific columns)</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>large.parquet<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="s2">&quot;SELECT name, salary FROM large WHERE date &gt; &#39;2024-01-01&#39;&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span>--backend<span class="w"> </span>pandas
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Slow (Python backend, all columns, all rows)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>large.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM large&quot;</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Fast (pandas, filtered, specific columns)</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>large.parquet<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="s2">&quot;SELECT name, salary FROM large WHERE date &gt; &#39;2024-01-01&#39;&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span>--backend<span class="w"> </span>pandas
 </span></code></pre></div></p>
 <h3 id="what-backends-are-supported">What backends are supported?</h3>
 <p>SQLStream supports three execution backends:</p>
@@ -3182,10 +3228,10 @@
 <h3 id="how-do-i-use-the-duckdb-backend">How do I use the DuckDB backend?</h3>
 <p>Install with <code>pip install duckdb</code> or <code>pip install "sqlstream[duckdb]"</code>.</p>
 <p>Then use it in your code:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;duckdb&quot;</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">query</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;duckdb&quot;</span><span class="p">)</span>
 </span></code></pre></div></p>
 <p>Or via CLI:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span>--backend<span class="w"> </span>duckdb
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span>--backend<span class="w"> </span>duckdb
 </span></code></pre></div></p>
 <h3 id="does-duckdb-backend-support-all-file-formats">Does DuckDB backend support all file formats?</h3>
 <p><strong>Yes!</strong> The DuckDB backend uses SQLStream's unified reader architecture, so it supports:
@@ -3243,26 +3289,26 @@
 - Large files
 - Production pipelines</p>
 <p><strong>Convert CSV to Parquet</strong>:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data.csv&#39;</span><span class="p">)</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="s1">&#39;data.parquet&#39;</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data.csv&#39;</span><span class="p">)</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="s1">&#39;data.parquet&#39;</span><span class="p">)</span>
 </span></code></pre></div></p>
 <hr />
 <h2 id="error-messages">Error Messages</h2>
 <h3 id="no-module-named-textual">"No module named 'textual'"</h3>
 <p><strong>Problem</strong>: Interactive shell not installed</p>
 <p><strong>Solution</strong>:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sqlstream[cli]&quot;</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1"># or</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sqlstream[all]&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sqlstream[cli]&quot;</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1"># or</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sqlstream[all]&quot;</span>
 </span></code></pre></div></p>
 <hr />
 <h3 id="no-module-named-pandas">"No module named 'pandas'"</h3>
 <p><strong>Problem</strong>: Pandas backend not installed</p>
 <p><strong>Solution</strong>:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sqlstream[pandas]&quot;</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1"># or</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sqlstream[all]&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sqlstream[pandas]&quot;</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="c1"># or</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sqlstream[all]&quot;</span>
 </span></code></pre></div></p>
 <hr />
 <h3 id="file-not-found-error">"File not found" error</h3>
@@ -3270,23 +3316,23 @@
 <ol>
 <li>
 <p><strong>Wrong path</strong>:
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Wrong</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Correct (use file path in query)</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39;&quot;</span>
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Wrong</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Correct (use file path in query)</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39;&quot;</span>
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>Relative vs absolute path</strong>:
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Use absolute path if unsure</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;/home/user/data.csv&#39;&quot;</span>
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Use absolute path if unsure</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;/home/user/data.csv&#39;&quot;</span>
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>Path with spaces</strong>:
-   <div class="language-sql highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">-- Use quotes</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;my data.csv&#39;</span>
+   <div class="language-sql highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">-- Use quotes</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;my data.csv&#39;</span>
 </span></code></pre></div></p>
 </li>
 </ol>
@@ -3297,14 +3343,14 @@
 <ol>
 <li>
 <p><strong>Set AWS credentials</strong>:
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>your_key
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>your_secret
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span>us-east-1
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>your_key
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>your_secret
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span>us-east-1
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>Use AWS config</strong>:
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>aws<span class="w"> </span>configure
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>aws<span class="w"> </span>configure
 </span></code></pre></div></p>
 </li>
 <li>
@@ -3329,10 +3375,10 @@
 <li><strong>Write examples</strong>: Add real-world examples</li>
 </ol>
 <p><strong>Get started</strong>:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/subhayu99/sqlstream.git
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nb">cd</span><span class="w"> </span>sqlstream
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>pytest
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/subhayu99/sqlstream.git
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nb">cd</span><span class="w"> </span>sqlstream
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>pytest
 </span></code></pre></div></p>
 <p>See <a href="../contributing/">Contributing Guide</a> for details.</p>
 <hr />

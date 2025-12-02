@@ -1374,6 +1374,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#11-backend-toggle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Backend Toggle
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2158,6 +2169,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../examples/duckdb-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DuckDB Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../examples/real-world/" class="md-nav__link">
         
   
@@ -2680,6 +2719,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#11-backend-toggle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Backend Toggle
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2855,6 +2905,7 @@
 <li>🔀 <strong>Column Sorting</strong> - Click headers to sort ascending/descending</li>
 <li>💾 <strong>Multi-Format Export</strong> - Save results as CSV, JSON, and Parquet</li>
 <li>🔍 <strong>Filtering</strong> - Search across all columns</li>
+<li>⚙️ <strong>Backend Toggle</strong> - Cycle through execution backends (<code>F5</code> or <code>Ctrl+B</code>: auto/duckdb/pandas/python)</li>
 <li>☁️ <strong>S3 Support</strong> - Query files directly from S3 buckets</li>
 <li>⚡ <strong>Fast</strong> - Execution time display and row counts</li>
 </ul>
@@ -2965,6 +3016,16 @@
 <td><code>F4</code></td>
 <td>Explain Mode</td>
 <td>Show query plan</td>
+</tr>
+<tr>
+<td><code>F5</code></td>
+<td>Backend Toggle</td>
+<td>Cycle through backends (auto/duckdb/pandas/python)</td>
+</tr>
+<tr>
+<td><code>Ctrl+B</code></td>
+<td>Backend Toggle</td>
+<td>Alternative backend cycle key</td>
 </tr>
 <tr>
 <td><code>Ctrl+O</code></td>
@@ -3187,6 +3248,34 @@
 <p><strong>Example</strong>:
 <div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Filtered to 45 rows (from 450 total)
 </span></code></pre></div></p>
+<h3 id="11-backend-toggle">11. Backend Toggle</h3>
+<p>Press <code>F5</code> or <code>Ctrl+B</code> to cycle through available execution backends on-the-fly.</p>
+<p><strong>Available Backends</strong>:
+- <strong>auto</strong> - Automatically selects best backend (pandas &gt; duckdb &gt; python)
+- <strong>duckdb</strong> - Full SQL support with window functions, CTEs, subqueries
+- <strong>pandas</strong> - Fast execution for basic queries (10-100x faster than Python)
+- <strong>python</strong> - Educational Volcano model implementation</p>
+<p><strong>Status Display</strong>:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>⚙️ DUCKDB
+</span></code></pre></div></p>
+<p><strong>Behavior</strong>:
+- Current backend shown in status bar
+- Press <code>F5</code> or <code>Ctrl+B</code> to cycle to next backend
+- Backend preference saved in state (persists between sessions)
+- Allows testing queries with different backends without restarting</p>
+<p><strong>Example Workflow</strong>:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>1. Start with &#39;auto&#39; backend
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>2. Press F5 → switches to &#39;duckdb&#39;
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>3. Run complex query with window functions
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>4. Press F5 → switches to &#39;pandas&#39;
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>5. Run simple aggregation
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>6. Press F5 → switches to &#39;python&#39;
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>7. Inspect Volcano model behavior
+</span></code></pre></div></p>
+<p><strong>Notes</strong>:
+- Some SQL features only work with specific backends
+- DuckDB backend required for window functions, CTEs, subqueries
+- If a backend is not installed, query will fail with helpful error message</p>
 <hr />
 <h2 id="performance">Performance</h2>
 <table>
@@ -3222,37 +3311,37 @@
 <hr />
 <h2 id="examples">Examples</h2>
 <h3 id="example-1-explore-large-dataset">Example 1: Explore Large Dataset</h3>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">-- Load first 1000 rows</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;big_file.csv&#39;</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1000</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1">-- Results: 1000 rows → 10 pages</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1">-- Use ] to navigate pages</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1">-- Click &#39;revenue&#39; header to sort</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1">-- Use Ctrl+X to export</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1">-- Load first 1000 rows</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;big_file.csv&#39;</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1000</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1">-- Results: 1000 rows → 10 pages</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="c1">-- Use ] to navigate pages</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="c1">-- Click &#39;revenue&#39; header to sort</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1">-- Use Ctrl+X to export</span>
 </span></code></pre></div>
 <h3 id="example-2-s3-analytics">Example 2: S3 Analytics</h3>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1">-- Query S3 Parquet</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">SELECT</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">category</span><span class="p">,</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="k">count</span><span class="p">,</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="k">AVG</span><span class="p">(</span><span class="n">price</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">avg_price</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;s3://my-bucket/products.parquet&#39;</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">category</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">count</span><span class="w"> </span><span class="k">DESC</span>
-</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
-</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="c1">-- Click &#39;count&#39; to sort</span>
-</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="c1">-- Export to CSV for sharing</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1">-- Query S3 Parquet</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="k">SELECT</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="n">category</span><span class="p">,</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="k">count</span><span class="p">,</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="k">AVG</span><span class="p">(</span><span class="n">price</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">avg_price</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;s3://my-bucket/products.parquet&#39;</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">category</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">count</span><span class="w"> </span><span class="k">DESC</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="c1">-- Click &#39;count&#39; to sort</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="c1">-- Export to CSV for sharing</span>
 </span></code></pre></div>
 <h3 id="example-3-schema-exploration">Example 3: Schema Exploration</h3>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1">-- Press F2 to see schema</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="c1">-- Write query with column names visible</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">city</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;employees.csv&#39;</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">25</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">name</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="c1">-- Sort by different columns using headers</span>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="c1">-- Export to JSON for API use</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">-- Press F2 to see schema</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="c1">-- Write query with column names visible</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">city</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;employees.csv&#39;</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">25</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">name</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="c1">-- Sort by different columns using headers</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="c1">-- Export to JSON for API use</span>
 </span></code></pre></div>
 <hr />
 <h2 id="tips-tricks">Tips &amp; Tricks</h2>
@@ -3267,6 +3356,7 @@
 <li><strong>Export</strong>: Export to Parquet for best compression</li>
 <li><strong>Sidebar</strong>: Toggle with <code>F2</code> to maximize editor space when needed</li>
 <li><strong>Manual Save</strong>: Use <code>Ctrl+S</code> if you want to save state before experimenting</li>
+<li><strong>Backend Toggle</strong>: Use <code>F5</code> to test complex SQL features - start with <code>auto</code>, switch to <code>duckdb</code> for window functions/CTEs</li>
 </ol>
 <hr />
 <h2 id="troubleshooting">Troubleshooting</h2>

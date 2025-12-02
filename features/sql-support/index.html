@@ -880,10 +880,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-yet-supported" class="md-nav__link">
+  <a href="#advanced-features-duckdb-backend-only" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Not Yet Supported
+        Advanced Features (DuckDB Backend Only)
       
     </span>
   </a>
@@ -1914,6 +1914,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../examples/duckdb-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DuckDB Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../examples/real-world/" class="md-nav__link">
         
   
@@ -2309,10 +2337,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-yet-supported" class="md-nav__link">
+  <a href="#advanced-features-duckdb-backend-only" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Not Yet Supported
+        Advanced Features (DuckDB Backend Only)
       
     </span>
   </a>
@@ -2352,6 +2380,10 @@
 
 <h1 id="sql-support">SQL Support</h1>
 <p>SQLStream supports a practical subset of SQL designed for data exploration and ETL tasks.</p>
+<div class="admonition info">
+<p class="admonition-title">Backend-Specific Support</p>
+<p>The features listed below are supported by <strong>Python</strong> and <strong>Pandas</strong> backends. For <strong>advanced SQL features</strong> (window functions, CTEs, subqueries, HAVING, etc.), use the <strong>DuckDB backend</strong> which provides full SQL support. See <a href="../duckdb-backend/">DuckDB Backend Guide</a> for details.</p>
+</div>
 <hr />
 <h2 id="supported-syntax">Supported Syntax</h2>
 <h3 id="select">SELECT</h3>
@@ -2456,18 +2488,31 @@
 </span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;/path/with spaces/data.csv&#39;&quot;</span>
 </span></code></pre></div>
 <hr />
-<h2 id="not-yet-supported">Not Yet Supported</h2>
-<p>The following SQL features are planned but not yet implemented:</p>
+<h2 id="advanced-features-duckdb-backend-only">Advanced Features (DuckDB Backend Only)</h2>
+<p>The following SQL features are <strong>not supported by Python/Pandas backends</strong> but are <strong>available with DuckDB backend</strong>:</p>
 <ul>
-<li>❌ Subqueries</li>
-<li>❌ UNION/INTERSECT/EXCEPT</li>
-<li>❌ HAVING clause</li>
-<li>❌ CASE expressions</li>
-<li>❌ String functions (UPPER, LOWER, etc.)</li>
-<li>❌ Date functions</li>
-<li>❌ Window functions</li>
-<li>❌ Common Table Expressions (WITH)</li>
+<li>✅ <strong>Subqueries</strong> (with DuckDB) - In FROM, WHERE, and SELECT clauses</li>
+<li>✅ <strong>UNION/INTERSECT/EXCEPT</strong> (with DuckDB) - Set operations</li>
+<li>✅ <strong>HAVING clause</strong> (with DuckDB) - Filter aggregated results</li>
+<li>✅ <strong>CASE expressions</strong> (with DuckDB) - Conditional logic</li>
+<li>✅ <strong>String functions</strong> (with DuckDB) - UPPER, LOWER, SUBSTRING, CONCAT, etc.</li>
+<li>✅ <strong>Date functions</strong> (with DuckDB) - EXTRACT, DATE_DIFF, DATE_TRUNC, etc.</li>
+<li>✅ <strong>Window functions</strong> (with DuckDB) - ROW_NUMBER, RANK, LAG, LEAD, etc.</li>
+<li>✅ <strong>Common Table Expressions</strong> (with DuckDB) - WITH clause</li>
 </ul>
+<p><strong>To use these features</strong>, specify <code>backend="duckdb"</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sqlstream</span><span class="w"> </span><span class="kn">import</span> <span class="n">query</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># Example with window function</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="p">()</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="s2">    SELECT </span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="s2">        name,</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="s2">        salary,</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="s2">        ROW_NUMBER() OVER (ORDER BY salary DESC) as rank</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="s2">    FROM &#39;employees.csv&#39;</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;duckdb&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p>See <a href="../duckdb-backend/">DuckDB Backend Guide</a> for comprehensive examples and documentation.</p>
 <hr />
 <h2 id="next-steps">Next Steps</h2>
 <ul>

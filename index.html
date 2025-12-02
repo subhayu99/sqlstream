@@ -1935,6 +1935,34 @@
   
   
     <li class="md-nav__item">
+      <a href="examples/duckdb-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DuckDB Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="examples/real-world/" class="md-nav__link">
         
   
@@ -2552,7 +2580,7 @@
 </div>
 <hr />
 <h2 id="performance">Performance</h2>
-<p>SQLStream offers two execution backends:</p>
+<p>SQLStream offers three execution backends:</p>
 <table>
 <thead>
 <tr>
@@ -2570,14 +2598,20 @@
 <tr>
 <td><strong>Pandas</strong></td>
 <td><strong>10-100x faster</strong></td>
-<td>Production, large files (&gt;100K rows)</td>
+<td>Basic queries, large files (&gt;100K rows)</td>
+</tr>
+<tr>
+<td><strong>DuckDB</strong></td>
+<td><strong>100x+ faster</strong></td>
+<td>Complex SQL, analytics, huge files</td>
 </tr>
 </tbody>
 </table>
 <div class="admonition tip">
 <p class="admonition-title">Performance Tips</p>
 <ul>
-<li>Use <code>--backend pandas</code> for files &gt;100K rows</li>
+<li>Use <code>--backend duckdb</code> for complex SQL (CTEs, window functions)</li>
+<li>Use <code>--backend pandas</code> for simple queries on large files</li>
 <li>Use column pruning: <code>SELECT name, age</code> instead of <code>SELECT *</code></li>
 <li>Add WHERE filters to reduce data scanned</li>
 <li>Use Parquet format for better compression</li>
