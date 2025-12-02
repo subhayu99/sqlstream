@@ -44,11 +44,12 @@
 
 **Considerations**:
 - 🚧 API may change between versions
-- 🚧 Limited SQL feature set (no WINDOW functions, CTEs, etc.)
+- ✅ Full SQL support with DuckDB backend (CTEs, window functions, subqueries)
+- 🚧 Limited SQL with Python/Pandas backends
 - 🚧 No transaction support (read-only)
 - ✅ Good test coverage (377 tests, 53%)
 
-**Recommendation**: Use for non-critical workloads or alongside other tools. Consider DuckDB for mission-critical production systems.
+**Recommendation**: Use DuckDB backend for production workloads requiring complex SQL. Python/Pandas backends suitable for simple queries and learning.
 
 ---
 
@@ -176,7 +177,7 @@ TypeError: ...
 - See [Development Status](../index.md#project-status) for roadmap
 - Phase 10: Error handling & user feedback
 - Phase 11: Testing & documentation
-- Future: WINDOW functions, CTEs, subqueries
+- Future: Enhanced Python/Pandas backend SQL support (window functions, CTEs currently available in DuckDB backend)
 
 ---
 
@@ -284,18 +285,39 @@ ORDER BY avg_salary DESC
 
 ### Can I use subqueries or CTEs?
 
-**Not yet.** Currently not supported:
-- ❌ Subqueries in FROM clause
-- ❌ Common Table Expressions (WITH clause)
-- ❌ Correlated subqueries
-- ❌ Subqueries in WHERE clause
+**Yes, with the DuckDB backend!**
 
-**Workarounds**:
-1. Save intermediate results
-2. Use temporary files
-3. Use pandas for complex queries
+**Supported (DuckDB backend)**:
+- ✅ Subqueries in FROM clause
+- ✅ Common Table Expressions (WITH clause)
+- ✅ Correlated subqueries
+- ✅ Subqueries in WHERE clause
 
-**Planned**: Future roadmap item
+**Example**:
+```python
+from sqlstream import query
+
+# Use CTEs with DuckDB backend
+results = query().sql("""
+    WITH high_earners AS (
+        SELECT * FROM 'employees.csv'
+        WHERE salary > 100000
+    )
+    SELECT 
+        department,
+        AVG(salary) as avg_salary
+    FROM high_earners
+    GROUP BY department
+""", backend="duckdb")
+```
+
+**Not supported (Python/Pandas backends)**:
+- ❌ Python backend: Limited SQL support
+- ❌ Pandas backend: Basic queries only
+
+**Recommendation**: Use `--backend duckdb` for complex SQL features.
+
+See [DuckDB Backend Guide](features/duckdb-backend.md) for full details.
 
 ---
 

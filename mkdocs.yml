@@ -106,6 +106,7 @@ nav:
       - Basic Queries: examples/basic-queries.md
       - JOIN Examples: examples/joins.md
       - Aggregations: examples/aggregations.md
+      - DuckDB Backend: examples/duckdb-backend.md
       - Real-World Use Cases: examples/real-world.md
   - Architecture:
       - Design Overview: architecture/design.md

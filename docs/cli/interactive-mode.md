@@ -18,6 +18,7 @@ SQLStream includes a powerful interactive shell built with [Textual](https://tex
 - 🔀 **Column Sorting** - Click headers to sort ascending/descending
 - 💾 **Multi-Format Export** - Save results as CSV, JSON, and Parquet
 - 🔍 **Filtering** - Search across all columns
+- ⚙️ **Backend Toggle** - Cycle through execution backends (`F5` or `Ctrl+B`: auto/duckdb/pandas/python)
 - ☁️ **S3 Support** - Query files directly from S3 buckets
 - ⚡ **Fast** - Execution time display and row counts
 
@@ -82,6 +83,8 @@ sqlstream shell --history-file ~/.my_sqlstream_history
 | `F1` | Help | Show help message |
 | `F2` | Toggle Sidebar | Show/hide tabbed sidebar (Schema/Files) |
 | `F4` | Explain Mode | Show query plan |
+| `F5` | Backend Toggle | Cycle through backends (auto/duckdb/pandas/python) |
+| `Ctrl+B` | Backend Toggle | Alternative backend cycle key |
 | `Ctrl+O` | Open Files Tab | Switch to file browser in sidebar |
 | `Ctrl+X` | Export | Export with custom filename |
 | `Ctrl+F` | Filter | Filter current results |
@@ -343,6 +346,44 @@ Press `Ctrl+F` to filter current results.
 Filtered to 45 rows (from 450 total)
 ```
 
+### 11. Backend Toggle
+
+Press `F5` or `Ctrl+B` to cycle through available execution backends on-the-fly.
+
+**Available Backends**:
+- **auto** - Automatically selects best backend (pandas > duckdb > python)
+- **duckdb** - Full SQL support with window functions, CTEs, subqueries
+- **pandas** - Fast execution for basic queries (10-100x faster than Python)
+- **python** - Educational Volcano model implementation
+
+**Status Display**:
+```
+⚙️ DUCKDB
+```
+
+**Behavior**:
+- Current backend shown in status bar
+- Press `F5` or `Ctrl+B` to cycle to next backend
+- Backend preference saved in state (persists between sessions)
+- Allows testing queries with different backends without restarting
+
+**Example Workflow**:
+```
+1. Start with 'auto' backend
+2. Press F5 → switches to 'duckdb'
+3. Run complex query with window functions
+4. Press F5 → switches to 'pandas'
+5. Run simple aggregation
+6. Press F5 → switches to 'python'
+7. Inspect Volcano model behavior
+```
+
+**Notes**:
+- Some SQL features only work with specific backends
+- DuckDB backend required for window functions, CTEs, subqueries
+- If a backend is not installed, query will fail with helpful error message
+
+
 ---
 
 ## Performance
@@ -415,6 +456,7 @@ ORDER BY name
 8. **Export**: Export to Parquet for best compression
 9. **Sidebar**: Toggle with `F2` to maximize editor space when needed
 10. **Manual Save**: Use `Ctrl+S` if you want to save state before experimenting
+11. **Backend Toggle**: Use `F5` to test complex SQL features - start with `auto`, switch to `duckdb` for window functions/CTEs
 
 ---
 

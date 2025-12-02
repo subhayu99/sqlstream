@@ -2,6 +2,9 @@
 
 SQLStream supports a practical subset of SQL designed for data exploration and ETL tasks.
 
+!!! info "Backend-Specific Support"
+    The features listed below are supported by **Python** and **Pandas** backends. For **advanced SQL features** (window functions, CTEs, subqueries, HAVING, etc.), use the **DuckDB backend** which provides full SQL support. See [DuckDB Backend Guide](duckdb-backend.md) for details.
+
 ---
 
 ## Supported Syntax
@@ -141,18 +144,35 @@ sqlstream query "SELECT * FROM '/path/with spaces/data.csv'"
 
 ---
 
-## Not Yet Supported
+## Advanced Features (DuckDB Backend Only)
 
-The following SQL features are planned but not yet implemented:
+The following SQL features are **not supported by Python/Pandas backends** but are **available with DuckDB backend**:
 
-- ❌ Subqueries
-- ❌ UNION/INTERSECT/EXCEPT
-- ❌ HAVING clause
-- ❌ CASE expressions
-- ❌ String functions (UPPER, LOWER, etc.)
-- ❌ Date functions
-- ❌ Window functions
-- ❌ Common Table Expressions (WITH)
+- ✅ **Subqueries** (with DuckDB) - In FROM, WHERE, and SELECT clauses
+- ✅ **UNION/INTERSECT/EXCEPT** (with DuckDB) - Set operations
+- ✅ **HAVING clause** (with DuckDB) - Filter aggregated results
+- ✅ **CASE expressions** (with DuckDB) - Conditional logic
+- ✅ **String functions** (with DuckDB) - UPPER, LOWER, SUBSTRING, CONCAT, etc.
+- ✅ **Date functions** (with DuckDB) - EXTRACT, DATE_DIFF, DATE_TRUNC, etc.
+- ✅ **Window functions** (with DuckDB) - ROW_NUMBER, RANK, LAG, LEAD, etc.
+- ✅ **Common Table Expressions** (with DuckDB) - WITH clause
+
+**To use these features**, specify `backend="duckdb"`:
+
+```python
+from sqlstream import query
+
+# Example with window function
+results = query().sql("""
+    SELECT 
+        name,
+        salary,
+        ROW_NUMBER() OVER (ORDER BY salary DESC) as rank
+    FROM 'employees.csv'
+""", backend="duckdb")
+```
+
+See [DuckDB Backend Guide](duckdb-backend.md) for comprehensive examples and documentation.
 
 ---
 

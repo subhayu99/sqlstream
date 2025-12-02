@@ -107,6 +107,7 @@ Features:
 - **File Browser** (`Ctrl+O`): Browse and select files to query with tree structure
 - **Query History** (`Ctrl+Up/Down`): Navigate through previous queries (multiline supported)
 - **Word Deletion** (`Ctrl+Delete`/`Ctrl+Backspace`): Fast editing with word-aware deletion
+- **Backend Toggle** (`F5` or `Ctrl+B`): Cycle through execution backends (auto/duckdb/pandas/python)
 - **Execution Plan** (`F4`): View detailed query execution steps
 - **Smart Export** (`Ctrl+X`): Save results as CSV, JSON, or Parquet with custom filenames
 - **Live Filtering** (`Ctrl+F`): Search across all columns

@@ -217,6 +217,7 @@ This launches a powerful TUI (Terminal User Interface) with:
 - **Word Deletion**: Use `Ctrl+Delete` and `Ctrl+Backspace` for fast editing.
 - **Results Viewer**: Scrollable table with pagination.
 - **Sidebar**: Toggle between **Schema** and **Files** browser (`F2` to toggle, `Ctrl+O` to open files).
+- **Backend Toggle**: Press `F5` or `Ctrl+B` to cycle through backends (auto/duckdb/pandas/python).
 - **Save Progress**: Save your work with `Ctrl+S`.
 - **Export**: Press `Ctrl+X` to export results to CSV/JSON/Parquet.
 - **History**: Use `Ctrl+Up`/`Down` to navigate previous queries.

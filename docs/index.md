@@ -182,15 +182,17 @@ results_list = query("data.csv").sql("SELECT * FROM data").to_list()
 
 ## Performance
 
-SQLStream offers two execution backends:
+SQLStream offers three execution backends:
 
 | Backend | Speed | Use Case |
 |---------|-------|----------|
 | **Python** | Baseline | Learning, small files (<100K rows) |
-| **Pandas** | **10-100x faster** | Production, large files (>100K rows) |
+| **Pandas** | **10-100x faster** | Basic queries, large files (>100K rows) |
+| **DuckDB** | **100x+ faster** | Complex SQL, analytics, huge files |
 
 !!! tip "Performance Tips"
-    - Use `--backend pandas` for files >100K rows
+    - Use `--backend duckdb` for complex SQL (CTEs, window functions)
+    - Use `--backend pandas` for simple queries on large files
     - Use column pruning: `SELECT name, age` instead of `SELECT *`
     - Add WHERE filters to reduce data scanned
     - Use Parquet format for better compression
