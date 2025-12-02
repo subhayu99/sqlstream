@@ -103,11 +103,17 @@ nav:
       - Guides:
           - Advanced Usage: api/guides/advanced.md
   - Examples:
-      - Basic Queries: examples/basic-queries.md
-      - JOIN Examples: examples/joins.md
-      - Aggregations: examples/aggregations.md
-      - DuckDB Backend: examples/duckdb-backend.md
-      - Real-World Use Cases: examples/real-world.md
+    - Basic Queries: examples/basic-queries.md
+    - JOIN Operations: examples/joins.md
+    - Aggregations: examples/aggregations.md
+    - DuckDB Backend: examples/duckdb-backend.md
+    - Parquet Files: examples/parquet-files.md
+    # - JSON Data: examples/json-data.md # TODO: not supported yet
+    - HTML Tables: examples/html-tables.md
+    - Markdown Tables: examples/markdown-tables.md
+    - Advanced / Real World: examples/real-world.md
+  - Reference:
+      - URL Fragments: reference/url-fragments.md
   - Architecture:
       - Design Overview: architecture/design.md
       - Volcano Model: architecture/volcano-model.md

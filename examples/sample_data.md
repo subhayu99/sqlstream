@@ -1,21 +1,17 @@
-# Sample Data
 
-This is sample data for testing SQLStream markdown reader.
+# Data Warehouse Export
 
-## Table 1: Products
+## Current Inventory
+| product_id | warehouse   | quantity | last_audit |
+|:-----------|:------------|---------:|:-----------|
+| 50         | North_WH    | 120      | 2023-10-01 |
+| 50         | South_WH    | 45       | 2023-10-02 |
+| 51         | North_WH    | 500      | 2023-09-15 |
+| 52         | East_WH     | 30       | 2023-10-05 |
 
-| Product | Price | Stock | Category  |
-|:--------|------:|------:|:----------|
-| Apple   | 1.50  | 100   | Fruit     |
-| Banana  | 0.75  | 150   | Fruit     |
-| Cherry  | 2.25  | 50    | Fruit     |
-| Carrot  | 0.50  | 200   | Vegetable |
-| Tomato  | 1.25  | 80    | Vegetable |
-
-## Table 2: Inventory
-
-| Warehouse | Items | Value  |
-|:----------|------:|-------:|
-| North     | 1000  | 5000.0 |
-| South     | 800   | 4200.0 |
-| East      | 1200  | 6100.0 |
+## Recent Events
+| event_id | event_type | severity | description       |
+|----------|------------|----------|-------------------|
+| 1001     | ERROR      | High     | Connection timeout|
+| 1002     | WARNING    | Medium   | Disk usage > 80%  |
+| 1003     | INFO       | Low      | Job completed     |

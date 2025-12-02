@@ -1,0 +1,72 @@
+[
+  {
+    "id": 50,
+    "name": "Laptop",
+    "category": "Electronics",
+    "price": 1200,
+    "stock": 50
+  },
+  {
+    "id": 51,
+    "name": "Mouse",
+    "category": "Electronics",
+    "price": 25,
+    "stock": 200
+  },
+  {
+    "id": 52,
+    "name": "Keyboard",
+    "category": "Electronics",
+    "price": 80,
+    "stock": 150
+  },
+  {
+    "id": 53,
+    "name": "Chair",
+    "category": "Furniture",
+    "price": 300,
+    "stock": 40
+  },
+  {
+    "id": 54,
+    "name": "Desk",
+    "category": "Furniture",
+    "price": 450,
+    "stock": 25
+  },
+  {
+    "id": 55,
+    "name": "Monitor",
+    "category": "Electronics",
+    "price": 250,
+    "stock": 80
+  },
+  {
+    "id": 56,
+    "name": "Headphones",
+    "category": "Electronics",
+    "price": 150,
+    "stock": 100
+  },
+  {
+    "id": 57,
+    "name": "Lamp",
+    "category": "Furniture",
+    "price": 45,
+    "stock": 300
+  },
+  {
+    "id": 58,
+    "name": "Tablet",
+    "category": "Electronics",
+    "price": 500,
+    "stock": 60
+  },
+  {
+    "id": 59,
+    "name": "Phone",
+    "category": "Electronics",
+    "price": 900,
+    "stock": 90
+  }
+]

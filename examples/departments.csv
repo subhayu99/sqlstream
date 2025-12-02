@@ -1,0 +1,5 @@
+dept_id,dept_name,manager_id,budget
+1,Engineering,101,500000
+2,Sales,102,300000
+3,Marketing,105,200000
+4,HR,108,150000

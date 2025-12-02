@@ -1,28 +1,40 @@
 # Basic Query Examples
 
-Common query patterns and examples.
+All examples below use real data files hosted in the SQLStream repository. You can copy, paste, and run them immediately!
 
-## Filtering
+## Selecting Data
 
-```sql
-SELECT * FROM data WHERE age > 25
-SELECT * FROM data WHERE city = 'NYC'
-SELECT * FROM data WHERE salary >= 80000
+**Data**: [employees.csv](https://github.com/subhayu99/sqlstream/raw/main/examples/employees.csv)
+
+### CLI Example
+
+```bash
+sqlstream query "SELECT name, salary FROM 'https://github.com/subhayu99/sqlstream/raw/main/examples/employees.csv' WHERE salary > 100000"
 ```
 
-## Sorting
+### Python Example
 
-```sql
-SELECT * FROM data ORDER BY age DESC
-SELECT * FROM data ORDER BY salary DESC LIMIT 10
+```python
+from sqlstream import query
+
+url = "https://github.com/subhayu99/sqlstream/raw/main/examples/employees.csv"
+
+# Select employees hired after 2020
+results = query().sql(f"""
+    SELECT name, hire_date 
+    FROM '{url}'
+    WHERE hire_date >= '2020-01-01'
+""")
 ```
 
-## Aggregations
+## Ordering and Limiting
 
-```sql
-SELECT COUNT(*) FROM data
-SELECT AVG(salary) FROM data
-SELECT department, COUNT(*) FROM data GROUP BY department
+```python
+# Top 3 highest paid employees
+results = query().sql(f"""
+    SELECT name, salary
+    FROM '{url}'
+    ORDER BY salary DESC
+    LIMIT 3
+""")
 ```
-
-See more: [Join Examples](joins.md) | [Aggregations](aggregations.md)

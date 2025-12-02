@@ -1,54 +1,50 @@
 # JOIN Examples
 
-## Joining CSV Files
+Combine data from multiple files using standard SQL syntax.
 
-Suppose you have `users.csv` and `orders.csv`.
+## joining CSVs
 
-**users.csv**
-```csv
-id,name,email
-1,Alice,alice@example.com
-2,Bob,bob@example.com
+**Data**:
+
+- [employees.csv](https://github.com/subhayu99/sqlstream/raw/main/examples/employees.csv)
+- [departments.csv](https://github.com/subhayu99/sqlstream/raw/main/examples/departments.csv)
+
+### Inner Join
+
+Match employees to their department names.
+
+```python
+from sqlstream import query
+
+base = "https://github.com/subhayu99/sqlstream/raw/main/examples"
+
+sql = f"""
+    SELECT 
+        e.name,
+        d.dept_name,
+        e.salary
+    FROM '{base}/employees.csv' e
+    JOIN '{base}/departments.csv' d ON e.dept_id = d.dept_id
+    WHERE e.salary > 80000
+"""
+
+results = query().sql(sql)
 ```
 
-**orders.csv**
-```csv
-order_id,user_id,amount
-101,1,50.00
-102,1,25.00
-103,2,100.00
-```
+### Aggregation across Joins
 
-**Query:**
-```sql
-SELECT 
-    u.name, 
-    o.amount 
-FROM 'users.csv' u 
-JOIN 'orders.csv' o 
-ON u.id = o.user_id
-```
+Calculate total budget usage (sum of salaries) per department.
 
-## Joining CSV and Parquet
+```python
+sql = f"""
+    SELECT 
+        d.dept_name,
+        d.budget,
+        SUM(e.salary) as total_salary_expense
+    FROM '{base}/departments.csv' d
+    JOIN '{base}/employees.csv' e ON d.dept_id = e.dept_id
+    GROUP BY d.dept_name, d.budget
+"""
 
-**Query:**
-```sql
-SELECT 
-    p.product_name, 
-    s.quantity 
-FROM 'products.csv' p 
-JOIN 'sales.parquet' s 
-ON p.id = s.product_id
-```
-
-## Self Join
-
-**Query:**
-```sql
-SELECT 
-    e1.name as employee, 
-    e2.name as manager 
-FROM 'employees.csv' e1 
-JOIN 'employees.csv' e2 
-ON e1.manager_id = e2.id
+results = query().sql(sql, backend="duckdb")
 ```
