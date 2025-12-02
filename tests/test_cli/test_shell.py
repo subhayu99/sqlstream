@@ -86,7 +86,15 @@ class TestHistoryNavigation:
                 self.cursor_location = (0, 0)
 
         app._query_one_mock = DummyEditor()
-        app.query_one = lambda x: app._query_one_mock
+        
+        def mock_query_one(*args, **kwargs):
+            if args and args[0] == "#query-tabs":
+                tabs = MagicMock()
+                tabs.active = None  # Simulate no active tab to force fallback
+                return tabs
+            return app._query_one_mock
+            
+        app.query_one = mock_query_one
 
         # Test Prev
         app.action_history_prev()
@@ -112,7 +120,15 @@ class TestHistoryNavigation:
                 self.cursor_location = (0, 0)
 
         app._query_one_mock = DummyEditor()
-        app.query_one = lambda x: app._query_one_mock
+        
+        def mock_query_one(*args, **kwargs):
+            if args and args[0] == "#query-tabs":
+                tabs = MagicMock()
+                tabs.active = None
+                return tabs
+            return app._query_one_mock
+            
+        app.query_one = mock_query_one
 
         # Test Next
         app.action_history_next()

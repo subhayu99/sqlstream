@@ -158,20 +158,6 @@ class TestQueryCommand:
 
 
 @pytest.mark.skipif(not CLICK_AVAILABLE, reason="Click not installed")
-class TestInteractiveCommand:
-    """Test interactive command"""
-
-    def test_interactive_not_implemented(self, sample_csv):
-        """Test interactive command shows coming soon message"""
-        runner = CliRunner()
-        result = runner.invoke(cli, ["interactive", str(sample_csv)])
-
-        # Should show message about coming soon or missing textual
-        assert "'interactive' command is deprecated." in result.output
-        assert "Use 'sqlstream shell' instead" in result.output
-
-
-@pytest.mark.skipif(not CLICK_AVAILABLE, reason="Click not installed")
 class TestCLIVersion:
     """Test CLI version info"""
 

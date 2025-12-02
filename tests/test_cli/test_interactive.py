@@ -52,8 +52,8 @@ class TestShouldUseInteractive:
     def test_non_table_format_disables(self):
         """Test non-table format disables interactive mode"""
         results = [{f"col{i}": i for i in range(15)}]
-        assert should_use_interactive(results, format="json") is False
-        assert should_use_interactive(results, format="csv") is False
+        assert should_use_interactive(results, fmt="json") is False
+        assert should_use_interactive(results, fmt="csv") is False
 
     def test_empty_results_no_trigger(self):
         """Test empty results don't trigger interactive mode"""
