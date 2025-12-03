@@ -1,6 +1,6 @@
 <div align="center">
   <img src="docs/assets/logo_cropped.png" alt="SQLStream Logo" width="200">
-  <h1>SQLStream</h1>
+  <!-- <h1>SQLStream</h1> -->
   
   <p>
     <strong>A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations.</strong>
