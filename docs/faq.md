@@ -47,7 +47,7 @@
 - ✅ Full SQL support with DuckDB backend (CTEs, window functions, subqueries)
 - 🚧 Limited SQL with Python/Pandas backends
 - 🚧 No transaction support (read-only)
-- ✅ Good test coverage (377 tests, 53%)
+- 🚧 Growing test coverage (560 tests, 15% - actively improving to 80%)
 
 **Recommendation**: Use DuckDB backend for production workloads requiring complex SQL. Python/Pandas backends suitable for simple queries and learning.
 

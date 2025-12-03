@@ -25,9 +25,12 @@ This gives you:
 
 - ✅ Core SQL engine
 - ✅ CSV file support
+- ✅ JSON and JSONL file support
+- ✅ Markdown table support
 - ✅ Basic CLI commands
 - ❌ No Parquet support
-- ❌ No performance optimizations
+- ❌ No HTML table extraction
+- ❌ No performance optimizations (Pandas/DuckDB)
 
 ---
 
@@ -64,9 +67,61 @@ Additional features:
 
 ---
 
+### With DuckDB Backend (Production-Ready)
+
+For **100x+ performance boost** and full SQL support:
+
+```bash
+pip install "sqlstream[duckdb]"
+```
+
+Additional features:
+
+- ✅ Everything from basic install
+- ✅ **DuckDB-powered execution** (100x+ faster)
+- ✅ Full SQL support (CTEs, window functions, subqueries)
+- ✅ Optimized for huge datasets (10M+ rows)
+- ✅ Production-ready analytics engine
+
+---
+
+### With HTML Table Extraction
+
+To query tables from HTML documents:
+
+```bash
+pip install "sqlstream[html]"
+```
+
+Additional features:
+
+- ✅ Extract tables from HTML files and URLs
+- ✅ Multi-table support with index selection
+- ✅ Automatic schema inference from HTML tables
+- ✅ Works with Pandas backend for fast processing
+
+---
+
+### With S3 Support
+
+To query files directly from Amazon S3:
+
+```bash
+pip install "sqlstream[s3]"
+```
+
+Additional features:
+
+- ✅ Direct S3 bucket access
+- ✅ Partition-aware queries
+- ✅ AWS credentials integration
+- ✅ Works with CSV and Parquet on S3
+
+---
+
 ### With HTTP Support
 
-To query CSV/Parquet files from URLs:
+To query CSV/Parquet/JSON files from URLs:
 
 ```bash
 pip install "sqlstream[http]"
@@ -107,11 +162,12 @@ pip install "sqlstream[all]"
 
 This includes:
 
-- ✅ CSV and Parquet support
-- ✅ Pandas backend
-- ✅ HTTP data sources
+- ✅ CSV, Parquet, JSON, JSONL support
+- ✅ HTML and Markdown table extraction
+- ✅ Pandas and DuckDB backends for maximum performance
+- ✅ HTTP and S3 data sources
 - ✅ Full CLI with interactive mode
-- ✅ All output formats
+- ✅ All output formats (table, JSON, CSV, Parquet, Markdown)
 
 ---
 

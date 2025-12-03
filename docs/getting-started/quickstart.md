@@ -197,13 +197,72 @@ Performance comparison:
 | 1M | 52s | 0.8s | **65x** |
 
 For complex SQL queries, use the DuckDB backend:
+
 ```bash
-$ sqlstream query "SELECT * FROM 'data.parquet'" --backend duckdb
+$ sqlstream query "
+    WITH ranked AS (
+        SELECT *,
+               ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) as rank
+        FROM 'employees.csv'
+    )
+    SELECT * FROM ranked WHERE rank = 1
+" --backend duckdb
 ```
 
 ---
 
-## Step 6: Interactive Shell
+## Step 6: Query Different Data Formats
+
+SQLStream supports multiple file formats beyond CSV:
+
+### JSON Files
+
+```bash
+# Query a simple JSON array
+$ sqlstream query "users.json" "SELECT name, email FROM users"
+
+# Query nested JSON with path syntax
+$ sqlstream query "api.json#json:data.users" "SELECT name FROM users WHERE age > 25"
+```
+
+### HTML Tables
+
+Extract and query tables from HTML documents:
+
+```bash
+# Query first table in HTML file
+$ sqlstream query "report.html" "SELECT * FROM report WHERE revenue > 100000"
+
+# Query specific table by index
+$ sqlstream query "report.html#html:1" "SELECT * FROM report"
+
+# Query tables from web pages
+$ sqlstream query "https://example.com/data.html" "SELECT * FROM data"
+```
+
+### Markdown Tables
+
+Parse tables from Markdown documents:
+
+```bash
+# Query a table from README
+$ sqlstream query "README.md" "SELECT * FROM readme"
+
+# Query specific table by index
+$ sqlstream query "docs/api.md#markdown:2" "SELECT * FROM api"
+```
+
+### Parquet Files
+
+High-performance columnar format:
+
+```bash
+$ sqlstream query "data.parquet" "SELECT * FROM data WHERE date > '2024-01-01'"
+```
+
+---
+
+## Step 7: Interactive Shell
 
 For a full interactive experience, use the shell command:
 

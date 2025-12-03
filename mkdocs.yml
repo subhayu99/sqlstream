@@ -1,5 +1,5 @@
 site_name: SQLStream
-site_description: A lightweight SQL query engine for CSV and Parquet files with lazy evaluation and intelligent optimizations
+site_description: A lightweight SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations
 site_author: SQLStream Team
 site_url: https://subhayu99.github.io/sqlstream
 
@@ -119,6 +119,7 @@ nav:
       - Design Overview: architecture/design.md
       - Volcano Model: architecture/volcano-model.md
       - Optimizations: architecture/optimizations.md
+  - Performance: performance.md
   - FAQ: faq.md
   - Troubleshooting: troubleshooting.md
   - Limitations: limitations.md

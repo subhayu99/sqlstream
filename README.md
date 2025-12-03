@@ -1,6 +1,6 @@
 # SQLStream
 
-**A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, and JSONL files with lazy evaluation and intelligent optimizations.**
+**A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations.**
 
 [![Tests](https://github.com/subhayu99/sqlstream/workflows/tests/badge.svg)](https://github.com/subhayu99/sqlstream/actions)
 [![Documentation](https://github.com/subhayu99/sqlstream/workflows/docs/badge.svg)](https://subhayu99.github.io/sqlstream)
@@ -19,28 +19,44 @@ $ sqlstream query data.csv "SELECT * FROM data WHERE age > 25"
 # Query with inline file path (source inferred from SQL)
 $ sqlstream query "SELECT * FROM 'data.csv' WHERE age > 25"
 
-# Query S3 files
-$ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '2024-01-01'"
+# Query JSON with nested paths
+$ sqlstream query "users.json#json:data.users" "SELECT name, email FROM users"
 
-# Join multiple files
-$ sqlstream query "SELECT c.name, o.total FROM 'customers.csv' c JOIN 'orders.csv' o ON c.id = o.customer_id"
+# Query JSONL (JSON Lines) files
+$ sqlstream query logs.jsonl "SELECT timestamp, level, message FROM logs WHERE level = 'ERROR'"
+
+# Query HTML tables
+$ sqlstream query "report.html#html:0" "SELECT * FROM report WHERE revenue > 1000000"
+
+# Query Markdown tables
+$ sqlstream query "README.md#markdown:1" "SELECT column1, column2 FROM readme"
+
+# Query S3 files with partitions
+$ sqlstream query "SELECT * FROM 's3://my-bucket/data/year=2024/' WHERE date > '2024-01-01'"
+
+# Join multiple formats (CSV + Parquet + JSON)
+$ sqlstream query "SELECT c.name, o.total, u.email
+  FROM 'customers.csv' c
+  JOIN 'orders.parquet' o ON c.id = o.customer_id
+  JOIN 'users.json#json:users' u ON c.user_id = u.id"
 
 # Interactive shell with full TUI
-$ sqlstream shell data.csv
+$ sqlstream shell
 ```
 
 ## Features
 
 - 🚀 **Pure Python** - No database installation required
-- 📊 **Multiple Formats** - CSV, Parquet, JSON, JSONL, HTTP URLs, S3 buckets
-- ⚡ **10-100x Faster** - Optional pandas backend for performance
-- 🔗 **JOIN Support** - INNER, LEFT, RIGHT joins
-- 📈 **Aggregations** - GROUP BY with COUNT, SUM, AVG, MIN, MAX
-- 🔢 **Type System** - Automatic schema inference with type checking
-- ☁️ **S3 Support** - Query files directly from Amazon S3
-- 🎨 **Beautiful Output** - Rich tables, JSON, CSV formatting
-- 🖥️ **Interactive Shell** - Full-featured TUI with multiple tabs, state persistence, file browser, query plan visualization, multi-format export
-- 🔍 **Smart Optimizations** - Column pruning, predicate pushdown, lazy evaluation
+- 📊 **Multiple Formats** - CSV, Parquet, JSON, JSONL, HTML, Markdown with nested path syntax, HTTP URLs, S3 buckets
+- ⚡ **100x+ Faster** - DuckDB backend for complex SQL, Pandas backend for simple queries
+- 🔗 **JOIN Support** - INNER, LEFT, RIGHT, FULL OUTER joins across different file formats
+- 📈 **Aggregations** - GROUP BY with COUNT, SUM, AVG, MIN, MAX, DISTINCT
+- 🔢 **Rich Type System** - 10 data types (INTEGER, FLOAT, DECIMAL, STRING, JSON, BOOLEAN, DATE, TIME, DATETIME, NULL) with automatic inference
+- ☁️ **S3 Support** - Query files directly from Amazon S3 with partition support
+- 🎨 **Beautiful Output** - Rich tables, JSON, CSV, Parquet, Markdown formatting
+- 🖥️ **Advanced Interactive Shell** - Multiple tabs, sidebars, layout cycling, backend toggle, state persistence, file browser
+- 🔍 **Smart Optimizations** - Column pruning, predicate pushdown, limit pushdown, lazy evaluation
+- 🌐 **REST API Ready** - Query HTTP endpoints and APIs (coming soon)
 - 📦 **Lightweight** - Minimal dependencies, works everywhere
 
 ## Installation
@@ -61,6 +77,16 @@ uv tool install "sqlstream[all]"
 ```bash
 uv tool install "sqlstream[interactive,pandas,s3,http,html,duckdb]"
 ```
+
+**Optional Dependencies**:
+- `pandas` - Pandas backend for 10-100x speedup
+- `duckdb` - DuckDB backend for 100x+ speedup and advanced SQL
+- `parquet` - Parquet file support
+- `s3` - Amazon S3 file access
+- `http` - HTTP/HTTPS data sources
+- `html` - HTML table extraction (requires pandas, html5lib, beautifulsoup4)
+- `interactive` - Interactive shell with rich TUI
+- `all` - All features combined
 
 ### Using `pip`
 
@@ -100,21 +126,37 @@ $ sqlstream shell data.csv
 $ sqlstream shell
 ```
 
-Features:
-- **Multiple Query Tabs** (`Ctrl+T`/`Ctrl+W`): Work with multiple queries simultaneously
-- **State Persistence**: Automatically saves and restores your tabs and queries between sessions
-- **Tabbed Sidebar** (`F2`): Toggle between Schema browser and File explorer
-- **File Browser** (`Ctrl+O`): Browse and select files to query with tree structure
-- **Query History** (`Ctrl+Up/Down`): Navigate through previous queries (multiline supported)
-- **Word Deletion** (`Ctrl+Delete`/`Ctrl+Backspace`): Fast editing with word-aware deletion
-- **Backend Toggle** (`F5` or `Ctrl+B`): Cycle through execution backends (auto/duckdb/pandas/python)
-- **Execution Plan** (`F4`): View detailed query execution steps
-- **Smart Export** (`Ctrl+X`): Save results as CSV, JSON, or Parquet with custom filenames
-- **Live Filtering** (`Ctrl+F`): Search across all columns
-- **Pagination**: Handle large result sets (100 rows per page)
-- **Column Sorting**: Click headers to sort ascending/descending
-- **Syntax Highlighting**: Dracula theme for SQL queries
-- **Exit & Save** (`Ctrl+Q` or `Ctrl+D`): Quit with automatic state saving
+**Enhanced TUI Features:**
+
+**Query Management:**
+- **Multiple Tabs** (`Ctrl+T`/`Ctrl+W`) - Work on multiple queries simultaneously
+- **State Persistence** - Auto-save tabs, queries, and layout between sessions
+- **Query History** (`Ctrl+Up/Down`) - Navigate previous queries with multiline support
+- **Auto-completion** - Schema-aware suggestions for tables and columns
+- **Syntax Highlighting** - SQL syntax with Dracula theme
+
+**Sidebars & Layout:**
+- **Dynamic Sidebars** (`F2`/`F3`) - Schema browser, File explorer, Filter, Export, Config
+- **Layout Cycling** (`Ctrl+L`) - Resize query editor: 50%, 60%, 70%, 80%, 100%
+- **File Browser** (`Ctrl+O`) - Tree view with directory navigation
+- **Schema Browser** - Real-time schema and type information
+
+**Execution & Performance:**
+- **Backend Toggle** (`F5` or `Ctrl+B`) - Cycle: Auto → DuckDB → Pandas → Python
+- **Execution Plan** (`F4`) - View query optimization steps
+- **Async Execution** - Responsive UI during long queries
+- **Cancel Queries** (`Ctrl+C`) - Stop running queries
+
+**Results Management:**
+- **Advanced Filtering** (`Ctrl+F`) - Column-specific or global search
+- **Smart Export** (`Ctrl+X`) - CSV, JSON, or Parquet with format selection
+- **Pagination** - 100 rows per page, configurable
+- **Column Sorting** - Click headers to sort
+- **Live Stats** - Row counts and filter status
+
+**Keyboard Shortcuts:**
+- `Ctrl+Delete`/`Ctrl+Backspace` - Word-aware deletion
+- `Ctrl+Q` or `Ctrl+D` - Exit with auto-save
 
 ### Python API
 
@@ -146,6 +188,7 @@ Key sections:
 - [CLI Reference](https://subhayu99.github.io/sqlstream/cli/overview/) - Command-line interface
 - [Python API](https://subhayu99.github.io/sqlstream/api/overview/) - Programmatic usage
 - [Examples](https://subhayu99.github.io/sqlstream/examples/basic-queries/) - Real-world examples
+- [Troubleshooting](https://subhayu99.github.io/sqlstream/troubleshooting/) - Common issues and solutions
 - [Architecture](https://subhayu99.github.io/sqlstream/architecture/design/) - How it works
 
 ## Development Status
@@ -163,20 +206,21 @@ Key sections:
 - ✅ **Phase 7.6**: Inline file path support
 - ✅ **Phase 8**: Type system & schema inference
 - ✅ **Phase 9**: Enhanced interactive shell (multiple tabs, state persistence, file browser, query plan)
-- 🚧 **Phase 10**: Error handling & user feedback
-- 🚧 **Phase 11**: Testing & documentation
+- ✅ **Phase 10**: HTML & Markdown readers with table extraction
+- ✅ **Phase 11**: Enhanced type system (Decimal, DateTime, Date, Time, JSON)
+- 🚧 **Phase 12**: Comprehensive testing & documentation (15% coverage → 80% target)
 
-**Test Coverage**: 377 tests, 53% coverage
+**Test Coverage**: 560 tests, 15% coverage (actively improving)
 
 ## Performance
 
-SQLStream offers two execution backends:
+SQLStream offers **three execution backends**:
 
 | Backend | Speed | Use Case |
 |---------|-------|----------|
 | Python | Baseline | Learning, small files (<100K rows) |
-| Pandas | **10-100x faster** | Production, large files (>100K rows) |
-| DuckDB | **100x+ faster** | Complex SQL, analytics, huge files |
+| Pandas | **10-100x faster** | Basic queries, large files (>100K rows) |
+| DuckDB | **100x+ faster** | Complex SQL, analytics, huge files (10M+ rows) |
 
 Benchmark (1M rows):
 
@@ -199,7 +243,7 @@ Key concepts:
 - **Lazy Evaluation**: Rows are processed on-demand
 - **Column Pruning**: Only read columns that are used
 - **Predicate Pushdown**: Apply filters early to reduce data scanned
-- **Two Backends**: Pure Python (learning) and Pandas (performance)
+- **Three Backends**: Pure Python (learning), Pandas (performance), and DuckDB (full SQL)
 
 See [Architecture Guide](https://subhayu99.github.io/sqlstream/architecture/design/) for details.
 

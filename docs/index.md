@@ -1,6 +1,6 @@
 # SQLStream
 
-**A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, and JSONL files with lazy evaluation and intelligent optimizations.**
+**A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations.**
 
 ---
 
@@ -10,8 +10,17 @@
 # Query a CSV file
 $ sqlstream query "SELECT * FROM 'data.csv' WHERE age > 25"
 
-# Join multiple files
-$ sqlstream query "SELECT c.name, o.total FROM 'customers.csv' c JOIN 'orders.csv' o ON c.id = o.customer_id"
+# Query JSON with nested paths
+$ sqlstream query "users.json#json:data.users" "SELECT name, email FROM users"
+
+# Query HTML tables from files or URLs
+$ sqlstream query "report.html#html:0" "SELECT * FROM report WHERE revenue > 1000000"
+
+# Query Markdown tables
+$ sqlstream query "README.md#markdown:1" "SELECT column1, column2 FROM readme"
+
+# Join multiple files (any format combination)
+$ sqlstream query "SELECT c.name, o.total FROM 'customers.csv' c JOIN 'orders.parquet' o ON c.id = o.customer_id"
 
 # Interactive shell with full TUI
 $ sqlstream shell
@@ -36,7 +45,7 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
 
     ---
 
-    Support for CSV, Parquet, JSON, JSONL files, HTTP URLs, and S3 buckets.
+    Support for CSV, Parquet, JSON, JSONL, HTML, Markdown files, HTTP URLs, and S3 buckets.
 
 -   :material-lightning-bolt:{ .lg .middle } __10-100x Faster__
 
@@ -68,11 +77,11 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
 
     Full-featured TUI with multiple tabs, state persistence, file browser, and query plan visualization.
 
--   :material-file-search:{ .lg .middle } __Inline File Paths__
+-   :material-file-search:{ .lg .middle } __Table Extraction__
 
     ---
 
-    Specify files directly in SQL queries (Phase 7.6).
+    Extract and query tables from HTML pages and Markdown documents with multi-table support.
 
 -   :material-tune:{ .lg .middle } __Smart Optimizations__
 
@@ -233,12 +242,12 @@ SQLStream offers three execution backends:
 
 ## Project Status
 
-SQLStream is in **active development**. Current phase: **8**
+SQLStream is in **active development**. Current phase: **12**
 
 - ✅ Phase 0-2: Core query engine with Volcano model
 - ✅ Phase 3: Parquet support
 - ✅ Phase 4: Aggregations & GROUP BY
-- ✅ Phase 5: JOIN operations (INNER, LEFT, RIGHT)
+- ✅ Phase 5: JOIN operations (INNER, LEFT, RIGHT, FULL OUTER)
 - ✅ Phase 5.5: Pandas backend (10-100x speedup)
 - ✅ Phase 6: HTTP data sources
 - ✅ Phase 7: CLI with beautiful output
@@ -247,8 +256,9 @@ SQLStream is in **active development**. Current phase: **8**
 - ✅ Phase 7.7: S3 Support for CSV and Parquet
 - ✅ Phase 8: Type system & schema inference
 - ✅ Phase 9: Enhanced interactive shell (multiple tabs, state persistence, file browser, query plan)
-- 🚧 Phase 10: Error handling & user feedback
-- 🚧 Phase 11: Testing & documentation
+- ✅ Phase 10: HTML & Markdown readers with table extraction
+- ✅ Phase 11: Enhanced type system (Decimal, DateTime, Date, Time, JSON) & DuckDB backend integration
+- 🚧 Phase 12: Comprehensive testing & documentation (560 tests, 15% coverage → 80% target)
 
 ---
 
