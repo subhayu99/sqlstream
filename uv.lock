@@ -4015,7 +4015,7 @@ wheels = [
 
 [[package]]
 name = "sqlstream"
-version = "0.5.2"
+version = "0.5.5"
 source = { editable = "." }
 
 [package.optional-dependencies]
