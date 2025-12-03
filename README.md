@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/assets/logo_cropped.png" alt="SQLStream Logo" width="200">
+  <img src="docs/assets/logo_cropped_transparent.png" alt="SQLStream Logo" width="200">
   <!-- <h1>SQLStream</h1> -->
   
   <p>
