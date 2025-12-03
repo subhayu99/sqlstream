@@ -56,10 +56,12 @@ class TestFragmentParser:
         with pytest.raises(FragmentParseError, match="Unknown format"):
             parse_source_fragment("data#invalid")
 
-    def test_parse_invalid_table_index(self):
-        """Test that invalid table index raises error"""
-        with pytest.raises(FragmentParseError, match="Invalid table index"):
-            parse_source_fragment("data.html#html:abc")
+    def test_parse_string_table_identifier(self):
+        """Test that string table identifiers are now allowed (for JSON nested paths)"""
+        source, format_spec, table = parse_source_fragment("data.json#json:users.name")
+        assert source == "data.json"
+        assert format_spec == "json"
+        assert table == "users.name"  # String identifier for nested JSON path
 
     def test_parse_empty_table_index(self):
         """Test that empty table index raises error"""

@@ -463,8 +463,10 @@ class ParquetReader(BaseReader):
 
         if "int" in type_str.lower():
             return "int"
-        elif "float" in type_str.lower() or "double" in type_str.lower() or "decimal" in type_str.lower():
+        elif "float" in type_str.lower() or "double" in type_str.lower():
             return "float"
+        elif "decimal" in type_str.lower():
+            return "decimal"
         elif "string" in type_str.lower() or "utf8" in type_str.lower():
             return "string"
         elif "bool" in type_str.lower():
@@ -473,6 +475,8 @@ class ParquetReader(BaseReader):
             return "date"
         elif "timestamp" in type_str.lower():
             return "datetime"
+        elif "time" in type_str.lower():
+            return "time"
         else:
             return type_str
 
@@ -491,14 +495,20 @@ class ParquetReader(BaseReader):
             return DataType.INTEGER
         elif simple_type == "float":
             return DataType.FLOAT
+        elif simple_type == "decimal":
+            return DataType.DECIMAL
         elif simple_type == "string":
             return DataType.STRING
         elif simple_type == "bool":
             return DataType.BOOLEAN
-        elif simple_type in ["date", "datetime"]:
+        elif simple_type == "date":
             return DataType.DATE
+        elif simple_type == "datetime":
+            return DataType.DATETIME
+        elif simple_type == "time":
+            return DataType.TIME
         else:
-            return DataType.NULL
+            return DataType.STRING  # Default to string instead of NULL for unknown types
 
     def _parse_partition_info(self) -> None:
         """
@@ -538,20 +548,8 @@ class ParquetReader(BaseReader):
         Returns:
             Typed value (int, float, or str)
         """
-        # Try int first
-        try:
-            return int(value)
-        except ValueError:
-            pass
-
-        # Try float
-        try:
-            return float(value)
-        except ValueError:
-            pass
-
-        # Default to string
-        return value
+        from sqlstream.core.types import infer_type_from_string
+        return infer_type_from_string(value)
 
     def _partition_matches_filters(self) -> bool:
         """

@@ -103,6 +103,10 @@ class CSVReader(BaseReader):
 
             for row_num, raw_row in enumerate(reader, start=2):  # Start at 2 (after header)
                 try:
+                    # Check for extra columns (malformed row)
+                    if None in raw_row:
+                        raise ValueError(f"Row has extra columns: {raw_row[None]}")
+
                     # Apply type inference
                     row = self._infer_types(raw_row)
 
@@ -156,30 +160,16 @@ class CSVReader(BaseReader):
 
     def _infer_value_type(self, value: str) -> Any:
         """
-        Infer type of a single value
+        Infer type of a single value using enhanced type system.
 
         Args:
             value: String value from CSV
 
         Returns:
-            Value converted to int, float, or kept as string
+            Value converted to proper Python type (int, float, Decimal, datetime, etc.)
         """
-        value = value.strip()
-
-        # Try integer
-        try:
-            return int(value)
-        except ValueError:
-            pass
-
-        # Try float
-        try:
-            return float(value)
-        except ValueError:
-            pass
-
-        # Keep as string
-        return value
+        from sqlstream.core.types import infer_type_from_string
+        return infer_type_from_string(value)
 
     def _matches_filter(self, row: Dict[str, Any]) -> bool:
         """
@@ -278,24 +268,44 @@ class CSVReader(BaseReader):
 
     def to_dataframe(self):
         """
-        Convert to pandas DataFrame efficiently
+        Convert to pandas DataFrame efficiently, respecting inferred types.
         """
         import pandas as pd
+        from sqlstream.core.types import DataType
+
+        # Get schema to guide pandas parsing
+        schema = self.get_schema()
+        
+        parse_dates = []
+        dtypes = {}
+        
+        if schema:
+            for col, dtype in schema.columns.items():
+                if dtype == DataType.DATETIME or dtype == DataType.DATE:
+                    parse_dates.append(col)
+                elif dtype == DataType.INTEGER:
+                    dtypes[col] = "Int64"  # Nullable integer
+                elif dtype == DataType.FLOAT:
+                    dtypes[col] = "float64"
+                elif dtype == DataType.DECIMAL:
+                    # Pandas doesn't support native Decimal well in read_csv
+                    # We'll let it be object or float, or handle it post-load if needed
+                    pass 
+                elif dtype == DataType.STRING:
+                    dtypes[col] = "string"
+                elif dtype == DataType.BOOLEAN:
+                    dtypes[col] = "boolean"
 
         # Use pandas read_csv for performance
+        kwargs = {
+            "encoding": self.encoding,
+            "delimiter": self.delimiter,
+            "parse_dates": parse_dates,
+            "dtype": dtypes
+        }
+
         if self.is_s3:
-            # For S3, use s3fs via storage_options or direct s3 path if supported
-            # Since we already handle s3fs import in _get_file_handle, we can rely on pandas s3 support
-            # which uses s3fs under the hood
-            return pd.read_csv(
-                self.path_str,
-                encoding=self.encoding,
-                delimiter=self.delimiter,
-                storage_options={"anon": False}
-            )
+            kwargs["storage_options"] = {"anon": False}
+            return pd.read_csv(self.path_str, **kwargs)
         else:
-            return pd.read_csv(
-                self.path,
-                encoding=self.encoding,
-                delimiter=self.delimiter
-            )
+            return pd.read_csv(self.path, **kwargs)

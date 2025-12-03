@@ -80,8 +80,8 @@ class TestBasicReading:
         assert isinstance(row["price"], float)
         assert row["price"] == 19.99
 
-        # String (boolean not inferred yet)
-        assert isinstance(row["active"], str)
+        # Boolean (now inferred by enhanced type system)
+        assert isinstance(row["active"], bool)
 
     def test_empty_csv(self, empty_csv):
         """Test reading empty CSV"""
@@ -639,10 +639,11 @@ Bob,25,LA
         rows = list(reader.read_lazy())
 
         assert len(rows) == 3
-        # _infer_value_type strips whitespace
-        assert rows[0]["name"] == "Alice"
+        # _infer_value_type does NOT strip whitespace for strings (preserves fidelity)
+        # But it does strip for numbers (int/float)
+        assert rows[0]["name"] == "  Alice  "
         assert rows[0]["age"] == 30
-        assert rows[0]["city"] == "NYC"
+        assert rows[0]["city"] == "  NYC"
 
     def test_boolean_like_strings(self, tmp_path):
         """Test that boolean-like strings remain as strings"""
@@ -659,11 +660,14 @@ Diana,1,0"""
         rows = list(reader.read_lazy())
 
         assert len(rows) == 4
-        # Boolean strings are not converted (remain as strings)
-        assert rows[0]["active"] == "true"
-        assert rows[0]["verified"] == "yes"
-        assert rows[2]["active"] == "TRUE"
-        # Numbers 1 and 0 are parsed as int
+        # Boolean strings ARE converted now (case-insensitive)
+        assert rows[0]["active"] is True
+        assert rows[0]["verified"] == "yes"  # 'yes' is not boolean in our inference
+
+        # Case-insensitive boolean parsing: TRUE -> True
+        assert rows[2]["active"] is True
+
+        # Numbers 1 and 0 are parsed as int, not bool
         assert rows[3]["active"] == 1
         assert rows[3]["verified"] == 0
 

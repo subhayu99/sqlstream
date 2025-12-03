@@ -71,7 +71,7 @@ class PandasExecutor:
             df = self._apply_filter(df, ast.where.conditions)
 
         # Step 4: Apply GROUP BY + aggregation
-        if ast.group_by:
+        if ast.group_by or ast.aggregates:
             df = self._apply_groupby(df, ast)
 
         # Step 5: Apply ORDER BY
@@ -155,7 +155,8 @@ class PandasExecutor:
                 # Convert to DataFrame
                 return pd.DataFrame(reader.rows)
             else:  # csv
-                return pd.read_csv(source_path)
+                from sqlstream.readers.csv_reader import CSVReader
+                return CSVReader(source_path).to_dataframe()
 
         # Auto-detect from extension
         source_lower = source_path.lower()
@@ -178,11 +179,13 @@ class PandasExecutor:
             reader = MarkdownReader(source_path, table=table_index)
             return pd.DataFrame(reader.rows)
         elif source_lower.endswith(".csv"):
-            return pd.read_csv(source_path)
+            from sqlstream.readers.csv_reader import CSVReader
+            return CSVReader(source_path).to_dataframe()
         else:
             # Try CSV as default
             try:
-                return pd.read_csv(source_path)
+                from sqlstream.readers.csv_reader import CSVReader
+                return CSVReader(source_path).to_dataframe()
             except Exception:
                 raise ValueError(f"Unsupported file format: {source_path}")
 
@@ -282,14 +285,35 @@ class PandasExecutor:
                 agg_dict[col] = "max"
                 rename_map[col] = alias
 
-        # Perform groupby
-        grouped = df.groupby(ast.group_by, as_index=False).agg(agg_dict)
+        # Perform groupby or global aggregation
+        if ast.group_by:
+            grouped = df.groupby(ast.group_by, as_index=False).agg(agg_dict)
+        else:
+            # Global aggregation
+            # Create a single-row DataFrame with aggregated values
+            result = {}
+            for col, func in agg_dict.items():
+                if func == "count":
+                    val = df[col].count()
+                elif func == "sum":
+                    val = df[col].sum()
+                elif func == "mean":
+                    val = df[col].mean()
+                elif func == "min":
+                    val = df[col].min()
+                elif func == "max":
+                    val = df[col].max()
+                else:
+                    val = None
+                result[col] = [val]
+            
+            grouped = pd.DataFrame(result)
 
         # Rename aggregated columns to match expected output
         grouped = grouped.rename(columns=rename_map)
 
         # Select only the columns specified in SELECT (group_by cols + aggregates)
-        result_cols = ast.group_by.copy()
+        result_cols = ast.group_by.copy() if ast.group_by else []
         for agg in ast.aggregates:
             alias = agg.alias if agg.alias else f"{agg.function.lower()}_{agg.column}"
             result_cols.append(alias)

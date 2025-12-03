@@ -5,25 +5,44 @@ This module provides type definitions, inference, and validation for query execu
 
 from enum import Enum
 from typing import Any, Optional, Dict, List
-from datetime import date, datetime
+from datetime import date, datetime, time
+from decimal import Decimal, InvalidOperation
+import json
 
 
 class DataType(Enum):
     """SQL data types supported by SQLStream."""
 
+    # Numeric types
     INTEGER = "INTEGER"
     FLOAT = "FLOAT"
+    DECIMAL = "DECIMAL"
+    
+    # String types
     STRING = "STRING"
+    JSON = "JSON"
+    
+    # Boolean
     BOOLEAN = "BOOLEAN"
+    
+    # Temporal types
     DATE = "DATE"
+    TIME = "TIME"
+    DATETIME = "DATETIME"
+    
+    # Special
     NULL = "NULL"
 
     def __str__(self) -> str:
         return self.value
 
     def is_numeric(self) -> bool:
-        """Check if type is numeric (INTEGER or FLOAT)."""
-        return self in (DataType.INTEGER, DataType.FLOAT)
+        """Check if type is numeric (INTEGER, FLOAT, or DECIMAL)."""
+        return self in (DataType.INTEGER, DataType.FLOAT, DataType.DECIMAL)
+    
+    def is_temporal(self) -> bool:
+        """Check if type is temporal (DATE, TIME, or DATETIME)."""
+        return self in (DataType.DATE, DataType.TIME, DataType.DATETIME)
 
     def is_comparable(self, other: "DataType") -> bool:
         """Check if this type can be compared with another type."""
@@ -38,8 +57,12 @@ class DataType(Enum):
         # Numeric types are comparable with each other
         if self.is_numeric() and other.is_numeric():
             return True
+        
+        # Temporal types are comparable with each other
+        if self.is_temporal() and other.is_temporal():
+            return True
 
-        # Strings and dates are not comparable with numbers
+        # Strings and JSON are not comparable with numbers or temporals
         return False
 
     def coerce_to(self, other: "DataType") -> "DataType":
@@ -57,14 +80,161 @@ class DataType(Enum):
         if self == other:
             return self
 
-        # Numeric coercion: INT + FLOAT = FLOAT
-        if self == DataType.INTEGER and other == DataType.FLOAT:
-            return DataType.FLOAT
-        if self == DataType.FLOAT and other == DataType.INTEGER:
-            return DataType.FLOAT
+        # Numeric coercion hierarchy: INTEGER < FLOAT < DECIMAL
+        numeric_hierarchy = {
+            DataType.INTEGER: 1,
+            DataType.FLOAT: 2,
+            DataType.DECIMAL: 3,
+        }
+        if self in numeric_hierarchy and other in numeric_hierarchy:
+            # Return higher precedence type
+            return self if numeric_hierarchy[self] > numeric_hierarchy[other] else other
+        
+        # Temporal coercion: DATE/TIME -> DATETIME
+        if self == DataType.DATETIME or other == DataType.DATETIME:
+            if self.is_temporal() and other.is_temporal():
+                return DataType.DATETIME
+        
+        # JSON coercion
+        if self == DataType.JSON and other == DataType.JSON:
+            return DataType.JSON
+        if self == DataType.JSON or other == DataType.JSON:
+            return DataType.STRING  # Fallback to string
 
         # Otherwise, no coercion possible - return STRING as fallback
         return DataType.STRING
+
+
+def parse_datetime(value: str) -> Optional[datetime]:
+    """Try to parse datetime from string using multiple formats.
+    
+    Args:
+        value: String to parse
+        
+    Returns:
+        datetime object if successful, None otherwise
+    """
+    if not isinstance(value, str):
+        return None
+    
+    value = value.strip()
+    
+    # Try ISO 8601 with timezone (handle Z and +HH:MM)
+    if 'T' in value:
+        # Remove timezone suffix for basic parsing
+        base_value = value.replace('Z', '').split('+')[0].split('-')[0:3]
+        base_value = '-'.join(base_value) if len(base_value) == 3 else value.replace('Z', '')
+    
+    formats = [
+        "%Y-%m-%dT%H:%M:%S",           # ISO 8601: 2024-01-15T10:30:00
+        "%Y-%m-%dT%H:%M:%S.%f",        # ISO with microseconds
+        "%Y-%m-%d %H:%M:%S",           # SQL format: 2024-01-15 10:30:00
+        "%Y-%m-%d %H:%M:%S.%f",        # SQL with microseconds
+        "%d/%m/%Y %H:%M:%S",           # EU format: 15/01/2024 10:30:00
+        "%m/%d/%Y %H:%M:%S",           # US format: 01/15/2024 10:30:00
+        "%Y%m%d%H%M%S",                # Compact: 20240115103000
+        "%Y-%m-%d %H:%M",              # Without seconds
+        "%d/%m/%Y %H:%M",              # EU without seconds
+        "%m/%d/%Y %H:%M",              # US without seconds
+    ]
+    
+    for fmt in formats:
+        try:
+            return datetime.strptime(value, fmt)
+        except ValueError:
+            continue
+    
+    return None
+
+
+def parse_date(value: str) -> Optional[date]:
+    """Try to parse date from string using multiple formats.
+    
+    Args:
+        value: String to parse
+        
+    Returns:
+        date object if successful, None otherwise
+    """
+    if not isinstance(value, str):
+        return None
+    
+    value = value.strip()
+    
+    formats = [
+        "%Y-%m-%d",      # ISO: 2024-01-15
+        "%d/%m/%Y",      # EU: 15/01/2024
+        "%m/%d/%Y",      # US: 01/15/2024
+        "%Y%m%d",        # Compact: 20240115
+        "%d-%m-%Y",      # EU with dashes: 15-01-2024
+        "%m-%d-%Y",      # US with dashes: 01-15-2024
+    ]
+    
+    for fmt in formats:
+        try:
+            return datetime.strptime(value, fmt).date()
+        except ValueError:
+            continue
+    
+    return None
+
+
+def parse_time(value: str) -> Optional[time]:
+    """Try to parse time from string using multiple formats.
+    
+    Args:
+        value: String to parse
+        
+    Returns:
+        time object if successful, None otherwise
+    """
+    if not isinstance(value, str):
+        return None
+    
+    value = value.strip()
+    
+    formats = [
+        "%H:%M:%S",          # 24-hour: 14:30:00
+        "%H:%M:%S.%f",       # With microseconds: 14:30:00.123456
+        "%H:%M",             # Without seconds: 14:30
+        "%I:%M:%S %p",       # 12-hour with seconds: 02:30:00 PM
+        "%I:%M %p",          # 12-hour: 02:30 PM
+    ]
+    
+    for fmt in formats:
+        try:
+            return datetime.strptime(value, fmt).time()
+        except ValueError:
+            continue
+    
+    return None
+
+
+def is_json_string(value: str) -> bool:
+    """Check if a string contains valid JSON (object or array).
+    
+    Args:
+        value: String to check
+        
+    Returns:
+        True if valid JSON object/array, False otherwise
+    """
+    if not isinstance(value, str):
+        return False
+    
+    value = value.strip()
+    
+    # Must start with { or [
+    if not (value.startswith('{') or value.startswith('[')):
+        return False
+    
+    # Try to parse as JSON
+    try:
+        parsed = json.loads(value)
+        # Must be dict or list (not just a string, number, etc.)
+        return isinstance(parsed, (dict, list))
+    except (json.JSONDecodeError, ValueError):
+        return False
 
 
 def infer_type(value: Any) -> DataType:
@@ -85,10 +255,14 @@ def infer_type(value: Any) -> DataType:
         DataType.STRING
         >>> infer_type(None)
         DataType.NULL
+        >>> infer_type(Decimal("19.99"))
+        DataType.DECIMAL
     """
+    # 1. NULL check
     if value is None:
         return DataType.NULL
 
+    # 2. Python type checks (non-string)
     if isinstance(value, bool):
         return DataType.BOOLEAN
 
@@ -97,42 +271,152 @@ def infer_type(value: Any) -> DataType:
 
     if isinstance(value, float):
         return DataType.FLOAT
+    
+    if isinstance(value, Decimal):
+        return DataType.DECIMAL
 
-    if isinstance(value, (date, datetime)):
+    if isinstance(value, datetime):
+        return DataType.DATETIME
+    
+    if isinstance(value, date):
         return DataType.DATE
+    
+    if isinstance(value, time):
+        return DataType.TIME
 
+    # 3. String value inference
     if isinstance(value, str):
-        # Try to infer more specific types from string values
-        if value.lower() in ("true", "false"):
+        value_stripped = value.strip()
+        
+        # Empty string → NULL
+        if not value_stripped:
+            return DataType.NULL
+        
+        # Boolean literals
+        if value_stripped.lower() in ("true", "false"):
             return DataType.BOOLEAN
-
-        # Try integer
+        
+        # JSON (must check early - before numeric)
+        if is_json_string(value_stripped):
+            return DataType.JSON
+        
+        # Integer
         try:
-            int(value)
+            int(value_stripped)
             return DataType.INTEGER
         except ValueError:
             pass
-
-        # Try float
+        
+        # Float or Decimal
         try:
-            float(value)
+            # Check if it has decimal point
+            if '.' in value_stripped:
+                # Check precision - if more than 6 decimal places, use DECIMAL
+                decimal_part = value_stripped.split('.')[1]
+                # Remove trailing zeros for check
+                significant_decimals = decimal_part.rstrip('0')
+                if len(significant_decimals) > 6:
+                    Decimal(value_stripped)  # Validate
+                    return DataType.DECIMAL
+            float(value_stripped)
             return DataType.FLOAT
-        except ValueError:
+        except (ValueError, InvalidOperation):
             pass
-
-        # Try date (ISO format YYYY-MM-DD)
-        try:
-            if len(value) == 10 and value[4] == "-" and value[7] == "-":
-                datetime.strptime(value, "%Y-%m-%d")
-                return DataType.DATE
-        except ValueError:
-            pass
-
-        # Default to string
+        
+        # DateTime (check before Date to catch timestamps)
+        dt = parse_datetime(value_stripped)
+        if dt is not None:
+            return DataType.DATETIME
+        
+        # Date
+        d = parse_date(value_stripped)
+        if d is not None:
+            return DataType.DATE
+        
+        # Time
+        t = parse_time(value_stripped)
+        if t is not None:
+            return DataType.TIME
+        
+        # Default to STRING
         return DataType.STRING
 
-    # Fallback to string for unknown types
+    # 4. Fallback for unknown types
     return DataType.STRING
+
+
+def infer_type_from_string(value: str) -> Any:
+    """Parse a string value and return the typed Python value.
+    
+    This is used by readers to convert string data into proper Python types.
+    
+    Args:
+        value: String value to parse
+        
+    Returns:
+        Typed Python value (int, float, Decimal, datetime, bool, str, etc.)
+    
+    Examples:
+        >>> infer_type_from_string("42")
+        42
+        >>> infer_type_from_string("3.14159265358979")
+        Decimal("3.14159265358979")
+        >>> infer_type_from_string("2024-01-15 10:30:00")
+        datetime(2024, 1, 15, 10, 30, 0)
+    """
+    if not isinstance(value, str):
+        return value
+    
+    value_stripped = value.strip()
+    
+    # Empty → None
+    if not value_stripped:
+        return None
+    
+    # Boolean
+    if value_stripped.lower() == "true":
+        return True
+    if value_stripped.lower() == "false":
+        return False
+    
+    # JSON - keep as string for now (DuckDB will handle it)
+    if is_json_string(value_stripped):
+        return value_stripped
+    
+    # Integer
+    try:
+        return int(value_stripped)
+    except ValueError:
+        pass
+    
+    # Float or Decimal
+    try:
+        if '.' in value_stripped:
+            decimal_part = value_stripped.split('.')[1]
+            significant_decimals = decimal_part.rstrip('0')
+            if len(significant_decimals) > 6:
+                return Decimal(value_stripped)
+        return float(value_stripped)
+    except (ValueError, InvalidOperation):
+        pass
+    
+    # DateTime
+    dt = parse_datetime(value_stripped)
+    if dt is not None:
+        return dt
+    
+    # Date
+    d = parse_date(value_stripped)
+    if d is not None:
+        return d
+    
+    # Time
+    t = parse_time(value_stripped)
+    if t is not None:
+        return t
+    
+    # Return as string
+    return value
 
 
 def infer_common_type(values: List[Any]) -> DataType:

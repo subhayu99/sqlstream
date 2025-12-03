@@ -165,8 +165,22 @@ class HTMLReader(BaseReader):
                 schema[col] = DataType.FLOAT
             elif dtype == 'bool':
                 schema[col] = DataType.BOOLEAN
+            elif dtype.startswith('datetime'):
+                schema[col] = DataType.DATETIME
+            elif dtype.startswith('timedelta'):
+                schema[col] = DataType.TIME
             else:
-                schema[col] = DataType.STRING
+                # For object/string types, try to infer from content
+                # This is important for JSON or date strings that pandas didn't parse
+                from sqlstream.core.types import infer_type
+                
+                # Sample non-null values
+                sample_values = self.df[col].dropna().head(10)
+                if not sample_values.empty:
+                    # Use the first value to infer type
+                    schema[col] = infer_type(sample_values.iloc[0])
+                else:
+                    schema[col] = DataType.STRING
         return Schema(schema)
 
     def supports_pushdown(self) -> bool:

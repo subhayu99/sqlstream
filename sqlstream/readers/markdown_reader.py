@@ -216,26 +216,8 @@ class MarkdownReader(BaseReader):
 
     def _infer_type(self, value: str) -> Any:
         """Infer and convert value to appropriate type"""
-        # Try integer
-        try:
-            return int(value)
-        except ValueError:
-            pass
-
-        # Try float
-        try:
-            return float(value)
-        except ValueError:
-            pass
-
-        # Try boolean
-        if value.lower() in ('true', 'yes'):
-            return True
-        elif value.lower() in ('false', 'no'):
-            return False
-
-       # Return as string
-        return value
+        from sqlstream.core.types import infer_type_from_string
+        return infer_type_from_string(value)
 
     def read_lazy(self) -> Iterator[Dict[str, Any]]:
         """Read data lazily from the selected table"""
@@ -300,6 +282,8 @@ class MarkdownReader(BaseReader):
         # Sample first few rows to infer types
         sample_size = min(10, len(self.rows))
 
+        from sqlstream.core.types import infer_type
+
         for col in self.columns:
             # Collect non-None values
             values = [
@@ -312,14 +296,10 @@ class MarkdownReader(BaseReader):
                 continue
 
             # Infer type from values
-            if all(isinstance(v, bool) for v in values):
-                schema[col] = DataType.BOOLEAN
-            elif all(isinstance(v, int) for v in values):
-                schema[col] = DataType.INTEGER
-            elif all(isinstance(v, (int, float)) for v in values):
-                schema[col] = DataType.FLOAT
-            else:
-                schema[col] = DataType.STRING
+            # Use the first non-null value to infer type, or check consistency
+            # For simplicity, we'll use the first value's type, but we could be more robust
+            first_val = values[0]
+            schema[col] = infer_type(first_val)
 
         return Schema(schema)
 
