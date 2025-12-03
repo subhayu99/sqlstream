@@ -119,6 +119,7 @@ nav:
       - Volcano Model: architecture/volcano-model.md
       - Optimizations: architecture/optimizations.md
   - FAQ: faq.md
+  - Troubleshooting: troubleshooting.md
   - Limitations: limitations.md
   - Contributing: contributing.md
 
