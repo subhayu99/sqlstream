@@ -1,0 +1,61 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  # Job 1: Linting and Formatting Check
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Lint with Ruff
+        run: ruff check .
+
+      - name: Check formatting
+        run: ruff format --check .
+
+  # Job 2: Run Pytest Matrix
+  test:
+    needs: lint
+    name: Test (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Install with 'all' extras to ensure pandas, duckdb, parquet, etc. are tested
+          # Install 'dev' to get pytest and coverage tools
+          pip install -e ".[all,dev]"
+
+      - name: Run tests
+        # Configuration is pulled automatically from pyproject.toml [tool.pytest.ini_options]
+        run: pytest
