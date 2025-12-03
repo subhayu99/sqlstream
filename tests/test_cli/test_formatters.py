@@ -6,7 +6,13 @@ import json
 
 import pytest
 
-from sqlstream.cli.formatters import CSVFormatter, JSONFormatter, TableFormatter, get_formatter
+from sqlstream.cli.formatters import (
+    CSVFormatter,
+    JSONFormatter,
+    MarkdownFormatter,
+    TableFormatter,
+    get_formatter,
+)
 
 
 class TestGetFormatter:
@@ -191,3 +197,153 @@ class TestTableFormatter:
 
         except ImportError:
             pytest.skip("Rich not installed")
+
+
+class TestMarkdownFormatter:
+    """Test Markdown formatter"""
+
+    def test_format_basic(self):
+        """Test basic Markdown table formatting"""
+        formatter = MarkdownFormatter()
+        results = [
+            {"name": "Alice", "age": 30},
+            {"name": "Bob", "age": 25},
+        ]
+
+        output = formatter.format(results)
+
+        # Check header
+        assert "| name | age |" in output
+        # Check separator (default left alignment)
+        assert "| :--- | :--- |" in output
+        # Check data
+        assert "| Alice | 30 |" in output
+        assert "| Bob | 25 |" in output
+        # Check footer
+        assert "2 rows" in output
+
+    def test_format_empty(self):
+        """Test formatting empty results"""
+        formatter = MarkdownFormatter()
+        output = formatter.format([])
+
+        assert output == "_No results found._"
+
+    def test_format_with_null(self):
+        """Test formatting with NULL values"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "Alice", "age": None}]
+
+        output = formatter.format(results)
+
+        # Should display _NULL_ for None values
+        assert "_NULL_" in output
+        assert "| Alice | _NULL_ |" in output
+
+    def test_format_pipe_escaping(self):
+        """Test escaping pipe characters in cell values"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "Smith | Jones", "age": 30}]
+
+        output = formatter.format(results)
+
+        # Pipes should be escaped
+        assert "Smith \\| Jones" in output
+
+    def test_alignment_left(self):
+        """Test left alignment (default)"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "Alice", "age": 30}]
+
+        output = formatter.format(results, align="left")
+
+        # Left alignment uses :---
+        assert "| :--- | :--- |" in output
+
+    def test_alignment_center(self):
+        """Test center alignment"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "Alice", "age": 30}]
+
+        output = formatter.format(results, align="center")
+
+        # Center alignment uses :---:
+        assert "| :---: | :---: |" in output
+
+    def test_alignment_right(self):
+        """Test right alignment"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "Alice", "age": 30}]
+
+        output = formatter.format(results, align="right")
+
+        # Right alignment uses ---:
+        assert "| ---: | ---: |" in output
+
+    def test_alignment_per_column(self):
+        """Test different alignment per column"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "Alice", "age": 30, "score": 95.5}]
+
+        output = formatter.format(results, align={"name": "left", "age": "center", "score": "right"})
+
+        # Check mixed alignments
+        assert "| :--- | :---: | ---: |" in output
+
+    def test_no_footer(self):
+        """Test disabling footer"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "Alice", "age": 30}]
+
+        output = formatter.format(results, show_footer=False)
+
+        # Should not contain row count
+        assert "1 row" not in output
+        assert "rows" not in output
+
+    def test_footer_singular(self):
+        """Test footer with singular 'row' for 1 result"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "Alice", "age": 30}]
+
+        output = formatter.format(results, show_footer=True)
+
+        # Should say "1 row" not "1 rows"
+        assert "1 row" in output
+        assert "1 rows" not in output
+
+    def test_footer_plural(self):
+        """Test footer with plural 'rows' for multiple results"""
+        formatter = MarkdownFormatter()
+        results = [
+            {"name": "Alice", "age": 30},
+            {"name": "Bob", "age": 25},
+        ]
+
+        output = formatter.format(results, show_footer=True)
+
+        # Should say "2 rows"
+        assert "2 rows" in output
+
+    def test_format_mixed_types(self):
+        """Test formatting with mixed data types"""
+        formatter = MarkdownFormatter()
+        results = [
+            {"name": "Alice", "age": 30, "score": 95.5, "active": True},
+        ]
+
+        output = formatter.format(results)
+
+        # All types should be converted to strings
+        assert "| Alice | 30 | 95.5 | True |" in output
+
+    def test_format_with_special_characters(self):
+        """Test formatting with special markdown characters"""
+        formatter = MarkdownFormatter()
+        results = [{"name": "**Bold** _Italic_", "value": "< > &"}]
+
+        output = formatter.format(results)
+
+        # Special characters should be preserved (except pipes)
+        assert "**Bold** _Italic_" in output
+        assert "< > &" in output

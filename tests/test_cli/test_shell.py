@@ -16,11 +16,9 @@ class TestShellComponents:
     def test_shell_imports(self):
         """Test that all shell components can be imported."""
         from sqlstream.cli.shell import (
-            SQLShellApp,
-            QueryEditor,
             ResultsViewer,
+            SchemaBrowser,
             StatusBar,
-            SchemaBrowser
         )
 
         # Verify they can be instantiated with kwargs
@@ -86,14 +84,14 @@ class TestHistoryNavigation:
                 self.cursor_location = (0, 0)
 
         app._query_one_mock = DummyEditor()
-        
+
         def mock_query_one(*args, **kwargs):
             if args and args[0] == "#query-tabs":
                 tabs = MagicMock()
                 tabs.active = None  # Simulate no active tab to force fallback
                 return tabs
             return app._query_one_mock
-            
+
         app.query_one = mock_query_one
 
         # Test Prev
@@ -120,14 +118,14 @@ class TestHistoryNavigation:
                 self.cursor_location = (0, 0)
 
         app._query_one_mock = DummyEditor()
-        
+
         def mock_query_one(*args, **kwargs):
             if args and args[0] == "#query-tabs":
                 tabs = MagicMock()
                 tabs.active = None
                 return tabs
             return app._query_one_mock
-            
+
         app.query_one = mock_query_one
 
         # Test Next
@@ -204,26 +202,6 @@ class TestPagination:
         assert app.current_page == 0
 
 
-class TestFiltering:
-    """Test filtering logic."""
-
-    def test_filtering_case_insensitive(self):
-        """Test case-insensitive filtering."""
-        from sqlstream.cli.shell import SQLShellApp
-
-        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history")
-        app.last_results = [
-            {"name": "Alice", "city": "NYC"},
-            {"name": "Bob", "city": "LA"},
-            {"name": "Charlie", "city": "NYC"}
-        ]
-        app.filter_text = "nyc"
-
-        filtered = app._apply_filter(app.last_results)
-        assert len(filtered) == 2
-        assert all("nyc" in str(r).lower() for r in filtered)
-
-
 class TestSorting:
     """Test sorting logic."""
 
@@ -271,3 +249,96 @@ class TestCLIRegistration:
 
         commands = [cmd.name for cmd in cli.commands.values()]
         assert 'shell' in commands
+
+
+class TestFiltering:
+    """Test advanced filtering functionality."""
+
+    def test_filter_with_special_characters(self):
+        """Test filtering with special characters."""
+        from sqlstream.cli.shell import SQLShellApp
+
+        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history")
+        app.last_results = [
+            {"email": "user@example.com", "name": "Alice"},
+            {"email": "admin@test.org", "name": "Bob"},
+        ]
+        app.filter_text = "@example"
+
+        filtered = app._apply_filter(app.last_results)
+        assert len(filtered) == 1
+        assert filtered[0]["email"] == "user@example.com"
+
+    def test_filter_with_numbers(self):
+        """Test filtering with numeric values."""
+        from sqlstream.cli.shell import SQLShellApp
+
+        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history")
+        app.last_results = [
+            {"id": 1, "value": 100},
+            {"id": 2, "value": 200},
+            {"id": 3, "value": 150},
+        ]
+        app.filter_text = "200"
+
+        filtered = app._apply_filter(app.last_results)
+        assert len(filtered) == 1
+        assert filtered[0]["id"] == 2
+
+    def test_filtering_case_insensitive(self):
+        """Test case-insensitive filtering."""
+        from sqlstream.cli.shell import SQLShellApp
+
+        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history")
+        app.last_results = [
+            {"name": "Alice", "city": "NYC"},
+            {"name": "Bob", "city": "LA"},
+            {"name": "Charlie", "city": "NYC"}
+        ]
+        app.filter_text = "nyc"
+
+        filtered = app._apply_filter(app.last_results)
+        assert len(filtered) == 2
+        assert all("nyc" in str(r).lower() for r in filtered)
+
+
+class TestSortingEdgeCases:
+    """Test sorting edge cases."""
+
+    def test_sorting_with_none_values(self):
+        """Test sorting with NULL/None values."""
+        from sqlstream.cli.shell import SQLShellApp
+
+        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history")
+        app.last_results = [
+            {"id": 1, "value": None},
+            {"id": 2, "value": 50},
+            {"id": 3, "value": None},
+            {"id": 4, "value": 25},
+        ]
+        app.sort_column = "value"
+        app.sort_reverse = False
+
+        sorted_results = app._apply_sort(app.last_results)
+
+        # None values should be handled (typically sorted to beginning or end)
+        assert len(sorted_results) == 4
+        # At least verify no exceptions were raised
+
+    def test_sorting_mixed_types(self):
+        """Test sorting with mixed types in column."""
+        from sqlstream.cli.shell import SQLShellApp
+
+        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history")
+        app.last_results = [
+            {"id": 1, "value": "100"},
+            {"id": 2, "value": "50"},
+            {"id": 3, "value": "25"},
+        ]
+        app.sort_column = "value"
+        app.sort_reverse = False
+
+        sorted_results = app._apply_sort(app.last_results)
+
+        # Should handle string sorting
+        assert len(sorted_results) == 3
