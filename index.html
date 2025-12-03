@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A lightweight SQL query engine for CSV and Parquet files with lazy evaluation and intelligent optimizations">
+        <meta name="description" content="A lightweight SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations">
       
       
         <meta name="author" content="SQLStream Team">
@@ -383,6 +383,25 @@
         </a>
       </li>
     
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="performance/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Performance
+
+      </a>
+    </li>
   
 
       
@@ -1181,6 +1200,34 @@
     
   
     Inline File Paths
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="features/advanced-formats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Data Formats
   
 
     
@@ -2030,6 +2077,34 @@
   
   
     <li class="md-nav__item">
+      <a href="examples/json-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="examples/html-tables/" class="md-nav__link">
         
   
@@ -2340,6 +2415,33 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2665,20 +2767,29 @@
 
 
 <h1 id="sqlstream">SQLStream</h1>
-<p><strong>A lightweight, pure-Python SQL query engine for CSV and Parquet files with lazy evaluation and intelligent optimizations.</strong></p>
+<p><strong>A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations.</strong></p>
 <hr />
 <h2 id="quick-example">Quick Example</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Query a CSV file</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;data.csv&#39; WHERE age &gt; 25&quot;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Join multiple files</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT c.name, o.total FROM &#39;customers.csv&#39; c JOIN &#39;orders.csv&#39; o ON c.id = o.customer_id&quot;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Query JSON with nested paths</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;users.json#json:data.users&quot;</span><span class="w"> </span><span class="s2">&quot;SELECT name, email FROM users&quot;</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Interactive shell with full TUI</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>shell
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Query HTML tables from files or URLs</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;report.html#html:0&quot;</span><span class="w"> </span><span class="s2">&quot;SELECT * FROM report WHERE revenue &gt; 1000000&quot;</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Query S3 files</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;s3://my-bucket/data.parquet&#39; WHERE date &gt; &#39;2024-01-01&#39;&quot;</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Query Markdown tables</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;README.md#markdown:1&quot;</span><span class="w"> </span><span class="s2">&quot;SELECT column1, column2 FROM readme&quot;</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># Join multiple files (any format combination)</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT c.name, o.total FROM &#39;customers.csv&#39; c JOIN &#39;orders.parquet&#39; o ON c.id = o.customer_id&quot;</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1"># Interactive shell with full TUI</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>shell
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="c1"># Query S3 files</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;SELECT * FROM &#39;s3://my-bucket/data.parquet&#39; WHERE date &gt; &#39;2024-01-01&#39;&quot;</span>
 </span></code></pre></div>
 <hr />
 <h2 id="key-features">Key Features</h2>
@@ -2692,7 +2803,7 @@
 <li>
 <p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 9h5.5L13 3.5zM6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4c0-1.11.89-2 2-2m1 18h2v-6H7zm4 0h2v-8h-2zm4 0h2v-4h-2z"/></svg></span> <strong>Multiple Formats</strong></p>
 <hr />
-<p>Support for CSV, Parquet files, HTTP URLs, and S3 buckets.</p>
+<p>Support for CSV, Parquet, JSON, JSONL, HTML, Markdown files, HTTP URLs, and S3 buckets.</p>
 </li>
 <li>
 <p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 15H6l7-14v8h5l-7 14z"/></svg></span> <strong>10-100x Faster</strong></p>
@@ -2720,9 +2831,9 @@
 <p>Full-featured TUI with multiple tabs, state persistence, file browser, and query plan visualization.</p>
 </li>
 <li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h7c-.41-.25-.8-.56-1.14-.9a6.48 6.48 0 0 1-.36-9.18C13.69 9.5 17.33 9.13 20 11V8zm-1 7V3.5L18.5 9zm7.31 9.9c1.33-2.11.69-4.9-1.4-6.22-2.11-1.33-4.91-.68-6.22 1.4-1.34 2.11-.69 4.89 1.4 6.22 1.46.93 3.32.93 4.79.02L22 23.39 23.39 22zm-3.81.1a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5"/></svg></span> <strong>Inline File Paths</strong></p>
+<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h7c-.41-.25-.8-.56-1.14-.9a6.48 6.48 0 0 1-.36-9.18C13.69 9.5 17.33 9.13 20 11V8zm-1 7V3.5L18.5 9zm7.31 9.9c1.33-2.11.69-4.9-1.4-6.22-2.11-1.33-4.91-.68-6.22 1.4-1.34 2.11-.69 4.89 1.4 6.22 1.46.93 3.32.93 4.79.02L22 23.39 23.39 22zm-3.81.1a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5"/></svg></span> <strong>Table Extraction</strong></p>
 <hr />
-<p>Specify files directly in SQL queries (Phase 7.6).</p>
+<p>Extract and query tables from HTML pages and Markdown documents with multi-table support.</p>
 </li>
 <li>
 <p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 17v2h6v-2zM3 5v2h10V5zm10 16v-2h8v-2h-8v-2h-2v6zM7 9v2H3v2h4v2h2V9zm14 4v-2H11v2zm-6-4h2V7h4V5h-4V3h-2z"/></svg></span> <strong>Smart Optimizations</strong></p>
@@ -2882,12 +2993,12 @@
 </div>
 <hr />
 <h2 id="project-status">Project Status</h2>
-<p>SQLStream is in <strong>active development</strong>. Current phase: <strong>8</strong></p>
+<p>SQLStream is in <strong>active development</strong>. Current phase: <strong>12</strong></p>
 <ul>
 <li>✅ Phase 0-2: Core query engine with Volcano model</li>
 <li>✅ Phase 3: Parquet support</li>
 <li>✅ Phase 4: Aggregations &amp; GROUP BY</li>
-<li>✅ Phase 5: JOIN operations (INNER, LEFT, RIGHT)</li>
+<li>✅ Phase 5: JOIN operations (INNER, LEFT, RIGHT, FULL OUTER)</li>
 <li>✅ Phase 5.5: Pandas backend (10-100x speedup)</li>
 <li>✅ Phase 6: HTTP data sources</li>
 <li>✅ Phase 7: CLI with beautiful output</li>
@@ -2896,8 +3007,9 @@
 <li>✅ Phase 7.7: S3 Support for CSV and Parquet</li>
 <li>✅ Phase 8: Type system &amp; schema inference</li>
 <li>✅ Phase 9: Enhanced interactive shell (multiple tabs, state persistence, file browser, query plan)</li>
-<li>🚧 Phase 10: Error handling &amp; user feedback</li>
-<li>🚧 Phase 11: Testing &amp; documentation</li>
+<li>✅ Phase 10: HTML &amp; Markdown readers with table extraction</li>
+<li>✅ Phase 11: Enhanced type system (Decimal, DateTime, Date, Time, JSON) &amp; DuckDB backend integration</li>
+<li>🚧 Phase 12: Comprehensive testing &amp; documentation (560 tests, 15% coverage → 80% target)</li>
 </ul>
 <hr />
 <h2 id="license">License</h2>

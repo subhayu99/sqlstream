@@ -12,13 +12,13 @@
         <meta name="author" content="SQLStream Team">
       
       
-        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/limitations/">
+        <link rel="canonical" href="https://subhayu99.github.io/sqlstream/performance/">
       
       
-        <link rel="prev" href="../troubleshooting/">
+        <link rel="prev" href="../architecture/optimizations/">
       
       
-        <link rel="next" href="../contributing/">
+        <link rel="next" href="../faq/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Limitations - SQLStream</title>
+        <title>Performance - SQLStream</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#limitations-known-issues" class="md-skip">
+        <a href="#performance-tuning-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Limitations
+              Performance
             
           </span>
         </div>
@@ -390,9 +390,11 @@
   
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../performance/" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
   
@@ -447,11 +449,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../limitations/" class="md-tabs__link">
         
   
   
@@ -2212,10 +2212,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../performance/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -2231,6 +2258,559 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#backend-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backend Selection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Backend Selection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backend-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backend Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-use-each-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Each Backend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use Each Backend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pandas-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pandas Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#duckdb-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DuckDB Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-backend-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto Backend Selection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-format-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Format Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Format Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#format-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benchmark-results-1m-rows-10-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark Results (1M rows, 10 columns)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommendations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Query Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-column-pruning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Column Pruning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-predicate-pushdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Predicate Pushdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-early-limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Early LIMIT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-use-appropriate-joins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Use Appropriate Joins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-avoid-select-distinct-on-large-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Avoid SELECT DISTINCT on Large Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#memory-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Memory Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#understanding-memory-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Memory Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming-large-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming Large Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#s3-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3 Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S3 Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimize-s3-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimize S3 Requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-parquet-on-s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Parquet on S3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partitioned-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partitioned Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interactive-shell-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive Shell Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Interactive Shell Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#background-computation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Background Computation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result-set-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result Set Limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#export-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Benchmark Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#small-files-100k-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Small Files (&lt;100K rows)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-files-100k-1m-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium Files (100K - 1M rows)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#large-files-1m-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Files (&gt;1M rows)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complex-sql-window-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complex SQL (Window Functions)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#profiling-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Profiling Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Profiling Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#view-execution-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Execution Plan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#measure-query-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measure Query Time
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-is-slow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query is Slow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of Memory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s3-is-slow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3 is Slow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2293,37 +2873,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Limitations
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../limitations/" class="md-nav__link">
         
   
   
@@ -2339,614 +2892,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sql-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SQL Features
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SQL Features">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#supported-sql-pythonpandas-backends" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported SQL (Python/Pandas Backends)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#full-sql-support-duckdb-backend" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Full SQL Support (DuckDB Backend) ✅
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#not-supported-pythonpandas-backends" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Not Supported (Python/Pandas Backends)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Not Supported (Python/Pandas Backends)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#window-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Window Functions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#advanced-aggregations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Advanced Aggregations
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#unionintersectexcept" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        UNION/INTERSECT/EXCEPT
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#datetime-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date/Time Functions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#string-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        String Functions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#case-statements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CASE Statements
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#self-joins" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SELF JOINS
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#write-operations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write Operations
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#file-format-limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File Format Limitations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="File Format Limitations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#csv" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CSV
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#parquet" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parquet
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#html-tables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        HTML Tables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#markdown-tables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Markdown Tables
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#data-source-limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data Source Limitations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Data Source Limitations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#s3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        S3
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#httphttps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        HTTP/HTTPS
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#local-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Local Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance Limitations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance Limitations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#memory" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Memory
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#concurrency" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Concurrency
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#caching" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Caching
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#platform-limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Platform Limitations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Platform Limitations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#windows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Windows
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#python-versions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Python Versions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#type-system-limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type System Limitations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Type System Limitations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#type-inference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type Inference
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#type-coercion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type Coercion
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#known-bugs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known Bugs
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Known Bugs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#critical" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Critical
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#high" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        High
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#medium" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Medium
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#low" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Low
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#comparison-with-other-tools" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Comparison with Other Tools
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Comparison with Other Tools">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#vs-duckdb" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        vs DuckDB
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#vs-pandas" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        vs pandas
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#vs-sqlite" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        vs sqlite
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#workarounds-best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Workarounds &amp; Best Practices
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Workarounds &amp; Best Practices">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-complex-queries" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Complex Queries
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-large-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Large Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-performance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Performance
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-type-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Type Issues
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reporting-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reporting Issues
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#roadmap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Roadmap
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See Also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -3005,22 +2950,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sql-features" class="md-nav__link">
+  <a href="#backend-selection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        SQL Features
+        Backend Selection
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="SQL Features">
+    <nav class="md-nav" aria-label="Backend Selection">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#supported-sql-pythonpandas-backends" class="md-nav__link">
+  <a href="#backend-comparison" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Supported SQL (Python/Pandas Backends)
+        Backend Comparison
       
     </span>
   </a>
@@ -3028,33 +2973,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#full-sql-support-duckdb-backend" class="md-nav__link">
+  <a href="#when-to-use-each-backend" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Full SQL Support (DuckDB Backend) ✅
+        When to Use Each Backend
       
     </span>
   </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#not-supported-pythonpandas-backends" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Not Supported (Python/Pandas Backends)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Not Supported (Python/Pandas Backends)">
+    <nav class="md-nav" aria-label="When to Use Each Backend">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#window-functions" class="md-nav__link">
+  <a href="#python-backend" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Window Functions
+        Python Backend
       
     </span>
   </a>
@@ -3062,10 +2996,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#advanced-aggregations" class="md-nav__link">
+  <a href="#pandas-backend" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Advanced Aggregations
+        Pandas Backend
       
     </span>
   </a>
@@ -3073,54 +3007,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#unionintersectexcept" class="md-nav__link">
+  <a href="#duckdb-backend" class="md-nav__link">
     <span class="md-ellipsis">
       
-        UNION/INTERSECT/EXCEPT
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#datetime-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Date/Time Functions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#string-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        String Functions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#case-statements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CASE Statements
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#self-joins" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SELF JOINS
+        DuckDB Backend
       
     </span>
   </a>
@@ -3133,10 +3023,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#write-operations" class="md-nav__link">
+  <a href="#auto-backend-selection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Write Operations
+        Auto Backend Selection
       
     </span>
   </a>
@@ -3149,22 +3039,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#file-format-limitations" class="md-nav__link">
+  <a href="#file-format-performance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        File Format Limitations
+        File Format Performance
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="File Format Limitations">
+    <nav class="md-nav" aria-label="File Format Performance">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#csv" class="md-nav__link">
+  <a href="#format-comparison" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CSV
+        Format Comparison
       
     </span>
   </a>
@@ -3172,10 +3062,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#parquet" class="md-nav__link">
+  <a href="#benchmark-results-1m-rows-10-columns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Parquet
+        Benchmark Results (1M rows, 10 columns)
       
     </span>
   </a>
@@ -3183,21 +3073,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#html-tables" class="md-nav__link">
+  <a href="#recommendations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HTML Tables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#markdown-tables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Markdown Tables
+        Recommendations
       
     </span>
   </a>
@@ -3210,22 +3089,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#data-source-limitations" class="md-nav__link">
+  <a href="#query-optimization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Data Source Limitations
+        Query Optimization
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Data Source Limitations">
+    <nav class="md-nav" aria-label="Query Optimization">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#s3" class="md-nav__link">
+  <a href="#1-column-pruning" class="md-nav__link">
     <span class="md-ellipsis">
       
-        S3
+        1. Column Pruning
       
     </span>
   </a>
@@ -3233,10 +3112,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#httphttps" class="md-nav__link">
+  <a href="#2-predicate-pushdown" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HTTP/HTTPS
+        2. Predicate Pushdown
       
     </span>
   </a>
@@ -3244,10 +3123,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#local-files" class="md-nav__link">
+  <a href="#3-early-limit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Local Files
+        3. Early LIMIT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-use-appropriate-joins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Use Appropriate Joins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-avoid-select-distinct-on-large-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Avoid SELECT DISTINCT on Large Results
       
     </span>
   </a>
@@ -3260,22 +3161,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance-limitations" class="md-nav__link">
+  <a href="#memory-optimization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Performance Limitations
+        Memory Optimization
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Performance Limitations">
+    <nav class="md-nav" aria-label="Memory Optimization">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#memory" class="md-nav__link">
+  <a href="#understanding-memory-usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Memory
+        Understanding Memory Usage
       
     </span>
   </a>
@@ -3283,10 +3184,60 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#concurrency" class="md-nav__link">
+  <a href="#streaming-large-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Concurrency
+        Streaming Large Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#s3-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3 Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S3 Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimize-s3-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimize S3 Requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-parquet-on-s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Parquet on S3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partitioned-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partitioned Data
       
     </span>
   </a>
@@ -3310,22 +3261,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#platform-limitations" class="md-nav__link">
+  <a href="#interactive-shell-performance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Platform Limitations
+        Interactive Shell Performance
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Platform Limitations">
+    <nav class="md-nav" aria-label="Interactive Shell Performance">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#windows" class="md-nav__link">
+  <a href="#background-computation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Windows
+        Background Computation
       
     </span>
   </a>
@@ -3333,10 +3284,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#python-versions" class="md-nav__link">
+  <a href="#result-set-limits" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Python Versions
+        Result Set Limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#export-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export Performance
       
     </span>
   </a>
@@ -3349,22 +3311,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-system-limitations" class="md-nav__link">
+  <a href="#benchmark-examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Type System Limitations
+        Benchmark Examples
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Type System Limitations">
+    <nav class="md-nav" aria-label="Benchmark Examples">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#type-inference" class="md-nav__link">
+  <a href="#small-files-100k-rows" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Type Inference
+        Small Files (&lt;100K rows)
       
     </span>
   </a>
@@ -3372,10 +3334,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#type-coercion" class="md-nav__link">
+  <a href="#medium-files-100k-1m-rows" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Type Coercion
+        Medium Files (100K - 1M rows)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#large-files-1m-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Files (&gt;1M rows)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complex-sql-window-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complex SQL (Window Functions)
       
     </span>
   </a>
@@ -3388,22 +3372,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#known-bugs" class="md-nav__link">
+  <a href="#performance-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Known Bugs
+        Performance Checklist
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Known Bugs">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#profiling-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Profiling Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Profiling Queries">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#critical" class="md-nav__link">
+  <a href="#view-execution-plan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Critical
+        View Execution Plan
       
     </span>
   </a>
@@ -3411,32 +3406,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#high" class="md-nav__link">
+  <a href="#measure-query-time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        High
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#medium" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Medium
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#low" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Low
+        Measure Query Time
       
     </span>
   </a>
@@ -3449,22 +3422,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#comparison-with-other-tools" class="md-nav__link">
+  <a href="#troubleshooting-performance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Comparison with Other Tools
+        Troubleshooting Performance
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Comparison with Other Tools">
+    <nav class="md-nav" aria-label="Troubleshooting Performance">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#vs-duckdb" class="md-nav__link">
+  <a href="#query-is-slow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        vs DuckDB
+        Query is Slow
       
     </span>
   </a>
@@ -3472,10 +3445,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#vs-pandas" class="md-nav__link">
+  <a href="#out-of-memory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        vs pandas
+        Out of Memory
       
     </span>
   </a>
@@ -3483,10 +3456,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#vs-sqlite" class="md-nav__link">
+  <a href="#s3-is-slow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        vs sqlite
+        S3 is Slow
       
     </span>
   </a>
@@ -3499,93 +3472,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#workarounds-best-practices" class="md-nav__link">
+  <a href="#additional-resources" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Workarounds &amp; Best Practices
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Workarounds &amp; Best Practices">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-complex-queries" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Complex Queries
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-large-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Large Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-performance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Performance
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-type-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Type Issues
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reporting-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reporting Issues
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#roadmap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Roadmap
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See Also
+        Additional Resources
       
     </span>
   </a>
@@ -3612,472 +3502,438 @@
   
 
 
-<h1 id="limitations-known-issues">Limitations &amp; Known Issues</h1>
-<p>This document outlines current limitations and known issues in SQLStream to set proper expectations.</p>
+<h1 id="performance-tuning-guide">Performance Tuning Guide</h1>
+<p>This guide helps you optimize SQLStream for your workload, from small CSV files to multi-gigabyte datasets.</p>
 <hr />
-<h2 id="sql-features">SQL Features</h2>
-<h3 id="supported-sql-pythonpandas-backends">Supported SQL (Python/Pandas Backends)</h3>
-<p>The default Python and Pandas backends support a subset of standard SQL-92:</p>
-<ul>
-<li><code>SELECT</code> with <code>DISTINCT</code></li>
-<li><code>FROM</code> (single table or JOINs)</li>
-<li><code>WHERE</code> (filtering with AND/OR)</li>
-<li><code>GROUP BY</code></li>
-<li><code>ORDER BY</code> (ASC/DESC)</li>
-<li><code>LIMIT</code></li>
-<li><code>JOIN</code> (INNER, LEFT, RIGHT, CROSS)</li>
-<li>Aggregates: <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code></li>
-</ul>
-<h3 id="full-sql-support-duckdb-backend">Full SQL Support (DuckDB Backend) ✅</h3>
-<p><strong>To get full SQL support, use the DuckDB backend!</strong></p>
-<p>By using <code>backend="duckdb"</code>, you unlock:
-- ✅ Window Functions (<code>OVER</code>, <code>PARTITION BY</code>, <code>RANK</code>, etc.)
-- ✅ Common Table Expressions (CTEs / <code>WITH</code> clause)
-- ✅ Subqueries (in <code>FROM</code>, <code>WHERE</code>, <code>SELECT</code>)
-- ✅ <code>HAVING</code> clause
-- ✅ Set operations (<code>UNION</code>, <code>INTERSECT</code>, <code>EXCEPT</code>)
-- ✅ Advanced functions (String, Date, Math)</p>
-<h3 id="not-supported-pythonpandas-backends">Not Supported (Python/Pandas Backends)</h3>
-<p>If you are NOT using the DuckDB backend, the following are <strong>NOT</strong> supported:</p>
-<ul>
-<li>Window Functions (<code>OVER</code>, <code>PARTITION BY</code>)</li>
-<li>CTEs (<code>WITH</code>)</li>
-<li>Subqueries</li>
-<li><code>HAVING</code> clause</li>
-<li><code>UNION</code> / <code>INTERSECT</code> / <code>EXCEPT</code></li>
-<li><code>CASE</code> statements</li>
-<li>Complex expressions in <code>GROUP BY</code> or <code>ORDER BY</code>ers AS (
-    SELECT * FROM employees WHERE salary &gt; 100000
-)
-SELECT * FROM high_earners WHERE department = 'Engineering'
-<strong>Workaround</strong>: Break into multiple queries or use pandas for complex transformations.</li>
-</ul>
-<hr />
-<h4 id="window-functions">Window Functions</h4>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- ❌ NOT SUPPORTED</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">SELECT</span><span class="w"> </span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">name</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">salary</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="n">ROW_NUMBER</span><span class="p">()</span><span class="w"> </span><span class="n">OVER</span><span class="w"> </span><span class="p">(</span><span class="n">PARTITION</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="k">DESC</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">rank</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<h2 id="backend-selection">Backend Selection</h2>
+<p>SQLStream offers <strong>three execution backends</strong> with different performance characteristics:</p>
+<h3 id="backend-comparison">Backend Comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Speed</th>
+<th>Memory</th>
+<th>Best For</th>
+<th>Limitations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Python</strong></td>
+<td>Baseline</td>
+<td>Low</td>
+<td>Learning, debugging, small files (&lt;100K rows)</td>
+<td>Slow for large datasets</td>
+</tr>
+<tr>
+<td><strong>Pandas</strong></td>
+<td><strong>10-100x faster</strong></td>
+<td>Medium</td>
+<td>Production queries, large files (100K-10M rows)</td>
+<td>Basic SQL only</td>
+</tr>
+<tr>
+<td><strong>DuckDB</strong></td>
+<td><strong>100x+ faster</strong></td>
+<td>High</td>
+<td>Complex SQL, analytics, huge files (10M+ rows)</td>
+<td>Requires duckdb package</td>
+</tr>
+</tbody>
+</table>
+<h3 id="when-to-use-each-backend">When to Use Each Backend</h3>
+<h4 id="python-backend">Python Backend</h4>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Good for learning and understanding query execution</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data WHERE age &gt; 25&quot;</span><span class="w"> </span>--backend<span class="w"> </span>python
 </span></code></pre></div>
-<p><strong>Supported alternatives</strong>: Use pandas with <code>df.groupby().rank()</code> or DuckDB.</p>
-<p><strong>Planned</strong>: Future roadmap item (Phase 12+)</p>
-<hr />
-<h4 id="advanced-aggregations">Advanced Aggregations</h4>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">-- ✅ SUPPORTED: Basic aggregations</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">-- ❌ NOT SUPPORTED: DISTINCT in aggregates</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">department</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1">-- ❌ NOT SUPPORTED: HAVING</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">department</span><span class="p">,</span><span class="w"> </span><span class="k">AVG</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">avg_sal</span><span class="w"> </span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">department</span><span class="w"> </span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="k">HAVING</span><span class="w"> </span><span class="n">avg_sal</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">80000</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1">-- ❌ NOT SUPPORTED: Statistical functions</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">STDDEV</span><span class="p">(</span><span class="n">salary</span><span class="p">),</span><span class="w"> </span><span class="n">VARIANCE</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
+<p><strong>Use when:</strong>
+- Learning SQL query execution internals
+- Debugging query behavior
+- Working with small files (&lt;100K rows)
+- No dependencies available</p>
+<p><strong>Avoid when:</strong>
+- File has &gt;100K rows
+- Performance matters
+- Complex aggregations or joins</p>
+<h4 id="pandas-backend">Pandas Backend</h4>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 10-100x faster than Python for large files</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>large.csv<span class="w"> </span><span class="s2">&quot;SELECT city, COUNT(*) FROM data GROUP BY city&quot;</span><span class="w"> </span>--backend<span class="w"> </span>pandas
 </span></code></pre></div>
-<p><strong>Workarounds</strong>: Use pandas for statistical functions, use WHERE after GROUP BY (inefficient).</p>
-<hr />
-<h4 id="unionintersectexcept">UNION/INTERSECT/EXCEPT</h4>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">-- ❌ NOT SUPPORTED</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">file1</span><span class="p">.</span><span class="n">csv</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">UNION</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">file2</span><span class="p">.</span><span class="n">csv</span>
+<p><strong>Use when:</strong>
+- Files are 100K - 10M rows
+- Simple to moderate SQL queries
+- Need fast GROUP BY / aggregations
+- Memory is available (2-3x file size)</p>
+<p><strong>Avoid when:</strong>
+- Need advanced SQL (window functions, CTEs)
+- Memory constrained (&lt;2GB RAM)
+- Very small files (&lt;10K rows - overhead not worth it)</p>
+<h4 id="duckdb-backend">DuckDB Backend</h4>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># 100x+ faster with full SQL support</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>huge.parquet<span class="w"> </span><span class="s2">&quot;SELECT * FROM data WHERE date &gt; &#39;2024-01-01&#39;&quot;</span><span class="w"> </span>--backend<span class="w"> </span>duckdb
 </span></code></pre></div>
-<p><strong>Workaround</strong>: Concatenate files manually or use pandas <code>pd.concat()</code>.</p>
-<hr />
-<h4 id="datetime-functions">Date/Time Functions</h4>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- ❌ LIMITED SUPPORT: Date operations</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">DATE_ADD</span><span class="p">(</span><span class="n">date_col</span><span class="p">,</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">DAY</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w">  </span><span class="c1">-- Not supported</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">CURRENT_DATE</span><span class="p">()</span><span class="w">  </span><span class="c1">-- Not supported</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">EXTRACT</span><span class="p">(</span><span class="k">YEAR</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">date_col</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w">  </span><span class="c1">-- Not supported</span>
+<p><strong>Use when:</strong>
+- Files are &gt;10M rows or &gt;1GB
+- Need advanced SQL (CTEs, window functions, complex joins)
+- Working with Parquet files
+- Need maximum performance</p>
+<p><strong>Avoid when:</strong>
+- DuckDB package not installed
+- Very simple queries on small files</p>
+<h3 id="auto-backend-selection">Auto Backend Selection</h3>
+<p>By default, SQLStream intelligently selects the best backend:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Let SQLStream choose (recommended)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span>
 </span></code></pre></div>
-<p><strong>Current support</strong>: Basic date comparisons only
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- ✅ SUPPORTED</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">date_col</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="s1">&#39;2024-01-01&#39;</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">date_col</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="s1">&#39;2024-01-01&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="s1">&#39;2024-12-31&#39;</span>
+<p><strong>Selection logic:</strong>
+1. <strong>DuckDB preferred</strong> if installed and query is complex
+2. <strong>Pandas</strong> for simple queries on medium-large files
+3. <strong>Python</strong> fallback for compatibility</p>
+<p><strong>Override in interactive shell:</strong>
+- Press <code>F5</code> or <code>Ctrl+B</code> to cycle through backends
+- Current backend shown in status bar</p>
+<hr />
+<h2 id="file-format-performance">File Format Performance</h2>
+<h3 id="format-comparison">Format Comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Read Speed</th>
+<th>Write Speed</th>
+<th>Compression</th>
+<th>Schema</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CSV</strong></td>
+<td>Slow</td>
+<td>Fast</td>
+<td>None</td>
+<td>Inferred</td>
+<td>Compatibility, human-readable</td>
+</tr>
+<tr>
+<td><strong>Parquet</strong></td>
+<td><strong>Very Fast</strong></td>
+<td>Moderate</td>
+<td>Excellent</td>
+<td>Built-in</td>
+<td>Analytics, large datasets, archival</td>
+</tr>
+<tr>
+<td><strong>JSON</strong></td>
+<td>Moderate</td>
+<td>Fast</td>
+<td>None</td>
+<td>Flexible</td>
+<td>APIs, nested data</td>
+</tr>
+<tr>
+<td><strong>JSONL</strong></td>
+<td>Fast</td>
+<td>Fast</td>
+<td>None</td>
+<td>Flexible</td>
+<td>Streaming, logs, append-only</td>
+</tr>
+</tbody>
+</table>
+<h3 id="benchmark-results-1m-rows-10-columns">Benchmark Results (1M rows, 10 columns)</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Format     | Read Time | File Size | Compression |
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>-----------|-----------|-----------|-------------|
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>CSV        | 5.2s      | 180 MB    | None        |
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>CSV (gzip) | 8.1s      | 45 MB     | 4x          |
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>Parquet    | 0.4s      | 38 MB     | 4.7x        |
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>JSON       | 12.3s     | 280 MB    | None        |
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>JSONL      | 6.8s      | 280 MB    | None        |
+</span></code></pre></div>
+<h3 id="recommendations">Recommendations</h3>
+<p><strong>For maximum read performance:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Convert CSV to Parquet for repeated queries</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>--format<span class="w"> </span>parquet<span class="w"> </span>-o<span class="w"> </span>data.parquet
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># 10x faster subsequent reads</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.parquet<span class="w"> </span><span class="s2">&quot;SELECT * FROM data WHERE age &gt; 25&quot;</span>
 </span></code></pre></div></p>
-<p><strong>Workaround</strong>: Preprocess dates with pandas.</p>
+<p><strong>For space efficiency:</strong>
+- Use Parquet (built-in compression)
+- Or gzip CSV files (SQLStream auto-detects)</p>
+<p><strong>For streaming/append:</strong>
+- Use JSONL format (line-by-line processing)</p>
+<p><strong>For nested/hierarchical data:</strong>
+- Use JSON with nested path syntax:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;users.json#json:data.users&quot;</span><span class="w"> </span><span class="s2">&quot;SELECT name, email FROM users&quot;</span>
+</span></code></pre></div></p>
 <hr />
-<h4 id="string-functions">String Functions</h4>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">-- ❌ LIMITED SUPPORT</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">UPPER</span><span class="p">(</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="k">LOWER</span><span class="p">(</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="n">CONCAT</span><span class="p">(</span><span class="k">first</span><span class="p">,</span><span class="w"> </span><span class="k">last</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w">  </span><span class="c1">-- Not supported</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">SUBSTRING</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w">  </span><span class="c1">-- Not supported</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">TRIM</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w">  </span><span class="c1">-- Not supported</span>
+<h2 id="query-optimization">Query Optimization</h2>
+<h3 id="1-column-pruning">1. Column Pruning</h3>
+<p><strong>❌ Bad - Reads all columns:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;large.csv&#39;</span>
+</span></code></pre></div></p>
+<p><strong>✅ Good - Reads only needed columns:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;large.csv&#39;</span>
+</span></code></pre></div></p>
+<p><strong>Impact:</strong> 5-10x faster with 100+ columns</p>
+<h3 id="2-predicate-pushdown">2. Predicate Pushdown</h3>
+<p><strong>❌ Bad - Reads all data then filters:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;data.csv&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">25</span>
+</span></code></pre></div></p>
+<p><strong>✅ Good - Filters during read:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;data.csv&#39;</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">25</span>
+</span></code></pre></div></p>
+<p><strong>Impact:</strong> 10-100x faster depending on selectivity</p>
+<h3 id="3-early-limit">3. Early LIMIT</h3>
+<p><strong>❌ Bad - Processes all rows:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;large.csv&#39;</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span>
+</span></code></pre></div></p>
+<p><strong>✅ Good - Stops early when possible:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;large.csv&#39;</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1000</span><span class="w">  </span><span class="c1">-- Then process</span>
+</span></code></pre></div></p>
+<p><strong>Impact:</strong> Near-instant for small limits</p>
+<h3 id="4-use-appropriate-joins">4. Use Appropriate Joins</h3>
+<p><strong>Small file JOIN large file:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1">-- Load smaller table first (left side)</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;small.csv&#39;</span><span class="w"> </span><span class="n">s</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">JOIN</span><span class="w"> </span><span class="s1">&#39;large.csv&#39;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="n">user_id</span>
+</span></code></pre></div></p>
+<p><strong>Impact:</strong> Memory usage reduced by 50%+</p>
+<h3 id="5-avoid-select-distinct-on-large-results">5. Avoid SELECT DISTINCT on Large Results</h3>
+<p><strong>❌ Bad - Memory intensive:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">DISTINCT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;huge.csv&#39;</span>
+</span></code></pre></div></p>
+<p><strong>✅ Better - Use GROUP BY:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;huge.csv&#39;</span><span class="w"> </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">column</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="memory-optimization">Memory Optimization</h2>
+<h3 id="understanding-memory-usage">Understanding Memory Usage</h3>
+<p><strong>Python backend:</strong>
+- Memory = ~2x file size</p>
+<p><strong>Pandas backend:</strong>
+- Memory = ~3-4x file size</p>
+<p><strong>DuckDB backend:</strong>
+- Memory = ~1-2x file size (best for large files)</p>
+<h3 id="streaming-large-files">Streaming Large Files</h3>
+<p><strong>For files larger than available RAM:</strong></p>
+<ol>
+<li>
+<p><strong>Use LIMIT to process in chunks:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Process first 100K rows</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>huge.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data LIMIT 100000&quot;</span><span class="w"> </span>-o<span class="w"> </span>chunk1.parquet
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># Process next 100K rows (manual offset in WHERE)</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>huge.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data WHERE id &gt; 100000 LIMIT 100000&quot;</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Use column selection:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">-- Only read needed columns</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;huge.csv&#39;</span><span class="w">  </span><span class="c1">-- Not SELECT *</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Switch to DuckDB backend:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># DuckDB has better memory management</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>huge.parquet<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>--backend<span class="w"> </span>duckdb
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Convert to Parquet first:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Parquet uses 4x less memory than CSV</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>huge.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>-o<span class="w"> </span>huge.parquet
+</span></code></pre></div></p>
+</li>
+</ol>
+<hr />
+<h2 id="s3-performance">S3 Performance</h2>
+<h3 id="minimize-s3-requests">Minimize S3 Requests</h3>
+<p><strong>❌ Bad - Multiple S3 reads:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;s3://bucket/data.csv&#39;</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">25</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">UNION</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;s3://bucket/data.csv&#39;</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">18</span>
+</span></code></pre></div></p>
+<p><strong>✅ Good - Single S3 read:</strong>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;s3://bucket/data.csv&#39;</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">18</span>
+</span></code></pre></div></p>
+<h3 id="use-parquet-on-s3">Use Parquet on S3</h3>
+<p><strong>CSV on S3:</strong>
+- Must download entire file
+- 180 MB download for 1M rows</p>
+<p><strong>Parquet on S3:</strong>
+- Column-pruning reduces download
+- Only 10 MB download for 2 columns
+- <strong>18x less data transferred</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Parquet is 18x more efficient on S3</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;s3://bucket/data.parquet&quot;</span><span class="w"> </span><span class="s2">&quot;SELECT name, email FROM data&quot;</span>
 </span></code></pre></div>
-<p><strong>Current support</strong>: Only basic column selection and filtering.</p>
-<p><strong>Workaround</strong>: Use pandas string methods.</p>
-<hr />
-<h4 id="case-statements">CASE Statements</h4>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">-- ❌ NOT SUPPORTED</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">SELECT</span><span class="w"> </span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">name</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="k">CASE</span><span class="w"> </span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="k">WHEN</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100000</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">&#39;High&#39;</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">        </span><span class="k">WHEN</span><span class="w"> </span><span class="n">salary</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">50000</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">&#39;Medium&#39;</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">        </span><span class="k">ELSE</span><span class="w"> </span><span class="s1">&#39;Low&#39;</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">salary_category</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span>
-</span></code></pre></div>
-<p><strong>Workaround</strong>: Use pandas <code>apply()</code> or <code>np.select()</code>.</p>
-<hr />
-<h4 id="self-joins">SELF JOINS</h4>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">-- ❌ NOT RELIABLY SUPPORTED</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">name</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">FROM</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="n">a</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">employees</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">manager_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">id</span>
-</span></code></pre></div>
-<p><strong>Status</strong>: May work in simple cases, not tested thoroughly.</p>
-<p><strong>Workaround</strong>: Use DuckDB or pandas merge.</p>
-<hr />
-<h3 id="write-operations">Write Operations</h3>
-<p>SQLStream is <strong>read-only</strong>. No support for:</p>
-<ul>
-<li>❌ <code>INSERT INTO</code></li>
-<li>❌ <code>UPDATE</code></li>
-<li>❌ <code>DELETE</code></li>
-<li>❌ <code>CREATE TABLE</code></li>
-<li>❌ <code>ALTER TABLE</code></li>
-<li>❌ <code>DROP TABLE</code></li>
-<li>❌ <code>CREATE VIEW</code></li>
-<li>❌ <code>CREATE INDEX</code></li>
-<li>❌ Transactions (<code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code>)</li>
-</ul>
-<p><strong>For data modification</strong>: Use pandas, DuckDB, or traditional databases.</p>
-<hr />
-<h2 id="file-format-limitations">File Format Limitations</h2>
-<h3 id="csv">CSV</h3>
-<p><strong>Size limits</strong>:
-- Python backend: ~100 MB comfortably (RAM limited)
-- Pandas backend: up to available RAM</p>
-<p><strong>Encoding</strong>:
-- ✅ UTF-8 supported
-- ❌ Auto-detection of other encodings not implemented
-- Workaround: Convert to UTF-8 first</p>
-<p><strong>Delimiters</strong>:
-- ✅ Comma (,) - default
-- ❌ Custom delimiters not configurable via SQL
-- Workaround: Use Python API with custom reader settings</p>
-<p><strong>Special cases</strong>:
-- ❌ Multi-line cells with newlines - may cause parsing issues
-- ❌ Files without headers - not supported
-- ❌ Multiple CSV formats in one query - all must use same format</p>
-<hr />
-<h3 id="parquet">Parquet</h3>
-<p><strong>Size limits</strong>:
-- Typically 10x larger than CSV limit due to compression
-- Streaming supported for S3</p>
-<p><strong>Version support</strong>:
-- Depends on pyarrow version
-- Older Parquet formats may not work</p>
-<p><strong>Compression</strong>:
-- ✅ Snappy, Gzip, LZ4, ZSTD (via pyarrow)
-- Decompression automatic</p>
-<p><strong>Schema evolution</strong>:
-- ❌ Not supported - all files must have same schema for JOINs
-- ❌ Column addition/removal between versions not handled</p>
-<hr />
-<h3 id="html-tables">HTML Tables</h3>
-<p><strong>Limitations</strong>:
-- Only tables that <code>pandas.read_html()</code> can parse
-- ❌ JavaScript-rendered tables not supported
-- ❌ Complex nested tables may fail
-- ❌ No table selection by class/id (only by index)</p>
-<p><strong>Workaround</strong>: Save HTML locally and inspect table indices.</p>
-<hr />
-<h3 id="markdown-tables">Markdown Tables</h3>
-<p><strong>Limitations</strong>:
-- Only GitHub Flavored Markdown tables
-- ❌ No support for HTML tables in markdown
-- ❌ Tables must be well-formed (aligned pipes)
-- ❌ No support for merged cells</p>
-<hr />
-<h2 id="data-source-limitations">Data Source Limitations</h2>
-<h3 id="s3">S3</h3>
-<p><strong>Authentication</strong>:
-- ✅ AWS credentials (env vars, config, IAM roles)
-- ❌ Session tokens with expiration not well handled
-- ❌ SSO/SAML auth not supported</p>
-<p><strong>Regions</strong>:
-- ✅ Works with all AWS regions
-- ⚠️ Cross-region access may be slow
-- ⚠️ Some operations require correct region setting</p>
-<p><strong>Performance</strong>:
-- First query downloads entire file (no streaming for CSV)
-- Parquet uses column-level streaming (better)
-- No support for S3 Select</p>
-<p><strong>Permissions</strong>:
-- Requires <code>s3:GetObject</code> permission
-- Does not support bucket listing for discovery</p>
-<p><strong>Features not supported</strong>:
-- ❌ S3 versioning
-- ❌ Requester pays buckets
-- ❌ S3 Glacier / Deep Archive
-- ❌ S3 Batch Operations</p>
-<p><strong>Compatible services</strong>:
-- ✅ MinIO (mostly compatible)
-- ✅ DigitalOcean Spaces
-- ❌ Google Cloud Storage (use HTTP URLs instead)
-- ❌ Azure Blob Storage</p>
-<hr />
-<h3 id="httphttps">HTTP/HTTPS</h3>
-<p><strong>Limitations</strong>:
-- ❌ No authentication (Basic Auth, Bearer tokens, etc.)
-- ❌ No custom headers
-- ❌ No POST requests
-- ❌ No timeout configuration
-- ❌ No retry logic for failures
-- ✅ Basic caching (local directory)</p>
-<p><strong>SSL/TLS</strong>:
-- ✅ HTTPS supported
-- ❌ Certificate verification can't be disabled
-- ❌ Client certificates not supported</p>
-<p><strong>Large files</strong>:
-- Downloads entire file before processing
-- Not ideal for multi-GB files over HTTP</p>
-<hr />
-<h3 id="local-files">Local Files</h3>
-<p><strong>Path issues</strong>:
-- ✅ Relative paths supported
-- ✅ Absolute paths supported
-- ❌ <code>~</code> (home directory) expansion - not implemented
-- ❌ Glob patterns (<code>*.csv</code>) - not supported</p>
-<p><strong>Permissions</strong>:
-- Requires read access
-- No special handling for permission errors</p>
-<hr />
-<h2 id="performance-limitations">Performance Limitations</h2>
-<h3 id="memory">Memory</h3>
-<p><strong>Python backend</strong>:
-- Loads entire result set into memory
-- No streaming for large result sets
-- Risk of <code>MemoryError</code> with large data</p>
-<p><strong>Pandas backend</strong>:
-- Better memory management
-- Still loads results into RAM
-- Use LIMIT for very large queries</p>
-<hr />
-<h3 id="concurrency">Concurrency</h3>
-<ul>
-<li>❌ No parallel query execution</li>
-<li>❌ No multi-threading for single query</li>
-<li>❌ No connection pooling</li>
-</ul>
-<p><strong>Workaround</strong>: Run multiple Python processes for parallel queries.</p>
-<hr />
+<h3 id="partitioned-data">Partitioned Data</h3>
+<p><strong>Use Hive-style partitions for filtering:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Only reads year=2024 partition</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;s3://bucket/data/year=2024/&quot;</span><span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span>
+</span></code></pre></div></p>
 <h3 id="caching">Caching</h3>
-<p><strong>HTTP sources</strong>:
-- Basic file-level caching
-- No TTL or cache invalidation
-- Cache directory not configurable via SQL</p>
-<p><strong>S3 sources</strong>:
-- No caching (downloads each time)
-- No query result caching</p>
+<p>HTTP URLs are automatically cached for 24 hours:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># First query downloads</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;https://example.com/data.csv&quot;</span><span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c1"># Subsequent queries use cache (instant)</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span><span class="s2">&quot;https://example.com/data.csv&quot;</span><span class="w"> </span><span class="s2">&quot;SELECT COUNT(*) FROM data&quot;</span>
+</span></code></pre></div></p>
+<p><strong>Cache location:</strong> <code>~/.cache/sqlstream/</code></p>
 <hr />
-<h2 id="platform-limitations">Platform Limitations</h2>
-<h3 id="windows">Windows</h3>
-<p><strong>Known issues</strong>:
-- Interactive shell may not render perfectly in CMD (use Windows Terminal)
-- File paths: Use forward slashes or double backslashes</p>
-<p><strong>Supported shells</strong>:
-- ✅ PowerShell
-- ✅ Windows Terminal
-- ⚠️ CMD (basic support)
-- ✅ Git Bash</p>
+<h2 id="interactive-shell-performance">Interactive Shell Performance</h2>
+<h3 id="background-computation">Background Computation</h3>
+<p>The interactive shell runs queries asynchronously:
+- UI remains responsive during long queries
+- Cancel anytime with <code>Ctrl+C</code>
+- Progress shown in status bar</p>
+<h3 id="result-set-limits">Result Set Limits</h3>
+<p><strong>By default, shell limits to 10,000 rows</strong> to prevent freezing.</p>
+<p>For larger results:
+1. Export to file instead of viewing
+2. Use LIMIT in query
+3. Add more specific WHERE filters</p>
+<h3 id="export-performance">Export Performance</h3>
+<p><strong>Format selection matters:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>Format  | 1M rows | Compression |
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>--------|---------|-------------|
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>CSV     | 3.2s    | None        |
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>JSON    | 8.7s    | None        |
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>Parquet | 1.1s    | Built-in    |
+</span></code></pre></div>
+<p><strong>Recommendation:</strong> Use Parquet for large exports</p>
 <hr />
-<h3 id="python-versions">Python Versions</h3>
-<p><strong>Supported</strong>:
-- ✅ Python 3.8+
-- ✅ Python 3.9
-- ✅ Python 3.10
-- ✅ Python 3.11
-- ✅ Python 3.12</p>
-<p><strong>Not supported</strong>:
-- ❌ Python 2.7
-- ❌ Python 3.7 and older</p>
+<h2 id="benchmark-examples">Benchmark Examples</h2>
+<h3 id="small-files-100k-rows">Small Files (&lt;100K rows)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># All backends perform similarly</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span>small.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data WHERE age &gt; 25&quot;</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>Python:<span class="w">  </span><span class="m">0</span>.15s
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>Pandas:<span class="w">  </span><span class="m">0</span>.18s<span class="w"> </span><span class="o">(</span>overhead<span class="w"> </span>not<span class="w"> </span>worth<span class="w"> </span>it<span class="o">)</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>DuckDB:<span class="w">  </span><span class="m">0</span>.22s<span class="w"> </span><span class="o">(</span>overhead<span class="w"> </span>not<span class="w"> </span>worth<span class="w"> </span>it<span class="o">)</span>
+</span></code></pre></div>
+<p><strong>Recommendation:</strong> Use default (Python)</p>
+<h3 id="medium-files-100k-1m-rows">Medium Files (100K - 1M rows)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span>medium.csv<span class="w"> </span><span class="s2">&quot;SELECT city, COUNT(*) FROM data GROUP BY city&quot;</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>Python:<span class="w">  </span>42s
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>Pandas:<span class="w">  </span><span class="m">1</span>.2s<span class="w">  </span>⚡<span class="w"> </span>35x<span class="w"> </span>faster
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>DuckDB:<span class="w">  </span><span class="m">0</span>.9s<span class="w">  </span>⚡<span class="w"> </span>47x<span class="w"> </span>faster
+</span></code></pre></div>
+<p><strong>Recommendation:</strong> Use Pandas or DuckDB</p>
+<h3 id="large-files-1m-rows">Large Files (&gt;1M rows)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span>large.parquet<span class="w"> </span><span class="s2">&quot;SELECT * FROM data WHERE date &gt; &#39;2024-01-01&#39;&quot;</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>Python:<span class="w">  </span>380s<span class="w"> </span><span class="o">(</span><span class="m">6</span>+<span class="w"> </span>minutes<span class="o">)</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>Pandas:<span class="w">  </span>12s<span class="w">   </span>⚡<span class="w"> </span>32x<span class="w"> </span>faster
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>DuckDB:<span class="w">  </span><span class="m">0</span>.8s<span class="w">  </span>⚡<span class="w"> </span>475x<span class="w"> </span>faster
+</span></code></pre></div>
+<p><strong>Recommendation:</strong> Use DuckDB</p>
+<h3 id="complex-sql-window-functions">Complex SQL (Window Functions)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>$<span class="w"> </span>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT *, ROW_NUMBER() OVER (PARTITION BY city ORDER BY age) FROM data&quot;</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>Python:<span class="w">  </span>❌<span class="w"> </span>Not<span class="w"> </span>supported
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>Pandas:<span class="w">  </span>❌<span class="w"> </span>Not<span class="w"> </span>supported
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>DuckDB:<span class="w">  </span>✅<span class="w"> </span><span class="m">2</span>.1s
+</span></code></pre></div>
+<p><strong>Recommendation:</strong> Use DuckDB for advanced SQL</p>
 <hr />
-<h2 id="type-system-limitations">Type System Limitations</h2>
-<h3 id="type-inference">Type Inference</h3>
-<p><strong>CSV type detection</strong>:
-- Samples only first 100 rows
-- May mis-detect types if early rows not representative
-- No manual type specification</p>
-<p><strong>Ambiguous types</strong>:
-- Dates without time may be detected as strings
-- Large integers may overflow
-- Mixed types in column default to string</p>
-<p><strong>NULL handling</strong>:
-- Empty strings vs NULL not distinguished in CSV
-- Parquet NULL handling depends on file</p>
-<hr />
-<h3 id="type-coercion">Type Coercion</h3>
+<h2 id="performance-checklist">Performance Checklist</h2>
+<p><strong>Before running a query:</strong></p>
 <ul>
-<li>❌ No automatic type coercion in JOINs (int != float)</li>
-<li>❌ No CAST function to convert types</li>
-<li>Limited type checking before operations</li>
+<li>[ ] Using smallest file format? (Parquet &gt; CSV)</li>
+<li>[ ] Selecting only needed columns? (not <code>SELECT *</code>)</li>
+<li>[ ] Filtering as early as possible? (<code>WHERE</code> clause)</li>
+<li>[ ] Using appropriate backend? (DuckDB for large/complex)</li>
+<li>[ ] Using LIMIT for exploration? (faster feedback)</li>
+<li>[ ] Partitioned data on S3? (reduces scan)</li>
 </ul>
-<p><strong>Workaround</strong>: Preprocess with pandas.</p>
-<hr />
-<h2 id="known-bugs">Known Bugs</h2>
-<h3 id="critical">Critical</h3>
-<p>None currently identified.</p>
-<h3 id="high">High</h3>
-<ol>
-<li><strong>JOIN performance on large files</strong>: O(n*m) complexity for nested loop joins</li>
-<li><strong>Workaround</strong>: Use pandas backend or filter first</li>
-<li>
-<p><strong>Planned fix</strong>: Phase 12 - Hash joins</p>
-</li>
-<li>
-<p><strong>Memory leaks with repeated queries</strong> in interactive shell</p>
-</li>
-<li><strong>Workaround</strong>: Restart shell periodically</li>
-<li><strong>Investigation</strong>: Ongoing</li>
-</ol>
-<h3 id="medium">Medium</h3>
-<ol>
-<li><strong>Tab completion in interactive shell</strong> doesn't suggest all table names</li>
-<li><strong>Workaround</strong>: Type full table name</li>
-<li>
-<p><strong>Planned fix</strong>: Phase 10</p>
-</li>
-<li>
-<p><strong>Error messages</strong> can be cryptic for SQL syntax errors</p>
-</li>
-<li><strong>Workaround</strong>: Check query syntax carefully</li>
-<li>
-<p><strong>Planned fix</strong>: Phase 10 - Better error messages</p>
-</li>
-<li>
-<p><strong>File browser doesn't show hidden files</strong> in interactive shell</p>
-</li>
-<li><strong>Workaround</strong>: Type path manually</li>
-<li><strong>Planned fix</strong>: Add option to show hidden files</li>
-</ol>
-<h3 id="low">Low</h3>
-<ol>
-<li><strong>Query history</strong> limited to 100 entries</li>
-<li><strong>Workaround</strong>: Export important queries</li>
-<li>
-<p><strong>Enhancement</strong>: Make configurable</p>
-</li>
-<li>
-<p><strong>No syntax highlighting</strong> in non-interactive mode</p>
-</li>
-<li><strong>Workaround</strong>: Use interactive shell</li>
-<li><strong>Enhancement</strong>: Support --pretty flag</li>
-</ol>
-<hr />
-<h2 id="comparison-with-other-tools">Comparison with Other Tools</h2>
-<h3 id="vs-duckdb">vs DuckDB</h3>
-<p><strong>DuckDB advantages</strong>:
-- 100-1000x faster
-- Full SQL support
-- Production ready
-- ACID transactions
-- Write operations</p>
-<p><strong>SQLStream advantages</strong>:
-- Simpler installation
-- Pure Python (no compilation)
-- Educational (understand internals)
-- Lighter weight</p>
-<p><strong>Recommendation</strong>: Use DuckDB for production, SQLStream for learning/light analysis.</p>
-<hr />
-<h3 id="vs-pandas">vs pandas</h3>
-<p><strong>pandas advantages</strong>:
-- More data manipulation functions
-- Better performance for transformations
-- Wider adoption
-- Jupyter integration</p>
-<p><strong>SQLStream advantages</strong>:
-- SQL syntax (if you know SQL)
-- Lazy evaluation
-- Join multiple files without loading all</p>
-<p><strong>Recommendation</strong>: Use SQLStream to filter/join files, then pandas for analysis.</p>
-<hr />
-<h3 id="vs-sqlite">vs sqlite</h3>
-<p><strong>sqlite advantages</strong>:
-- Full ACID database
-- Mature and stable
-- Built into Python
-- Write operations</p>
-<p><strong>SQLStream advantages</strong>:
-- No database setup
-- Query files directly
-- S3 and HTTP sources
-- Better for file-based workflows</p>
-<p><strong>Recommendation</strong>: Use sqlite for structured data with updates, SQLStream for read-only file analysis.</p>
-<hr />
-<h2 id="workarounds-best-practices">Workarounds &amp; Best Practices</h2>
-<h3 id="1-complex-queries">1. Complex Queries</h3>
-<p><strong>Problem</strong>: Need features not supported (CTEs, window functions, etc.)</p>
-<p><strong>Solutions</strong>:
-1. Use DuckDB for complex queries
-2. Use pandas for transformations
-3. Break into multiple queries with temporary files
-4. Use Python to combine results</p>
-<hr />
-<h3 id="2-large-files">2. Large Files</h3>
-<p><strong>Problem</strong>: Files too large for memory</p>
-<p><strong>Solutions</strong>:
-1. Use pandas backend: <code>--backend pandas</code>
-2. Use LIMIT to sample data
-3. Use Parquet instead of CSV
-4. Filter with WHERE clause before loading
-5. Select only needed columns</p>
-<hr />
-<h3 id="3-performance">3. Performance</h3>
-<p><strong>Problem</strong>: Queries are slow</p>
-<p><strong>Solutions</strong>:
-1. Use pandas backend
-2. Convert CSV to Parquet
-3. Add WHERE filters
-4. Select specific columns (not <code>*</code>)
-5. Index on frequently joined columns (Parquet metadata)
-6. Use LIMIT for exploration</p>
-<hr />
-<h3 id="4-type-issues">4. Type Issues</h3>
-<p><strong>Problem</strong>: Wrong types inferred</p>
-<p><strong>Solutions</strong>:
-1. Preprocess with pandas
-2. Use Parquet with explicit types
-3. Ensure first 100 rows are representative
-4. Cast in Python after query</p>
-<hr />
-<h2 id="reporting-issues">Reporting Issues</h2>
-<p>Found a bug or limitation not listed here?</p>
-<ol>
-<li><strong>Check</strong>: <a href="https://github.com/subhayu99/sqlstream/issues">GitHub Issues</a></li>
-<li><strong>Report</strong>: Create new issue with:</li>
-<li>SQLStream version</li>
-<li>Python version</li>
-<li>Minimal reproduction code</li>
-<li>
-<p>Expected vs actual behavior</p>
-</li>
-<li>
-<p><strong>Discuss</strong>: Use <a href="https://github.com/subhayu99/sqlstream/discussions">GitHub Discussions</a> for feature requests</p>
-</li>
-</ol>
-<hr />
-<h2 id="roadmap">Roadmap</h2>
-<p>See <a href="../#project-status">Project Status</a> for upcoming features.</p>
-<p><strong>Planned improvements</strong>:
-- Phase 10: Better error messages
-- Phase 11: Testing &amp; documentation
-- Phase 12+: Subqueries, CTEs, window functions, hash joins</p>
-<hr />
-<h2 id="see-also">See Also</h2>
+<p><strong>For production pipelines:</strong></p>
 <ul>
-<li><a href="../faq/">FAQ</a> - Common questions</li>
-<li><a href="../troubleshooting/">Troubleshooting</a> - Error solutions</li>
-<li><a href="../features/sql-support/">SQL Support</a> - Supported SQL syntax</li>
-<li><a href="../performance/">Performance Guide</a> - Optimization tips (coming soon)</li>
+<li>[ ] Convert CSV → Parquet for repeated reads</li>
+<li>[ ] Use DuckDB backend for 100x speedup</li>
+<li>[ ] Cache HTTP sources locally</li>
+<li>[ ] Use column selection extensively</li>
+<li>[ ] Profile with <code>EXPLAIN</code> to verify optimizations</li>
 </ul>
+<hr />
+<h2 id="profiling-queries">Profiling Queries</h2>
+<h3 id="view-execution-plan">View Execution Plan</h3>
+<p><strong>CLI:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data WHERE age &gt; 25&quot;</span><span class="w"> </span>--explain
+</span></code></pre></div></p>
+<p><strong>Interactive Shell:</strong>
+Press <code>F4</code> to view execution plan</p>
+<p><strong>Output:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>Execution Plan:
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>├─ Scan: data.csv
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>│  └─ Columns: [name, age, city] (pruned 7 columns)
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>├─ Filter: age &gt; 25 (pushed down)
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>└─ Limit: 1000 (pushed down)
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>
+</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>Optimizations Applied:
+</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>✓ Column pruning (reads 3/10 columns)
+</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>✓ Predicate pushdown (filters during read)
+</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a>✓ Limit pushdown (early termination)
+</span></code></pre></div></p>
+<h3 id="measure-query-time">Measure Query Time</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># CLI shows execution time</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>--time
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="c1"># Output:</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="c1"># Query executed in 1.23s</span>
+</span></code></pre></div>
+<hr />
+<h2 id="troubleshooting-performance">Troubleshooting Performance</h2>
+<h3 id="query-is-slow">Query is Slow</h3>
+<ol>
+<li>
+<p><strong>Check backend:</strong>
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c1"># Try DuckDB</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>--backend<span class="w"> </span>duckdb
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Use Parquet instead of CSV:</strong>
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="c1"># Convert first</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>data.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM data&quot;</span><span class="w"> </span>-o<span class="w"> </span>data.parquet
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Add WHERE filters:</strong>
+   <div class="language-sql highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="c1">-- Reduce data scanned</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="nb">date</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="s1">&#39;2024-01-01&#39;</span>
+</span></code></pre></div></p>
+</li>
+</ol>
+<h3 id="out-of-memory">Out of Memory</h3>
+<ol>
+<li><strong>Use DuckDB backend</strong> (most memory-efficient)</li>
+<li><strong>Add LIMIT</strong> to reduce result set</li>
+<li><strong>Select fewer columns</strong></li>
+<li><strong>Process in chunks</strong> (manual pagination)</li>
+</ol>
+<h3 id="s3-is-slow">S3 is Slow</h3>
+<ol>
+<li><strong>Use Parquet</strong> (column pruning reduces download)</li>
+<li><strong>Use partitions</strong> (only read needed partitions)</li>
+<li><strong>Run from same AWS region</strong> (reduce latency)</li>
+<li><strong>Check S3 credentials</strong> (authentication overhead)</li>
+</ol>
+<hr />
+<h2 id="additional-resources">Additional Resources</h2>
+<ul>
+<li><a href="../features/backends.md">Backend Selection Guide</a></li>
+<li><a href="../features/data-sources.md">File Format Comparison</a></li>
+<li><a href="../features/sql-support.md">SQL Optimization Tips</a></li>
+<li><a href="../troubleshooting.md">Troubleshooting Guide</a></li>
+</ul>
+<hr />
+<p><strong>Last Updated:</strong> December 2025</p>
 
 
 

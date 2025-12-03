@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A lightweight SQL query engine for CSV and Parquet files with lazy evaluation and intelligent optimizations">
+        <meta name="description" content="A lightweight SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations">
       
       
         <meta name="author" content="SQLStream Team">
@@ -385,6 +385,25 @@
         </a>
       </li>
     
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../performance/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Performance
+
+      </a>
+    </li>
   
 
       
@@ -970,6 +989,34 @@
     
   
     Inline File Paths
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/advanced-formats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Data Formats
   
 
     
@@ -1819,6 +1866,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../examples/json-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JSON Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../examples/html-tables/" class="md-nav__link">
         
   
@@ -2113,6 +2188,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Supported Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json-nested-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON Nested Paths
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2292,6 +2384,33 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2517,6 +2636,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Supported Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json-nested-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON Nested Paths
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2627,12 +2763,33 @@
 <h2 id="supported-formats">Supported Formats</h2>
 <p>The following formats support the fragment syntax:</p>
 <ul>
-<li><strong>html</strong>: Supports table selection.</li>
-<li><strong>markdown</strong>: Supports table selection.</li>
-<li><strong>csv</strong>: Format specification only (table index ignored).</li>
-<li><strong>parquet</strong>: Format specification only.</li>
-<li><strong>json</strong>: Format specification only.</li>
+<li><strong>json</strong>: Supports nested path syntax (<code>key.nested</code>, <code>key[0]</code>, <code>key[]</code>)</li>
+<li><strong>jsonl</strong>: Format specification only</li>
+<li><strong>html</strong>: Supports table selection</li>
+<li><strong>markdown</strong>: Supports table selection</li>
+<li><strong>csv</strong>: Format specification only (table index ignored)</li>
+<li><strong>parquet</strong>: Format specification only</li>
 </ul>
+<h3 id="json-nested-paths">JSON Nested Paths</h3>
+<p>For JSON files, the table identifier supports a special path syntax:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- Simple nested key</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;data.json#json:result.users&quot;</span><span class="p">;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1">-- Array indexing (0-based)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;data.json#json:users[0].transactions&quot;</span><span class="p">;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1">-- Array flattening (merge arrays from all elements)</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;data.json#json:users[].transactions&quot;</span><span class="p">;</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1">-- Deep nesting</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">&quot;api.json#json:response.data.orders&quot;</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>Path Syntax:</strong>
+- <code>key</code> - Access simple key
+- <code>key.nested</code> - Navigate to nested object
+- <code>key[0]</code> - Access array element by index
+- <code>key[]</code> - Flatten array (extract nested data from all elements)</p>
+<p>See <a href="../../examples/json-data/">JSON Data Examples</a> for comprehensive guides.</p>
 <h2 id="table-indexing">Table Indexing</h2>
 <ul>
 <li><strong>Positive Index</strong>: <code>0</code> is the first table, <code>1</code> is the second, etc.</li>
