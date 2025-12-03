@@ -2,8 +2,8 @@
 
 **A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations.**
 
-[![Tests](https://github.com/subhayu99/sqlstream/workflows/tests/badge.svg)](https://github.com/subhayu99/sqlstream/actions)
-[![Documentation](https://github.com/subhayu99/sqlstream/workflows/docs/badge.svg)](https://subhayu99.github.io/sqlstream)
+[![Tests](https://img.shields.io/github/actions/workflow/status/subhayu99/sqlstream/tests.yml?branch=main&label=Tests)](https://github.com/subhayu99/sqlstream/actions)
+[![Documentation](https://img.shields.io/github/actions/workflow/status/subhayu99/sqlstream/docs.yml?branch=main&label=Documentation)](https://subhayu99.github.io/sqlstream)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 📖 **[Full Documentation](https://subhayu99.github.io/sqlstream)** | 🚀 **[Quick Start](https://subhayu99.github.io/sqlstream/getting-started/quickstart/)** | 💬 **[Discussions](https://github.com/subhayu99/sqlstream/discussions)**
