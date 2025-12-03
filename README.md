@@ -1,6 +1,6 @@
 # SQLStream
 
-**A lightweight, pure-Python SQL query engine for CSV and Parquet files with lazy evaluation and intelligent optimizations.**
+**A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, and JSONL files with lazy evaluation and intelligent optimizations.**
 
 [![Tests](https://github.com/subhayu99/sqlstream/workflows/tests/badge.svg)](https://github.com/subhayu99/sqlstream/actions)
 [![Documentation](https://github.com/subhayu99/sqlstream/workflows/docs/badge.svg)](https://subhayu99.github.io/sqlstream)
@@ -32,7 +32,7 @@ $ sqlstream shell data.csv
 ## Features
 
 - 🚀 **Pure Python** - No database installation required
-- 📊 **Multiple Formats** - CSV, Parquet files, HTTP URLs, S3 buckets
+- 📊 **Multiple Formats** - CSV, Parquet, JSON, JSONL, HTTP URLs, S3 buckets
 - ⚡ **10-100x Faster** - Optional pandas backend for performance
 - 🔗 **JOIN Support** - INNER, LEFT, RIGHT joins
 - 📈 **Aggregations** - GROUP BY with COUNT, SUM, AVG, MIN, MAX

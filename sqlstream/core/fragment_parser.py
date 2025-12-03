@@ -4,7 +4,7 @@ URL Fragment Parser - Parse source#format:table syntax
 Provides utilities to parse SQLstream URL fragments for format and table specification.
 """
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 
 class FragmentParseError(Exception):
@@ -12,7 +12,7 @@ class FragmentParseError(Exception):
     pass
 
 
-def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[int]]:
+def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Union[int, str]]]:
     """
     Parse source URL with optional fragment
 
@@ -59,10 +59,10 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[int
         format_spec = format_part.strip() if format_part.strip() else None
 
         # Validate format if specified
-        if format_spec and format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json'):
+        if format_spec and format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json', 'jsonl'):
             raise FragmentParseError(
                 f"Unknown format '{format_spec}'. "
-                f"Supported formats: csv, parquet, html, markdown, json"
+                f"Supported formats: csv, parquet, html, markdown, json, jsonl"
             )
 
         # Parse table index (supports negative)
@@ -72,9 +72,8 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[int
         try:
             table_index = int(table_part)
         except ValueError:
-            raise FragmentParseError(
-                f"Invalid table index: '{table_part}'. Must be an integer."
-            )
+            # Allow string identifiers (e.g. for JSON keys)
+            table_index = table_part
 
         return (source_path, format_spec, table_index)
     else:
@@ -82,10 +81,10 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[int
         format_spec = fragment.strip()
 
         # Validate format
-        if format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json'):
+        if format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json', 'jsonl'):
             raise FragmentParseError(
                 f"Unknown format '{format_spec}'. "
-                f"Supported formats: csv, parquet, html, markdown, json"
+                f"Supported formats: csv, parquet, html, markdown, json, jsonl"
             )
 
         return (source_path, format_spec, None)

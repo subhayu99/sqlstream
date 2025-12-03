@@ -155,6 +155,10 @@ class HTTPReader(BaseReader):
                 format_to_use = "html"
             elif path_lower.endswith((".md", ".markdown")):
                 format_to_use = "markdown"
+            elif path_lower.endswith(".json"):
+                format_to_use = "json"
+            elif path_lower.endswith(".jsonl"):
+                format_to_use = "jsonl"
             else:
                 # Try to detect from content
                 format_to_use = self._detect_format_from_content()
@@ -182,6 +186,16 @@ class HTTPReader(BaseReader):
             from sqlstream.readers.markdown_reader import MarkdownReader
             return MarkdownReader(str(self.local_path), **self.reader_kwargs)
 
+        elif format_to_use == "json":
+            from sqlstream.readers.json_reader import JSONReader
+            # Pass table/records_key if available in kwargs
+            records_key = self.reader_kwargs.get('table')
+            return JSONReader(str(self.local_path), records_key=records_key)
+
+        elif format_to_use == "jsonl":
+            from sqlstream.readers.jsonl_reader import JSONLReader
+            return JSONLReader(str(self.local_path))
+
         else:  # csv or unknown - default to CSV
             try:
                 return CSVReader(str(self.local_path))
@@ -206,6 +220,16 @@ class HTTPReader(BaseReader):
             # Check for Parquet magic number
             if header.startswith(b'PAR1'):
                 return "parquet"
+
+            # Check for JSON (starts with [ or {)
+            stripped = header.strip()
+            if stripped.startswith(b'[') or (stripped.startswith(b'{') and b'"records":' in stripped):
+                 return "json"
+            
+            # Check for JSONL (multiple lines starting with {)
+            lines = header.split(b'\n')
+            if len(lines) > 1 and lines[0].strip().startswith(b'{') and lines[1].strip().startswith(b'{'):
+                return "jsonl"
 
             # Default to CSV
             return "csv"

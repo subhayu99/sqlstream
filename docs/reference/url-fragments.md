@@ -64,11 +64,38 @@ SELECT * FROM "https://pastebin.com/raw/cnkgQp1t#markdown:1";
 
 The following formats support the fragment syntax:
 
-- **html**: Supports table selection.
-- **markdown**: Supports table selection.
-- **csv**: Format specification only (table index ignored).
-- **parquet**: Format specification only.
-- **json**: Format specification only.
+- **json**: Supports nested path syntax (`key.nested`, `key[0]`, `key[]`)
+- **jsonl**: Format specification only
+- **html**: Supports table selection
+- **markdown**: Supports table selection
+- **csv**: Format specification only (table index ignored)
+- **parquet**: Format specification only
+
+### JSON Nested Paths
+
+For JSON files, the table identifier supports a special path syntax:
+
+```sql
+-- Simple nested key
+SELECT * FROM "data.json#json:result.users";
+
+-- Array indexing (0-based)
+SELECT * FROM "data.json#json:users[0].transactions";
+
+-- Array flattening (merge arrays from all elements)
+SELECT * FROM "data.json#json:users[].transactions";
+
+-- Deep nesting
+SELECT * FROM "api.json#json:response.data.orders";
+```
+
+**Path Syntax:**
+- `key` - Access simple key
+- `key.nested` - Navigate to nested object
+- `key[0]` - Access array element by index
+- `key[]` - Flatten array (extract nested data from all elements)
+
+See [JSON Data Examples](../examples/json-data.md) for comprehensive guides.
 
 ## Table Indexing
 

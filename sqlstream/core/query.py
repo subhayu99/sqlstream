@@ -179,6 +179,16 @@ class Query:
             from sqlstream.readers.parquet_reader import ParquetReader
             return ParquetReader(source_path)
 
+        elif format_hint == 'json' or (not format_hint and suffix == ".json"):
+            from sqlstream.readers.json_reader import JSONReader
+            # Ensure key is a string for JSON lookups
+            key = str(table_hint) if table_hint is not None else None
+            return JSONReader(source_path, records_key=key)
+
+        elif format_hint == 'jsonl' or (not format_hint and suffix == ".jsonl"):
+            from sqlstream.readers.jsonl_reader import JSONLReader
+            return JSONLReader(source_path)
+
         elif format_hint == 'csv' or (not format_hint and suffix == ".csv"):
             return CSVReader(source_path)
 

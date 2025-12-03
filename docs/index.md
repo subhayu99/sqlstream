@@ -1,6 +1,6 @@
 # SQLStream
 
-**A lightweight, pure-Python SQL query engine for CSV and Parquet files with lazy evaluation and intelligent optimizations.**
+**A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, and JSONL files with lazy evaluation and intelligent optimizations.**
 
 ---
 
@@ -36,7 +36,7 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
 
     ---
 
-    Support for CSV, Parquet files, HTTP URLs, and S3 buckets.
+    Support for CSV, Parquet, JSON, JSONL files, HTTP URLs, and S3 buckets.
 
 -   :material-lightning-bolt:{ .lg .middle } __10-100x Faster__
 

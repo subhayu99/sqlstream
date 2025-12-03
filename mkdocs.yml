@@ -93,6 +93,7 @@ nav:
       - Pandas Backend: features/pandas-backend.md
       - DuckDB Backend (Full SQL): features/duckdb-backend.md
       - Inline File Paths: features/inline-paths.md
+      - Advanced Data Formats: features/advanced-formats.md
   - CLI Reference:
       - Overview: cli/overview.md
       - Query Command: cli/query-command.md
@@ -108,7 +109,7 @@ nav:
     - Aggregations: examples/aggregations.md
     - DuckDB Backend: examples/duckdb-backend.md
     - Parquet Files: examples/parquet-files.md
-    # - JSON Data: examples/json-data.md # TODO: not supported yet
+    - JSON Data: examples/json-data.md
     - HTML Tables: examples/html-tables.md
     - Markdown Tables: examples/markdown-tables.md
     - Advanced / Real World: examples/real-world.md

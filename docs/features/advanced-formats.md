@@ -68,6 +68,67 @@ SELECT * FROM "README.md#:1";
 
 ---
 
+## JSON and JSONL Files
+
+SQLStream supports both standard JSON and JSONL (JSON Lines) formats with powerful nested path navigation.
+
+### JSON Files
+
+Query JSON files containing arrays of objects or nested data structures.
+
+```python
+from sqlstream import query
+
+# Simple array of objects
+results = query("data.json").sql("SELECT * FROM data WHERE age > 25")
+
+# Nested data with path syntax
+results = query("api.json#json:result.users").sql("SELECT * FROM users")
+```
+
+**Nested Path Syntax:**
+
+- `key` - Simple key access
+- `key.nested` - Nested object navigation
+- `key[0]` - Array indexing
+- `key[]` - Array flattening (merge arrays from all elements)
+
+**Examples:**
+
+```python
+# Access nested data
+query("data.json#json:response.data.orders")
+
+# Get first user's transactions
+query("data.json#json:users[0].transactions")
+
+# Flatten transactions from all users
+query("data.json#json:users[].transactions")
+```
+
+### JSONL (JSON Lines) Files
+
+JSONL files contain one JSON object per line - perfect for streaming large datasets.
+
+```jsonl
+{"id": 1, "name": "Alice", "age": 30}
+{"id": 2, "name": "Bob", "age": 25}
+```
+
+```python
+# Auto-detected by .jsonl extension
+results = query("logs.jsonl").sql("SELECT * FROM logs")
+```
+
+**Benefits:**
+- True lazy loading (line-by-line processing)
+- Append-friendly for logging
+- Common in data engineering pipelines
+
+See [JSON Data Examples](../examples/json-data.md) for comprehensive guides.
+
+---
+
 ## Supported Formats
 
 ### 1. HTML Tables
