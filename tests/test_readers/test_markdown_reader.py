@@ -22,7 +22,7 @@ class TestMarkdownReaderBasic:
 | Bob    | 25  | Boston   |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -31,10 +31,10 @@ class TestMarkdownReaderBasic:
             rows = list(reader.read_lazy())
 
             assert len(rows) == 2
-            assert rows[0]['Name'] == 'Alice'
-            assert rows[0]['Age'] == 30
-            assert rows[1]['Name'] == 'Bob'
-            assert rows[1]['City'] == 'Boston'
+            assert rows[0]["Name"] == "Alice"
+            assert rows[0]["Age"] == 30
+            assert rows[1]["Name"] == "Bob"
+            assert rows[1]["City"] == "Boston"
         finally:
             os.unlink(temp_path)
 
@@ -49,7 +49,7 @@ class TestMarkdownReaderBasic:
 | Item2 | 5     | 9.50  | false  |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -58,12 +58,12 @@ class TestMarkdownReaderBasic:
             rows = list(reader.read_lazy())
 
             # Check types were inferred correctly
-            assert isinstance(rows[0]['Name'], str)
-            assert isinstance(rows[0]['Count'], int)
-            assert isinstance(rows[0]['Price'], float)
-            assert isinstance(rows[0]['Active'], bool)
-            assert rows[0]['Active'] is True
-            assert rows[1]['Active'] is False
+            assert isinstance(rows[0]["Name"], str)
+            assert isinstance(rows[0]["Count"], int)
+            assert isinstance(rows[0]["Price"], float)
+            assert isinstance(rows[0]["Active"], bool)
+            assert rows[0]["Active"] is True
+            assert rows[1]["Active"] is False
         finally:
             os.unlink(temp_path)
 
@@ -80,7 +80,7 @@ class TestMarkdownReaderBasic:
 | D     | -     |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -88,10 +88,10 @@ class TestMarkdownReaderBasic:
             reader = MarkdownReader(temp_path)
             rows = list(reader.read_lazy())
 
-            assert rows[0]['Value'] == 10
-            assert rows[1]['Value'] is None
-            assert rows[2]['Value'] is None
-            assert rows[3]['Value'] is None
+            assert rows[0]["Value"] == 10
+            assert rows[1]["Value"] is None
+            assert rows[2]["Value"] is None
+            assert rows[3]["Value"] is None
         finally:
             os.unlink(temp_path)
 
@@ -113,7 +113,7 @@ class TestMarkdownReaderBasic:
 | a | b | c |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -121,14 +121,14 @@ class TestMarkdownReaderBasic:
             # Read first table
             reader = MarkdownReader(temp_path, table=0)
             rows = list(reader.read_lazy())
-            assert 'A' in rows[0]
-            assert rows[0]['A'] == 1
+            assert "A" in rows[0]
+            assert rows[0]["A"] == 1
 
             # Read second table
             reader = MarkdownReader(temp_path, table=1)
             rows = list(reader.read_lazy())
-            assert 'X' in rows[0]
-            assert rows[0]['X'] == 'a'
+            assert "X" in rows[0]
+            assert rows[0]["X"] == "a"
         finally:
             os.unlink(temp_path)
 
@@ -149,7 +149,7 @@ Some text
 | a | b | c |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -158,10 +158,10 @@ Some text
             tables = reader.list_tables()
 
             assert len(tables) == 2
-            assert 'Table 0' in tables[0]
-            assert 'A, B' in tables[0]
-            assert '2 rows' in tables[0]
-            assert 'Table 1' in tables[1]
+            assert "Table 0" in tables[0]
+            assert "A, B" in tables[0]
+            assert "2 rows" in tables[0]
+            assert "Table 1" in tables[1]
         finally:
             os.unlink(temp_path)
 
@@ -177,7 +177,7 @@ Some text
 | Bob    | 25  | 87.3  | false  |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -185,10 +185,10 @@ Some text
             reader = MarkdownReader(temp_path)
             schema = reader.get_schema()
 
-            assert schema['Name'] == DataType.STRING
-            assert schema['Age'] == DataType.INTEGER
-            assert schema['Score'] == DataType.FLOAT
-            assert schema['Active'] == DataType.BOOLEAN
+            assert schema["Name"] == DataType.STRING
+            assert schema["Age"] == DataType.INTEGER
+            assert schema["Score"] == DataType.FLOAT
+            assert schema["Active"] == DataType.BOOLEAN
         finally:
             os.unlink(temp_path)
 
@@ -203,7 +203,7 @@ Some text
 | Normal      | 2     |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -212,7 +212,7 @@ Some text
             rows = list(reader.read_lazy())
 
             # Escaped pipe should be preserved
-            assert '|' in rows[0]['Text']
+            assert "|" in rows[0]["Text"]
         finally:
             os.unlink(temp_path)
 
@@ -222,7 +222,7 @@ Some text
 
         md = "# Just a heading\n\nNo tables here!"
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -245,7 +245,7 @@ Some text
 | 1 |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -276,7 +276,7 @@ class TestMarkdownReaderIntegration:
 | Cherry  | 2.25  | 50    |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -285,8 +285,8 @@ class TestMarkdownReaderIntegration:
             rows = result.to_list()
 
             assert len(rows) == 1
-            assert rows[0]['Product'] == 'Cherry'
-            assert rows[0]['Price'] == 2.25
+            assert rows[0]["Product"] == "Cherry"
+            assert rows[0]["Price"] == 2.25
         finally:
             os.unlink(temp_path)
 
@@ -304,7 +304,7 @@ class TestMarkdownReaderIntegration:
 | Widget  | 42       |
 """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(md)
             temp_path = f.name
 
@@ -314,7 +314,7 @@ class TestMarkdownReaderIntegration:
             rows = result.to_list()
 
             assert len(rows) == 1
-            assert rows[0]['Product'] == 'Widget'
-            assert rows[0]['Quantity'] == 42
+            assert rows[0]["Product"] == "Widget"
+            assert rows[0]["Quantity"] == 42
         finally:
             os.unlink(temp_path)

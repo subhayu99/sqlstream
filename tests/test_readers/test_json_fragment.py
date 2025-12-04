@@ -1,17 +1,10 @@
-
 def test_json_reader_fragment_integration(tmp_path):
     """Test that we can specify the key via fragment in the query"""
     import json
 
     from sqlstream.core.query import Query
 
-    data = {
-        "custom_key": [
-            {"id": 1, "name": "Alice"},
-            {"id": 2, "name": "Bob"}
-        ],
-        "other_key": []
-    }
+    data = {"custom_key": [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}], "other_key": []}
 
     file_path = tmp_path / "test_fragment.json"
     with open(file_path, "w") as f:
@@ -29,17 +22,14 @@ def test_json_reader_fragment_integration(tmp_path):
     assert len(rows) == 2
     assert rows[0]["name"] == "Alice"
 
+
 def test_json_reader_numeric_string_key(tmp_path):
     """Test that a numeric string key works (e.g. "2024")"""
     import json
 
     from sqlstream.core.query import Query
 
-    data = {
-        "2024": [
-            {"id": 1, "year": 2024}
-        ]
-    }
+    data = {"2024": [{"id": 1, "year": 2024}]}
 
     file_path = tmp_path / "test_numeric_key.json"
     with open(file_path, "w") as f:

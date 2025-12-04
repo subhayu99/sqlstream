@@ -2,7 +2,6 @@
 Tests for CLI main commands
 """
 
-
 import pytest
 
 try:
@@ -21,12 +20,7 @@ except ImportError:
 def sample_csv(tmp_path):
     """Create sample CSV file"""
     csv_file = tmp_path / "data.csv"
-    csv_file.write_text(
-        "name,age,city\n"
-        "Alice,30,NYC\n"
-        "Bob,25,LA\n"
-        "Charlie,35,SF\n"
-    )
+    csv_file.write_text("name,age,city\nAlice,30,NYC\nBob,25,LA\nCharlie,35,SF\n")
     return csv_file
 
 
@@ -37,9 +31,7 @@ class TestQueryCommand:
     def test_query_basic(self, sample_csv):
         """Test basic query execution"""
         runner = CliRunner()
-        result = runner.invoke(
-            cli, ["query", str(sample_csv), "SELECT * FROM data"]
-        )
+        result = runner.invoke(cli, ["query", str(sample_csv), "SELECT * FROM data"])
 
         assert result.exit_code == 0
         assert "Alice" in result.output
@@ -48,9 +40,7 @@ class TestQueryCommand:
     def test_query_with_where(self, sample_csv):
         """Test query with WHERE clause"""
         runner = CliRunner()
-        result = runner.invoke(
-            cli, ["query", str(sample_csv), "SELECT * FROM data WHERE age > 25"]
-        )
+        result = runner.invoke(cli, ["query", str(sample_csv), "SELECT * FROM data WHERE age > 25"])
 
         assert result.exit_code == 0
         assert "Alice" in result.output
@@ -113,9 +103,7 @@ class TestQueryCommand:
     def test_query_file_not_found(self):
         """Test error handling for missing file"""
         runner = CliRunner()
-        result = runner.invoke(
-            cli, ["query", "/nonexistent/file.csv", "SELECT * FROM data"]
-        )
+        result = runner.invoke(cli, ["query", "/nonexistent/file.csv", "SELECT * FROM data"])
 
         assert result.exit_code == 1
         assert "Error" in result.output or "error" in result.output
@@ -123,9 +111,7 @@ class TestQueryCommand:
     def test_query_invalid_sql(self, sample_csv):
         """Test error handling for invalid SQL"""
         runner = CliRunner()
-        result = runner.invoke(
-            cli, ["query", str(sample_csv), "INVALID SQL SYNTAX"]
-        )
+        result = runner.invoke(cli, ["query", str(sample_csv), "INVALID SQL SYNTAX"])
 
         assert result.exit_code == 1
 

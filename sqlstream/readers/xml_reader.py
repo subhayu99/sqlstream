@@ -44,12 +44,7 @@ class XMLReader(BaseReader):
         reader = XMLReader("data.xml", element="data/record")
     """
 
-    def __init__(
-        self,
-        source: str,
-        element: str | None = None,
-        **kwargs
-    ):
+    def __init__(self, source: str, element: str | None = None, **kwargs):
         """
         Initialize XML reader
 
@@ -187,13 +182,14 @@ class XMLReader(BaseReader):
 
         # If element has text and no children, add it with special key
         if elem.text and elem.text.strip() and len(elem) == 0:
-            row['_text'] = self._infer_type(elem.text.strip())
+            row["_text"] = self._infer_type(elem.text.strip())
 
         return row
 
     def _infer_type(self, value: str) -> Any:
         """Infer and convert value to appropriate type"""
         from sqlstream.core.types import infer_type_from_string
+
         return infer_type_from_string(value)
 
     def read_lazy(self) -> Iterator[dict[str, Any]]:
@@ -207,10 +203,7 @@ class XMLReader(BaseReader):
             # Apply column selection if any
             if self.required_columns:
                 # Ensure all columns exist in row (fill with None if missing)
-                filtered_row = {
-                    k: row.get(k)
-                    for k in self.required_columns
-                }
+                filtered_row = {k: row.get(k) for k in self.required_columns}
                 yield filtered_row
             else:
                 # Ensure all columns exist in row (fill with None if missing)
@@ -263,10 +256,7 @@ class XMLReader(BaseReader):
 
         for col in self.columns:
             # Collect all non-None values for this column
-            values = [
-                row[col] for row in self.rows
-                if col in row and row[col] is not None
-            ]
+            values = [row[col] for row in self.rows if col in row and row[col] is not None]
 
             if not values:
                 schema[col] = DataType.STRING
@@ -303,9 +293,6 @@ class XMLReader(BaseReader):
             raise ImportError("Pandas is required for to_dataframe()") from e
 
         # Ensure all rows have all columns
-        complete_rows = [
-            {col: row.get(col) for col in self.columns}
-            for row in self.rows
-        ]
+        complete_rows = [{col: row.get(col) for col in self.columns} for row in self.rows]
 
         return pd.DataFrame(complete_rows)

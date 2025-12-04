@@ -71,13 +71,12 @@ class HTTPReader(BaseReader):
             **kwargs: Additional arguments passed to the delegate reader
         """
         if not HTTPX_AVAILABLE:
-            raise ImportError(
-                "HTTP reader requires httpx library. "
-                "Install `sqlstream[http]`"
-            )
+            raise ImportError("HTTP reader requires httpx library. Install `sqlstream[http]`")
 
         self.url = url
-        self.cache_dir = Path(cache_dir) if cache_dir else Path(tempfile.gettempdir()) / "sqlstream_cache"
+        self.cache_dir = (
+            Path(cache_dir) if cache_dir else Path(tempfile.gettempdir()) / "sqlstream_cache"
+        )
         self.force_download = force_download
         self.explicit_format = format
         self.reader_kwargs = kwargs
@@ -166,34 +165,34 @@ class HTTPReader(BaseReader):
         # Create appropriate reader based on detected/specified format
         if format_to_use == "parquet":
             if not PARQUET_AVAILABLE:
-                raise ImportError(
-                    "Parquet files require pyarrow. "
-                    "Install `sqlstream[parquet]`"
-                )
+                raise ImportError("Parquet files require pyarrow. Install `sqlstream[parquet]`")
             return ParquetReader(str(self.local_path))
 
         elif format_to_use == "html":
             try:
                 from sqlstream.readers.html_reader import HTMLReader
+
                 return HTMLReader(str(self.local_path), **self.reader_kwargs)
             except ImportError as e:
                 raise ImportError(
-                    "HTML reader requires pandas library. "
-                    "Install `sqlstream[pandas]`"
+                    "HTML reader requires pandas library. Install `sqlstream[pandas]`"
                 ) from e
 
         elif format_to_use == "markdown":
             from sqlstream.readers.markdown_reader import MarkdownReader
+
             return MarkdownReader(str(self.local_path), **self.reader_kwargs)
 
         elif format_to_use == "json":
             from sqlstream.readers.json_reader import JSONReader
+
             # Pass table/records_key if available in kwargs
-            records_key = self.reader_kwargs.get('table')
+            records_key = self.reader_kwargs.get("table")
             return JSONReader(str(self.local_path), records_key=records_key)
 
         elif format_to_use == "jsonl":
             from sqlstream.readers.jsonl_reader import JSONLReader
+
             return JSONLReader(str(self.local_path))
 
         else:  # csv or unknown - default to CSV
@@ -205,30 +204,40 @@ class HTTPReader(BaseReader):
     def _detect_format_from_content(self) -> str:
         """Try to detect format by peeking at file content"""
         try:
-            with open(self.local_path, 'rb') as f:
+            with open(self.local_path, "rb") as f:
                 # Read first few bytes
                 header = f.read(512)
 
             # Check for HTML
-            if b'<html' in header.lower() or b'<!doctype html' in header.lower() or b'<table' in header.lower():
+            if (
+                b"<html" in header.lower()
+                or b"<!doctype html" in header.lower()
+                or b"<table" in header.lower()
+            ):
                 return "html"
 
             # Check for Markdown table (simple heuristic)
-            if b'|' in header and b'---' in header:
+            if b"|" in header and b"---" in header:
                 return "markdown"
 
             # Check for Parquet magic number
-            if header.startswith(b'PAR1'):
+            if header.startswith(b"PAR1"):
                 return "parquet"
 
             # Check for JSON (starts with [ or {)
             stripped = header.strip()
-            if stripped.startswith(b'[') or (stripped.startswith(b'{') and b'"records":' in stripped):
-                 return "json"
+            if stripped.startswith(b"[") or (
+                stripped.startswith(b"{") and b'"records":' in stripped
+            ):
+                return "json"
 
             # Check for JSONL (multiple lines starting with {)
-            lines = header.split(b'\n')
-            if len(lines) > 1 and lines[0].strip().startswith(b'{') and lines[1].strip().startswith(b'{'):
+            lines = header.split(b"\n")
+            if (
+                len(lines) > 1
+                and lines[0].strip().startswith(b"{")
+                and lines[1].strip().startswith(b"{")
+            ):
                 return "jsonl"
 
             # Default to CSV
@@ -288,7 +297,9 @@ class HTTPReader(BaseReader):
         Returns:
             Number of files deleted
         """
-        cache_path = Path(cache_dir) if cache_dir else Path(tempfile.gettempdir()) / "sqlstream_cache"
+        cache_path = (
+            Path(cache_dir) if cache_dir else Path(tempfile.gettempdir()) / "sqlstream_cache"
+        )
 
         if not cache_path.exists():
             return 0

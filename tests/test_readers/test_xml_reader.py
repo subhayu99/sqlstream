@@ -1,6 +1,7 @@
 """
 Test XMLReader - parsing and querying XML files
 """
+
 import tempfile
 from pathlib import Path
 
@@ -26,7 +27,7 @@ class TestXMLReaderBasic:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -35,11 +36,11 @@ class TestXMLReaderBasic:
             rows = list(reader.read_lazy())
 
             assert len(rows) == 2
-            assert rows[0]['name'] == 'Alice'
-            assert rows[0]['age'] == 30
-            assert rows[0]['city'] == 'New York'
-            assert rows[1]['name'] == 'Bob'
-            assert rows[1]['age'] == 25
+            assert rows[0]["name"] == "Alice"
+            assert rows[0]["age"] == 30
+            assert rows[0]["city"] == "New York"
+            assert rows[1]["name"] == "Bob"
+            assert rows[1]["age"] == 25
         finally:
             Path(temp_path).unlink()
 
@@ -59,7 +60,7 @@ class TestXMLReaderBasic:
     </item>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -69,8 +70,8 @@ class TestXMLReaderBasic:
             rows = list(reader.read_lazy())
 
             assert len(rows) == 2
-            assert rows[0]['id'] == 1
-            assert rows[0]['value'] == 'foo'
+            assert rows[0]["id"] == 1
+            assert rows[0]["value"] == "foo"
         finally:
             Path(temp_path).unlink()
 
@@ -90,7 +91,7 @@ class TestXMLReaderBasic:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -100,11 +101,11 @@ class TestXMLReaderBasic:
 
             assert len(rows) == 2
             # Attributes are prefixed with @
-            assert rows[0]['@id'] == 1
-            assert rows[0]['@status'] == 'active'
-            assert rows[0]['name'] == 'Alice'
-            assert rows[1]['@id'] == 2
-            assert rows[1]['@status'] == 'inactive'
+            assert rows[0]["@id"] == 1
+            assert rows[0]["@status"] == "active"
+            assert rows[0]["name"] == "Alice"
+            assert rows[1]["@id"] == 2
+            assert rows[1]["@status"] == "inactive"
         finally:
             Path(temp_path).unlink()
 
@@ -130,7 +131,7 @@ class TestXMLReaderBasic:
     </person>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -139,11 +140,11 @@ class TestXMLReaderBasic:
             rows = list(reader.read_lazy())
 
             assert len(rows) == 2
-            assert rows[0]['name'] == 'Alice'
+            assert rows[0]["name"] == "Alice"
             # Nested elements use dot notation
-            assert rows[0]['address.city'] == 'New York'
-            assert rows[0]['address.zip'] == 10001
-            assert rows[1]['address.city'] == 'San Francisco'
+            assert rows[0]["address.city"] == "New York"
+            assert rows[0]["address.zip"] == 10001
+            assert rows[1]["address.city"] == "San Francisco"
         finally:
             Path(temp_path).unlink()
 
@@ -168,7 +169,7 @@ class TestXMLReaderBasic:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -176,10 +177,10 @@ class TestXMLReaderBasic:
             reader = XMLReader(temp_path, element="record")
             schema = reader.get_schema()
 
-            assert schema['id'] == DataType.INTEGER
-            assert schema['price'] == DataType.FLOAT
-            assert schema['active'] == DataType.BOOLEAN
-            assert schema['name'] == DataType.STRING
+            assert schema["id"] == DataType.INTEGER
+            assert schema["price"] == DataType.FLOAT
+            assert schema["active"] == DataType.BOOLEAN
+            assert schema["name"] == DataType.STRING
         finally:
             Path(temp_path).unlink()
 
@@ -208,7 +209,7 @@ class TestXMLReaderFiltering:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -220,8 +221,8 @@ class TestXMLReaderFiltering:
             rows = list(reader.read_lazy())
 
             assert len(rows) == 2
-            assert rows[0]['name'] == 'Alice'
-            assert rows[1]['name'] == 'Charlie'
+            assert rows[0]["name"] == "Alice"
+            assert rows[1]["name"] == "Charlie"
         finally:
             Path(temp_path).unlink()
 
@@ -238,19 +239,19 @@ class TestXMLReaderFiltering:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
         try:
             reader = XMLReader(temp_path, element="record")
-            reader.set_columns(['name', 'age'])
+            reader.set_columns(["name", "age"])
             rows = list(reader.read_lazy())
 
             assert len(rows) == 1
-            assert 'name' in rows[0]
-            assert 'age' in rows[0]
-            assert 'city' not in rows[0]
+            assert "name" in rows[0]
+            assert "age" in rows[0]
+            assert "city" not in rows[0]
         finally:
             Path(temp_path).unlink()
 
@@ -280,7 +281,7 @@ class TestXMLReaderErrors:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -303,7 +304,7 @@ class TestXMLReaderErrors:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -325,7 +326,7 @@ class TestXMLReaderErrors:
     <age>30</age>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -355,21 +356,20 @@ class TestXMLReaderIntegration:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
         try:
             # Test with fragment syntax - force pandas/python backend
             results = query(f"{temp_path}#xml:record").sql(
-                "SELECT name, age FROM data WHERE age > 25",
-                backend="python"
+                "SELECT name, age FROM data WHERE age > 25", backend="python"
             )
             rows = list(results)
 
             assert len(rows) == 1
-            assert rows[0]['name'] == 'Alice'
-            assert rows[0]['age'] == 30
+            assert rows[0]["name"] == "Alice"
+            assert rows[0]["age"] == 30
         finally:
             Path(temp_path).unlink()
 
@@ -391,7 +391,7 @@ class TestXMLReaderIntegration:
     </record>
 </data>"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
             temp_path = f.name
             f.write(xml_content)
 
@@ -400,10 +400,11 @@ class TestXMLReaderIntegration:
 
             try:
                 import pandas as pd  # noqa: F401
+
                 df = reader.to_dataframe()
                 assert len(df) == 2
-                assert sorted(df.columns) == ['age', 'name']
-                assert df['name'].tolist() == ['Alice', 'Bob']
+                assert sorted(df.columns) == ["age", "name"]
+                assert df["name"].tolist() == ["Alice", "Bob"]
             except ImportError:
                 # Pandas not available, should raise ImportError
                 with pytest.raises(ImportError):

@@ -47,15 +47,19 @@ except ImportError:
     from sqlstream import query
 
 
-APP_THEMES = [(' '.join(y.title() for y in x.split('-')), x) for x in _BUILTIN_THEMES.keys()]
-TEXT_AREA_THEMES = [(' '.join(y.title() for y in x.split('-')), x) for x in _TEXT_AREA_BUILTIN_THEMES.keys()]
+APP_THEMES = [(" ".join(y.title() for y in x.split("-")), x) for x in _BUILTIN_THEMES.keys()]
+TEXT_AREA_THEMES = [
+    (" ".join(y.title() for y in x.split("-")), x) for x in _TEXT_AREA_BUILTIN_THEMES.keys()
+]
 
 
 class SQLAutoComplete(OptionList):
     """A popup widget that shows autocomplete suggestions."""
+
     def __init__(self, suggestions: list[str], **kwargs):
         super().__init__(*suggestions, **kwargs)
         self.add_class("autocomplete-popup")
+
 
 class QueryEditor(TextArea):
     """Multi-line SQL query editor with syntax highlighting and auto-completion."""
@@ -78,16 +82,40 @@ class QueryEditor(TextArea):
         Binding("ctrl+shift+d", "duplicate_line", "Duplicate", show=False),
         Binding("ctrl+a", "select_all", "Select All", show=False),
         # Selection with Shift+Navigation
-        Binding("shift+home", "select_to_line_start", "Select to Line Start", show=False, priority=True),
+        Binding(
+            "shift+home", "select_to_line_start", "Select to Line Start", show=False, priority=True
+        ),
         Binding("shift+end", "select_to_line_end", "Select to Line End", show=False, priority=True),
     ]
 
     # SQL Keywords to suggest
     KEYWORDS = [
-        "SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "LIMIT",
-        "JOIN", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "AND", "OR",
-        "NOT", "NULL", "IS", "IN", "VALUES", "INSERT", "UPDATE",
-        "DELETE", "CREATE", "TABLE", "DROP", "ALTER", "HAVING", "AS"
+        "SELECT",
+        "FROM",
+        "WHERE",
+        "GROUP BY",
+        "ORDER BY",
+        "LIMIT",
+        "JOIN",
+        "LEFT JOIN",
+        "RIGHT JOIN",
+        "INNER JOIN",
+        "AND",
+        "OR",
+        "NOT",
+        "NULL",
+        "IS",
+        "IN",
+        "VALUES",
+        "INSERT",
+        "UPDATE",
+        "DELETE",
+        "CREATE",
+        "TABLE",
+        "DROP",
+        "ALTER",
+        "HAVING",
+        "AS",
     ]
 
     autocomplete_popup: SQLAutoComplete | None = None
@@ -100,7 +128,7 @@ class QueryEditor(TextArea):
 
         # Find start of word
         start = col
-        while start > 0 and (line[start-1].isalnum() or line[start-1] == "_"):
+        while start > 0 and (line[start - 1].isalnum() or line[start - 1] == "_"):
             start -= 1
 
         return line[start:col]
@@ -110,7 +138,7 @@ class QueryEditor(TextArea):
         suggestions = []
         try:
             # Access parent app's schema
-            if hasattr(self.app, 'schemas') and self.app.schemas:
+            if hasattr(self.app, "schemas") and self.app.schemas:
                 for source_name, schema in self.app.schemas.items():
                     # Add table/source name
                     suggestions.append(source_name)
@@ -175,7 +203,9 @@ class QueryEditor(TextArea):
                 return
             elif event.key in ("enter", "tab"):
                 # Complete the word
-                selected = self.autocomplete_popup.get_option_at_index(self.autocomplete_popup.highlighted).prompt
+                selected = self.autocomplete_popup.get_option_at_index(
+                    self.autocomplete_popup.highlighted
+                ).prompt
                 self._insert_completion(str(selected))
                 self._close_popup()
                 event.prevent_default()
@@ -191,7 +221,7 @@ class QueryEditor(TextArea):
         # Delete the partial word
         self.delete(
             start=(self.cursor_location[0], self.cursor_location[1] - len(current_word)),
-            end=self.cursor_location
+            end=self.cursor_location,
         )
         # Insert the full keyword
         self.insert(completion)
@@ -310,7 +340,7 @@ class QueryEditor(TextArea):
                 # Remove up to 4 leading spaces
                 spaces_to_remove = 0
                 for char in line[:4]:
-                    if char == ' ':
+                    if char == " ":
                         spaces_to_remove += 1
                     else:
                         break
@@ -327,7 +357,7 @@ class QueryEditor(TextArea):
             # Remove up to 4 leading spaces
             spaces_to_remove = 0
             for char in line[:4]:
-                if char == ' ':
+                if char == " ":
                     spaces_to_remove += 1
                 else:
                     break
@@ -366,11 +396,11 @@ class QueryEditor(TextArea):
 
             # Find word boundaries
             start = col
-            while start > 0 and (line[start-1].isalnum() or line[start-1] == '_'):
+            while start > 0 and (line[start - 1].isalnum() or line[start - 1] == "_"):
                 start -= 1
 
             end = col
-            while end < len(line) and (line[end].isalnum() or line[end] == '_'):
+            while end < len(line) and (line[end].isalnum() or line[end] == "_"):
                 end += 1
 
             if start < end:
@@ -398,8 +428,7 @@ class QueryEditor(TextArea):
                 # Found it! Set selection directly
                 actual_col = start_col + pos
                 self.selection = Selection(
-                    (search_row, actual_col),
-                    (search_row, actual_col + len(selected_text))
+                    (search_row, actual_col), (search_row, actual_col + len(selected_text))
                 )
                 found = True
                 break
@@ -415,10 +444,7 @@ class QueryEditor(TextArea):
                 pos = search_line.find(selected_text)
                 if pos != -1:
                     # Set selection directly
-                    self.selection = Selection(
-                        (row, pos),
-                        (row, pos + len(selected_text))
-                    )
+                    self.selection = Selection((row, pos), (row, pos + len(selected_text)))
                     break
 
     def action_select_to_line_start(self) -> None:
@@ -454,13 +480,13 @@ class QueryEditor(TextArea):
 
         # 2. Consume word characters OR symbols (but not mixed)
         if i >= 0:
-            if line[i].isalnum() or line[i] == '_':
+            if line[i].isalnum() or line[i] == "_":
                 # Word characters
-                while i >= 0 and (line[i].isalnum() or line[i] == '_'):
+                while i >= 0 and (line[i].isalnum() or line[i] == "_"):
                     i -= 1
             else:
                 # Symbols
-                while i >= 0 and not (line[i].isalnum() or line[i] == '_' or line[i].isspace()):
+                while i >= 0 and not (line[i].isalnum() or line[i] == "_" or line[i].isspace()):
                     i -= 1
 
         target_col = i + 1
@@ -485,13 +511,15 @@ class QueryEditor(TextArea):
 
         # 2. Consume word characters OR symbols
         if i < len(line):
-            if line[i].isalnum() or line[i] == '_':
+            if line[i].isalnum() or line[i] == "_":
                 # Word characters
-                while i < len(line) and (line[i].isalnum() or line[i] == '_'):
+                while i < len(line) and (line[i].isalnum() or line[i] == "_"):
                     i += 1
             else:
                 # Symbols
-                while i < len(line) and not (line[i].isalnum() or line[i] == '_' or line[i].isspace()):
+                while i < len(line) and not (
+                    line[i].isalnum() or line[i] == "_" or line[i].isspace()
+                ):
                     i += 1
 
         target_col = i
@@ -519,7 +547,7 @@ class StatusBar(Static):
         execution_time: Optional[float] = None,
         row_count: Optional[int] = None,
         filter_info: str = "",
-        backend_info: str = ""
+        backend_info: str = "",
     ) -> None:
         """Update status bar with execution info."""
         if execution_time is not None:
@@ -529,7 +557,7 @@ class StatusBar(Static):
 
         status_parts = [message]
         if filter_info:
-             status_parts.append(f"🔍 {filter_info}")
+            status_parts.append(f"🔍 {filter_info}")
         if backend_info:
             status_parts.append(f"⚙️ {backend_info}")
         if self.row_count is not None:
@@ -649,28 +677,28 @@ class FilterSidebar(Container):
             # Simple date detection could go here if data is Python datetime objects
 
         # Populate Operators based on Type
-        if col_type is float: # Numbers
+        if col_type is float:  # Numbers
             ops = [
                 ("Equals (=)", "eq"),
                 ("Greater Than (>)", "gt"),
                 ("Less Than (<)", "lt"),
-                ("Between (Range)", "between")
+                ("Between (Range)", "between"),
             ]
             op_select.set_options(ops)
             op_select.value = "eq"
 
-        elif col_type is bool: # Booleans
+        elif col_type is bool:  # Booleans
             ops = [("Is", "is")]
             op_select.set_options(ops)
             op_select.value = "is"
 
-        else: # Strings (Default)
+        else:  # Strings (Default)
             ops = [
                 ("Contains", "contains"),
                 ("Equals", "eq"),
                 ("Starts With", "startswith"),
                 ("Ends With", "endswith"),
-                ("Regex", "regex")
+                ("Regex", "regex"),
             ]
             op_select.set_options(ops)
             op_select.value = "contains"
@@ -827,11 +855,7 @@ class ExportSidebar(Container):
 
             # 1. Format Selection
             yield Label("Format:")
-            format_options = [
-                ("CSV", "csv"),
-                ("JSON", "json"),
-                ("Parquet", "parquet")
-            ]
+            format_options = [("CSV", "csv"), ("JSON", "json"), ("Parquet", "parquet")]
             yield Select(format_options, allow_blank=False, value="csv", id="ex-format")
 
             # 2. Directory Browser
@@ -899,7 +923,7 @@ class ExportSidebar(Container):
         tree = self.query_one("#export-tree", DirectoryTree)
         cursor_node = tree.cursor_node
 
-        target_dir = Path(tree.path) # Default to root of tree
+        target_dir = Path(tree.path)  # Default to root of tree
 
         if cursor_node and cursor_node.data:
             node_path = cursor_node.data.path
@@ -915,7 +939,9 @@ class ExportSidebar(Container):
             # PASS filename.name HERE
             self.app.push_screen(
                 OverwriteConfirmDialog(filename),
-                lambda should_overwrite: self._finish_export(full_path, fmt) if should_overwrite else None
+                lambda should_overwrite: self._finish_export(full_path, fmt)
+                if should_overwrite
+                else None,
             )
         else:
             self._finish_export(full_path, fmt)
@@ -951,7 +977,7 @@ class ConfigSidebar(Container):
                     [("CSV", "csv"), ("JSON", "json"), ("Parquet", "parquet")],
                     value="csv",
                     id="cfg-export-fmt",
-                    allow_blank=False
+                    allow_blank=False,
                 )
 
             # --- SECTION 2: EXECUTION ---
@@ -963,7 +989,7 @@ class ConfigSidebar(Container):
                     [("Auto", "auto"), ("DuckDB", "duckdb"), ("Pandas", "pandas")],
                     value="auto",
                     id="cfg-backend",
-                    allow_blank=False
+                    allow_blank=False,
                 )
 
                 yield Label("Page Size (Rows):", classes="config-sublabel")
@@ -1510,13 +1536,11 @@ class SQLShellApp(App):
         Binding("f3", "toggle_history", "History", show=False),
         Binding("f4", "toggle_explain", "Explain", show=False),
         Binding("f5", "cycle_backend", "Backend", show=False),
-
         # --- NEW BINDINGS ---
         Binding("f6", "cycle_layout", "Layout"),
         Binding("alt+up", "resize_query(-1)", "Shrink Edit", show=False),
         Binding("alt+down", "resize_query(1)", "Grow Edit", show=False),
         # --------------------
-
         Binding("ctrl+b", "cycle_backend", "Backend", show=True),
         Binding("ctrl+o", "open_file", "Files", priority=True),
         Binding("ctrl+f", "toggle_tools('filter')", "Filter", priority=True),
@@ -1576,7 +1600,7 @@ class SQLShellApp(App):
 
         # --- Layout State ---
         self.layout_mode = 0  # 0: Split, 1: Max Editor, 2: Max Results
-        self.query_height = 12 # Default height
+        self.query_height = 12  # Default height
         # --------------------
 
         if initial_file:
@@ -1638,9 +1662,7 @@ class SQLShellApp(App):
         await self._load_state()
 
         status_bar = self.query_one(StatusBar)
-        status_bar.update_status(
-            "Welcome! Type SQL and press Ctrl+Enter. Use F6 to toggle layout."
-        )
+        status_bar.update_status("Welcome! Type SQL and press Ctrl+Enter. Use F6 to toggle layout.")
 
         self._get_active_editor().focus()
 
@@ -1711,7 +1733,7 @@ class SQLShellApp(App):
         """Handle column header clicks for sorting."""
         # Get the column key - might be ColumnKey object
         column_key = event.column_key
-        if hasattr(column_key, 'value'):
+        if hasattr(column_key, "value"):
             column_key = column_key.value
         else:
             column_key = str(column_key)
@@ -1803,7 +1825,7 @@ class SQLShellApp(App):
 
     def _strip_sql_comments(self, sql: str) -> str:
         """Strip SQL comments (lines starting with --) from the query."""
-        lines = sql.split('\n')
+        lines = sql.split("\n")
         cleaned_lines = []
         for line in lines:
             # Find the position of '--' (not inside strings)
@@ -1812,14 +1834,14 @@ class SQLShellApp(App):
             string_char = None
 
             for i, char in enumerate(line):
-                if char in ('"', "'") and (i == 0 or line[i-1] != '\\'):
+                if char in ('"', "'") and (i == 0 or line[i - 1] != "\\"):
                     if not in_string:
                         in_string = True
                         string_char = char
                     elif char == string_char:
                         in_string = False
                         string_char = None
-                elif char == '-' and i + 1 < len(line) and line[i + 1] == '-' and not in_string:
+                elif char == "-" and i + 1 < len(line) and line[i + 1] == "-" and not in_string:
                     comment_pos = i
                     break
 
@@ -1830,7 +1852,7 @@ class SQLShellApp(App):
             if line.strip():  # Only keep non-empty lines
                 cleaned_lines.append(line)
 
-        return '\n'.join(cleaned_lines)
+        return "\n".join(cleaned_lines)
 
     def _execute_query(self, query_text: str) -> None:
         """Execute a SQL query and display results."""
@@ -1854,7 +1876,9 @@ class SQLShellApp(App):
             # Safe source discovery
             try:
                 _sources = result._discover_sources()
-                self.loaded_files.extend([f for f in _sources.values() if f and f not in self.loaded_files])
+                self.loaded_files.extend(
+                    [f for f in _sources.values() if f and f not in self.loaded_files]
+                )
             except Exception:
                 pass
 
@@ -1874,7 +1898,11 @@ class SQLShellApp(App):
                 self._display_results(results, execution_time)
             else:
                 results_viewer.clear(columns=True)
-                status_bar.update_status("Query executed successfully (no results)", execution_time=execution_time, row_count=0)
+                status_bar.update_status(
+                    "Query executed successfully (no results)",
+                    execution_time=execution_time,
+                    row_count=0,
+                )
 
         except Exception as e:
             self._show_error(str(e))
@@ -1927,7 +1955,7 @@ class SQLShellApp(App):
                 elif mode == "endswith":
                     if val_str.endswith(filter_lower):
                         match_found = True
-                else: # contains
+                else:  # contains
                     if filter_lower in val_str:
                         match_found = True
 
@@ -1946,14 +1974,14 @@ class SQLShellApp(App):
 
         try:
             return sorted(
-                results,
-                key=lambda x: x.get(self.sort_column, ""),
-                reverse=self.sort_reverse
+                results, key=lambda x: x.get(self.sort_column, ""), reverse=self.sort_reverse
             )
         except Exception:
             return results
 
-    def _infer_column_types(self, results: List[Dict[str, Any]], columns: List[str]) -> Dict[str, str]:
+    def _infer_column_types(
+        self, results: List[Dict[str, Any]], columns: List[str]
+    ) -> Dict[str, str]:
         """Infer column datatypes from result values."""
         from sqlstream.core.types import infer_type
 
@@ -1968,7 +1996,7 @@ class SQLShellApp(App):
             "DATE": "📅",
             "TIME": "⏰",
             "DATETIME": "📆",
-            "NULL": "∅"
+            "NULL": "∅",
         }
 
         column_types = {}
@@ -2001,7 +2029,7 @@ class SQLShellApp(App):
                 return f"{value:.6g}"
             else:
                 # Regular decimal notation
-                return f"{value:.6f}".rstrip('0').rstrip('.')
+                return f"{value:.6f}".rstrip("0").rstrip(".")
         else:
             return str(value)
 
@@ -2059,11 +2087,12 @@ class SQLShellApp(App):
         # FIX: Check filter_active flag
         filter_info = f" (filtered from {len(self.last_results)})" if self.filter_active else ""
 
-        message = f"Showing {start_idx + 1}-{end_idx} of {total_rows} rows{filter_info} | {page_info}"
+        message = (
+            f"Showing {start_idx + 1}-{end_idx} of {total_rows} rows{filter_info} | {page_info}"
+        )
         status_bar.update_status(message, execution_time=execution_time, row_count=total_rows)
         status_bar.remove_class("error")
         status_bar.add_class("success")
-
 
     def _show_error(self, error_message: str) -> None:
         """Show an error message."""
@@ -2085,7 +2114,9 @@ class SQLShellApp(App):
                 filter_info = f"`{self.filter_column}` {filter_mode} "
             filter_info += f"'{self.filter_text}'"
 
-        status_bar.update_status(message, filter_info=filter_info, backend_info=self.backend.upper())
+        status_bar.update_status(
+            message, filter_info=filter_info, backend_info=self.backend.upper()
+        )
 
         if error:
             status_bar.remove_class("success")
@@ -2116,7 +2147,9 @@ class SQLShellApp(App):
                 # Use special delimiter to separate queries (supports multiline)
                 if content:
                     self.query_history = content.split("\n===\n")
-                    self.query_history = sorted(set(self.query_history), key=self.query_history.index, reverse=True)
+                    self.query_history = sorted(
+                        set(self.query_history), key=self.query_history.index, reverse=True
+                    )
                 else:
                     self.query_history = []
             except Exception:
@@ -2127,7 +2160,7 @@ class SQLShellApp(App):
             history_path = Path(self.history_file)
             history_path.parent.mkdir(parents=True, exist_ok=True)
             # Use configurable limit
-            history_to_save = self.query_history[-self.max_history:]
+            history_to_save = self.query_history[-self.max_history :]
             history_path.write_text("\n===\n".join(history_to_save))
         except Exception:
             pass
@@ -2144,7 +2177,7 @@ class SQLShellApp(App):
             "editor_linenums": self.editor_linenums,
             "editor_soft_wrap": self.editor_soft_wrap,
             "results_zebra": self.results_zebra,
-            "results_compact": self.results_compact
+            "results_compact": self.results_compact,
         }
         try:
             Path(self.config_file).write_text(json.dumps(config, indent=2))
@@ -2271,8 +2304,9 @@ class SQLShellApp(App):
             row_count = len(results_to_export)
             filename = str(path)
 
-            if fmt == 'csv':
+            if fmt == "csv":
                 import csv
+
                 with open(filename, "w", newline="") as f:
                     writer = csv.DictWriter(f, fieldnames=results_to_export[0].keys())
                     writer.writeheader()
@@ -2283,8 +2317,9 @@ class SQLShellApp(App):
                     writer.writerows(export_rows)
                 self._show_status(f"✓ Exported {row_count} rows to CSV: {filename}")
 
-            elif fmt == 'json':
+            elif fmt == "json":
                 import json
+
                 export_rows = []
                 for row in results_to_export:
                     export_row = {k: self._prepare_value_for_export(v) for k, v in row.items()}
@@ -2293,10 +2328,11 @@ class SQLShellApp(App):
                     json.dump(export_rows, f, indent=2)
                 self._show_status(f"✓ Exported {row_count} rows to JSON: {filename}")
 
-            elif fmt == 'parquet':
+            elif fmt == "parquet":
                 try:
                     import pyarrow as pa
                     import pyarrow.parquet as pq
+
                     table = pa.Table.from_pylist(results_to_export)
                     pq.write_table(table, filename)
                     self._show_status(f"✓ Exported {row_count} rows to Parquet: {filename}")
@@ -2487,7 +2523,7 @@ class SQLShellApp(App):
             input_val = safe_cast(val1, target_type)
 
             if row_val is None or input_val is None:
-                continue # Skip invalid data
+                continue  # Skip invalid data
 
             match = False
 
@@ -2513,6 +2549,7 @@ class SQLShellApp(App):
                 match = row_val is input_val
             elif op == "regex":
                 import re
+
                 try:
                     if re.search(str(input_val), str(row_val), re.IGNORECASE):
                         match = True
@@ -2522,18 +2559,17 @@ class SQLShellApp(App):
             if match:
                 self.filtered_results.append(row)
 
-         # Update state so Export and Status Bar know a filter is active
+        # Update state so Export and Status Bar know a filter is active
         self.filter_active = True
         self.filter_column = col
         self.filter_mode = op
-        self.filter_text = str(val1) # Store value for display/logic
+        self.filter_text = str(val1)  # Store value for display/logic
         # ------------------------------------------------
 
         self.current_page = 0
         self._refresh_displayed_results()
-        self._refresh_tools_data() # Update the export sidebar count immediately
+        self._refresh_tools_data()  # Update the export sidebar count immediately
         self._show_status(f"Filtered: {col} {op} {val1}")
-
 
     def action_open_file(self) -> None:
         """Switch to file browser tab and show sidebar."""
@@ -2589,7 +2625,6 @@ class SQLShellApp(App):
 
         self._show_status(f"Added file to query: {file_path}")
 
-
     async def action_new_tab(self, content: str = "", title: str = None) -> None:
         """Create a new query tab."""
         self.tab_counter += 1
@@ -2606,7 +2641,7 @@ class SQLShellApp(App):
             theme=self.editor_theme,
             show_line_numbers=self.editor_linenums,
             soft_wrap=self.editor_soft_wrap,
-            text=content
+            text=content,
         )
 
         tabs = self.query_one("#query-tabs", TabbedContent)
@@ -2626,7 +2661,7 @@ class SQLShellApp(App):
 
         # If no tabs left, create a new one
         if not tabs.query(TabPane):
-             await self.action_new_tab()
+            await self.action_new_tab()
 
     def action_quit(self) -> None:
         """Save state and exit, optionally confirming."""
@@ -2661,10 +2696,7 @@ class SQLShellApp(App):
 
                         if editors:
                             editor = editors[0]
-                            state.append({
-                                "title": str(child._title),
-                                "content": editor.text
-                            })
+                            state.append({"title": str(child._title), "content": editor.text})
             except Exception:
                 pass
 
@@ -2673,10 +2705,7 @@ class SQLShellApp(App):
                 for pane in tabs.query(TabPane):
                     editors = list(pane.query(QueryEditor))
                     if editors:
-                        state.append({
-                            "title": str(pane._title),
-                            "content": editors[0].text
-                        })
+                        state.append({"title": str(pane._title), "content": editors[0].text})
 
             # Write to file
             path = Path(self.state_file)
@@ -2700,8 +2729,7 @@ class SQLShellApp(App):
                 if state and isinstance(state, list):
                     for tab_data in state:
                         await self.action_new_tab(
-                            content=tab_data.get("content", ""),
-                            title=tab_data.get("title")
+                            content=tab_data.get("content", ""), title=tab_data.get("title")
                         )
                     self.notify(f"Loaded {len(state)} tabs", timeout=3)
                     loaded = True
@@ -2711,6 +2739,7 @@ class SQLShellApp(App):
         if not loaded:
             # Create default tab
             await self.action_new_tab()
+
 
 def launch_shell(initial_file: Optional[str] = None, history_file: Optional[str] = None) -> None:
     """

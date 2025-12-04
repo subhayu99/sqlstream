@@ -142,9 +142,7 @@ if TEXTUAL_AVAILABLE:
 
             # Add rows
             for i, row in enumerate(self.results):
-                values = [
-                    str(row[col]) if row[col] is not None else "NULL" for col in columns
-                ]
+                values = [str(row[col]) if row[col] is not None else "NULL" for col in columns]
                 table.add_row(*values, key=f"row_{i}")
 
             # Configure table
@@ -172,10 +170,7 @@ def launch_interactive(results: List[Dict[str, Any]]) -> None:
         ImportError: If textual library is not installed
     """
     if not TEXTUAL_AVAILABLE:
-        raise ImportError(
-            "Interactive mode requires textual library. "
-            "Install `sqlstream[cli]`"
-        )
+        raise ImportError("Interactive mode requires textual library. Install `sqlstream[cli]`")
 
     app = TableApp(results)
     app.run()

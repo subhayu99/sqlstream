@@ -13,6 +13,7 @@ from sqlstream.readers.base import BaseReader
 
 try:
     import duckdb
+
     DUCKDB_AVAILABLE = True
 except ImportError:
     DUCKDB_AVAILABLE = False
@@ -47,8 +48,7 @@ class DuckDBExecutor:
         """Initialize DuckDB executor"""
         if not DUCKDB_AVAILABLE:
             raise ImportError(
-                "DuckDB backend requires duckdb library. "
-                "Install with: pip install duckdb"
+                "DuckDB backend requires duckdb library. Install with: pip install duckdb"
             )
 
         # Create in-memory DuckDB connection
@@ -60,7 +60,7 @@ class DuckDBExecutor:
         sources: dict[str, str],
         read_only: bool = True,
         use_dataframes: bool = True,
-        reader_factory: Callable[[str], Any] | None = None
+        reader_factory: Callable[[str], Any] | None = None,
     ) -> Iterator[dict[str, Any]]:
         """
         Execute raw SQL query with DuckDB
@@ -122,6 +122,7 @@ class DuckDBExecutor:
             SQL keywords (e.g., 'right', 'left', 'order', etc.)
         """
         import re
+
         transformed_sql = sql
 
         # Sort by length (longest first) to avoid partial replacements
@@ -146,12 +147,14 @@ class DuckDBExecutor:
                 escaped_path = re.escape(file_path)
                 # Pattern: match file path when NOT surrounded by alphanumeric/underscore/dot/slash
                 # This ensures we match complete paths
-                pattern = '(?<![\\w/.])' + escaped_path + '(?![\\w/.])'
+                pattern = "(?<![\\w/.])" + escaped_path + "(?![\\w/.])"
                 transformed_sql = re.sub(pattern, quoted_table, transformed_sql)
 
         return transformed_sql
 
-    def _register_sources_with_readers(self, sources: dict[str, str], reader_factory: Callable[[str], BaseReader]):
+    def _register_sources_with_readers(
+        self, sources: dict[str, str], reader_factory: Callable[[str], BaseReader]
+    ):
         """
         Register sources using Reader objects to get DataFrames
         """
@@ -189,15 +192,15 @@ class DuckDBExecutor:
                 file_path = file_path.strip("'\"")
 
                 # Load file as DataFrame
-                if file_path.endswith(('.parquet', '.pq')):
+                if file_path.endswith((".parquet", ".pq")):
                     df = pd.read_parquet(file_path)
-                elif file_path.endswith('.csv'):
+                elif file_path.endswith(".csv"):
                     df = pd.read_csv(file_path)
-                elif file_path.endswith('.json'):
+                elif file_path.endswith(".json"):
                     df = pd.read_json(file_path)
-                elif file_path.startswith(('s3://', 'http://', 'https://')):
+                elif file_path.startswith(("s3://", "http://", "https://")):
                     # For remote files, use pandas readers with appropriate storage options
-                    if file_path.endswith(('.parquet', '.pq')):
+                    if file_path.endswith((".parquet", ".pq")):
                         df = pd.read_parquet(file_path)
                     else:
                         df = pd.read_csv(file_path)
@@ -211,7 +214,6 @@ class DuckDBExecutor:
 
             except Exception:
                 self._register_source(table_name, file_path)
-
 
     def _register_source(self, table_name: str, file_path: str, read_only: bool = True):
         """
@@ -232,26 +234,26 @@ class DuckDBExecutor:
         file_path = file_path.strip("'\"")  # Remove quotes if present
 
         # Determine file type
-        if file_path.endswith('.parquet') or file_path.endswith('.pq'):
+        if file_path.endswith(".parquet") or file_path.endswith(".pq"):
             # Use DuckDB's native Parquet reader
             self.conn.execute(
                 f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM read_parquet('{file_path}')"
             )
-        elif file_path.endswith('.csv'):
+        elif file_path.endswith(".csv"):
             # Use DuckDB's CSV reader with auto-detection
             self.conn.execute(
                 f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM read_csv('{file_path}', "
                 f"auto_detect=true, header=true)"
             )
-        elif file_path.endswith('.json'):
+        elif file_path.endswith(".json"):
             # Use DuckDB's JSON reader
             self.conn.execute(
                 f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM read_json('{file_path}')"
             )
-        elif file_path.startswith('s3://'):
+        elif file_path.startswith("s3://"):
             # S3 support (requires httpfs extension)
             self._ensure_httpfs()
-            if file_path.endswith('.parquet') or file_path.endswith('.pq'):
+            if file_path.endswith(".parquet") or file_path.endswith(".pq"):
                 self.conn.execute(
                     f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM read_parquet('{file_path}')"
                 )
@@ -259,14 +261,14 @@ class DuckDBExecutor:
                 self.conn.execute(
                     f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM read_csv('{file_path}', auto_detect=true)"
                 )
-        elif file_path.startswith(('http://', 'https://')):
+        elif file_path.startswith(("http://", "https://")):
             # HTTP support (requires httpfs extension)
             self._ensure_httpfs()
-            if file_path.endswith('.parquet') or file_path.endswith('.pq'):
+            if file_path.endswith(".parquet") or file_path.endswith(".pq"):
                 self.conn.execute(
                     f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM read_parquet('{file_path}')"
                 )
-            elif file_path.endswith('.csv'):
+            elif file_path.endswith(".csv"):
                 self.conn.execute(
                     f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM read_csv('{file_path}', auto_detect=true)"
                 )
@@ -277,9 +279,7 @@ class DuckDBExecutor:
                 )
         else:
             # Generic - let DuckDB auto-detect
-            self.conn.execute(
-                f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM '{file_path}'"
-            )
+            self.conn.execute(f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM '{file_path}'")
 
     def _ensure_httpfs(self):
         """Ensure httpfs extension is loaded for S3/HTTP support"""

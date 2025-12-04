@@ -8,12 +8,14 @@ import pytest
 
 try:
     import duckdb  # noqa: F401
+
     DUCKDB_AVAILABLE = True
 except ImportError:
     DUCKDB_AVAILABLE = False
 
 try:
     import pandas as pd  # noqa: F401
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -42,9 +44,9 @@ class TestDuckDBBackendBasic:
 
     def test_select_all(self, sample_csv):
         """Test SELECT *"""
-        result = query(str(sample_csv)).sql(
-            f"SELECT * FROM '{sample_csv}'", backend="duckdb"
-        ).to_list()
+        result = (
+            query(str(sample_csv)).sql(f"SELECT * FROM '{sample_csv}'", backend="duckdb").to_list()
+        )
 
         assert len(result) == 4
         # Check values
@@ -53,9 +55,11 @@ class TestDuckDBBackendBasic:
 
     def test_where_filter(self, sample_csv):
         """Test WHERE clause"""
-        result = query(str(sample_csv)).sql(
-            f"SELECT * FROM '{sample_csv}' WHERE age > 28", backend="duckdb"
-        ).to_list()
+        result = (
+            query(str(sample_csv))
+            .sql(f"SELECT * FROM '{sample_csv}' WHERE age > 28", backend="duckdb")
+            .to_list()
+        )
 
         assert len(result) == 2
         names = sorted([r["name"] for r in result])
@@ -63,9 +67,11 @@ class TestDuckDBBackendBasic:
 
     def test_aggregations(self, sample_csv):
         """Test aggregations"""
-        result = query(str(sample_csv)).sql(
-            f"SELECT AVG(salary) as avg_sal FROM '{sample_csv}'", backend="duckdb"
-        ).to_list()
+        result = (
+            query(str(sample_csv))
+            .sql(f"SELECT AVG(salary) as avg_sal FROM '{sample_csv}'", backend="duckdb")
+            .to_list()
+        )
 
         assert len(result) == 1
         expected_avg = (75000 + 65000 + 85000 + 70000) / 4
@@ -140,9 +146,7 @@ class TestDuckDBJoins:
     @pytest.fixture
     def orders_csv(self, tmp_path):
         csv_file = tmp_path / "orders.csv"
-        csv_file.write_text(
-            "order_id,customer_id,amount\n" "101,1,100\n" "102,2,200\n" "103,1,150\n"
-        )
+        csv_file.write_text("order_id,customer_id,amount\n101,1,100\n102,2,200\n103,1,150\n")
         return csv_file
 
     def test_join_multiple_files(self, customers_csv, orders_csv):
@@ -182,7 +186,7 @@ class TestBackendSelection:
         q = query(str(sample_csv)).sql(f"SELECT * FROM '{sample_csv}'", backend="duckdb")
         assert q.use_duckdb is True
         assert q.use_pandas is False
-        assert isinstance(q.executor, object) # Should be DuckDBExecutor
+        assert isinstance(q.executor, object)  # Should be DuckDBExecutor
 
     def test_auto_priority(self, sample_csv):
         """Test auto priority (Pandas > DuckDB > Python)"""

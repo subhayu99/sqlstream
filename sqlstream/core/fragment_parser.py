@@ -9,6 +9,7 @@ from typing import Optional, Tuple, Union
 
 class FragmentParseError(Exception):
     """Raised when fragment parsing fails"""
+
     pass
 
 
@@ -38,12 +39,12 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Uni
     Raises:
         FragmentParseError: If fragment syntax is invalid
     """
-    if '#' not in source:
+    if "#" not in source:
         return (source, None, None)
 
     # Split on LAST # to handle URLs with # in path
     # (though this is rare, fragment should be last part)
-    parts = source.rsplit('#', 1)
+    parts = source.rsplit("#", 1)
     source_path = parts[0]
     fragment = parts[1]
 
@@ -52,14 +53,22 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Uni
         return (source_path, None, None)
 
     # Parse fragment: format:table
-    if ':' in fragment:
-        format_part, table_part = fragment.split(':', 1)
+    if ":" in fragment:
+        format_part, table_part = fragment.split(":", 1)
 
         # Empty format means auto-detect
         format_spec = format_part.strip() if format_part.strip() else None
 
         # Validate format if specified
-        if format_spec and format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json', 'jsonl', 'xml'):
+        if format_spec and format_spec not in (
+            "csv",
+            "parquet",
+            "html",
+            "markdown",
+            "json",
+            "jsonl",
+            "xml",
+        ):
             raise FragmentParseError(
                 f"Unknown format '{format_spec}'. "
                 f"Supported formats: csv, parquet, html, markdown, json, jsonl, xml"
@@ -81,7 +90,7 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Uni
         format_spec = fragment.strip()
 
         # Validate format
-        if format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json', 'jsonl', 'xml'):
+        if format_spec not in ("csv", "parquet", "html", "markdown", "json", "jsonl", "xml"):
             raise FragmentParseError(
                 f"Unknown format '{format_spec}'. "
                 f"Supported formats: csv, parquet, html, markdown, json, jsonl, xml"
@@ -91,9 +100,7 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Uni
 
 
 def build_source_fragment(
-    source: str,
-    format: Optional[str] = None,
-    table: Optional[int] = None
+    source: str, format: Optional[str] = None, table: Optional[int] = None
 ) -> str:
     """
     Build a source string with fragment from components

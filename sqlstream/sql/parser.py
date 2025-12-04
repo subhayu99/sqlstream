@@ -98,9 +98,7 @@ class SQLParser:
         token = self.tokens[self.pos]
 
         if expected and token.upper() != expected.upper():
-            raise ParseError(
-                f"Expected '{expected}' but got '{token}' at position {self.pos}"
-            )
+            raise ParseError(f"Expected '{expected}' but got '{token}' at position {self.pos}")
 
         self.pos += 1
         return token
@@ -450,7 +448,13 @@ class SQLParser:
         if self.current() and self.current().upper() == "AS":
             self.consume("AS")
             self.consume()  # Skip alias name
-        elif self.current() and self.current().upper() not in ("ON", "WHERE", "GROUP", "ORDER", "LIMIT"):
+        elif self.current() and self.current().upper() not in (
+            "ON",
+            "WHERE",
+            "GROUP",
+            "ORDER",
+            "LIMIT",
+        ):
             # If next token is not a keyword, it's likely an alias
             self.consume()  # Skip alias name
 

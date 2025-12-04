@@ -23,6 +23,7 @@ class JSONFormatter(BaseFormatter):
         Returns:
             JSON string
         """
+
         # Handle NaN and infinity values (convert to null)
         def clean_value(val):
             if isinstance(val, float):
@@ -31,14 +32,11 @@ class JSONFormatter(BaseFormatter):
             return val
 
         # Clean all values
-        cleaned_results = [
-            {k: clean_value(v) for k, v in row.items()}
-            for row in results
-        ]
+        cleaned_results = [{k: clean_value(v) for k, v in row.items()} for row in results]
 
         # Format as JSON
         if kwargs.get("compact", False):
-            return json.dumps(cleaned_results, separators=(',', ':'))
+            return json.dumps(cleaned_results, separators=(",", ":"))
         else:
             indent = kwargs.get("indent", 2)
             return json.dumps(cleaned_results, indent=indent)

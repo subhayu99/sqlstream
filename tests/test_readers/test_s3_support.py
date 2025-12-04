@@ -21,14 +21,14 @@ class TestS3CSVReader:
         self.mock_s3fs.S3FileSystem.return_value = self.mock_fs
 
         # Patch s3fs module
-        with patch.dict('sys.modules', {'s3fs': self.mock_s3fs}):
+        with patch.dict("sys.modules", {"s3fs": self.mock_s3fs}):
             yield
 
     def test_csv_reader_s3_init(self):
         """Test CSVReader initialization with S3 path."""
         from sqlstream.readers.csv_reader import CSVReader
 
-        with patch.dict('sys.modules', {'s3fs': self.mock_s3fs}):
+        with patch.dict("sys.modules", {"s3fs": self.mock_s3fs}):
             path = "s3://bucket/data.csv"
             reader = CSVReader(path)
 
@@ -40,7 +40,7 @@ class TestS3CSVReader:
         """Test CSVReader reading from S3."""
         from sqlstream.readers.csv_reader import CSVReader
 
-        with patch.dict('sys.modules', {'s3fs': self.mock_s3fs}):
+        with patch.dict("sys.modules", {"s3fs": self.mock_s3fs}):
             path = "s3://bucket/data.csv"
             reader = CSVReader(path)
 
@@ -64,7 +64,7 @@ class TestS3CSVReader:
         from sqlstream.readers.csv_reader import CSVReader
 
         # Mock ImportError for s3fs
-        with patch.dict('sys.modules', {'s3fs': None}):
+        with patch.dict("sys.modules", {"s3fs": None}):
             path = "s3://bucket/data.csv"
             reader = CSVReader(path)
 
@@ -79,7 +79,7 @@ class TestS3CSVReader:
 
         # Create test CSV
         csv_file = tmp_path / "test.csv"
-        with open(csv_file, 'w', newline='') as f:
+        with open(csv_file, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["name", "age"])
             writer.writerow(["Alice", "30"])
@@ -114,7 +114,7 @@ class TestS3ParquetReader:
         path = "s3://bucket/data.parquet"
 
         # Mock pyarrow.parquet.ParquetFile
-        with patch.dict('sys.modules', {'s3fs': self.mock_s3fs}):
+        with patch.dict("sys.modules", {"s3fs": self.mock_s3fs}):
             with patch("pyarrow.parquet.ParquetFile") as mock_pq:
                 # Mock ParquetFile to have required attributes
                 mock_parquet_file = MagicMock()
@@ -139,7 +139,7 @@ class TestS3ParquetReader:
         path = "s3://bucket/data.parquet"
 
         # Mock ImportError for s3fs
-        with patch.dict('sys.modules', {'s3fs': None}):
+        with patch.dict("sys.modules", {"s3fs": None}):
             with pytest.raises(ImportError, match="s3fs is required"):
                 ParquetReader(path)
 
@@ -152,10 +152,7 @@ class TestS3ParquetReader:
 
         # Create test Parquet file
         parquet_file = tmp_path / "test.parquet"
-        table = pa.table({
-            'name': ['Alice', 'Bob'],
-            'age': [30, 25]
-        })
+        table = pa.table({"name": ["Alice", "Bob"], "age": [30, 25]})
         pq.write_table(table, parquet_file)
 
         reader = ParquetReader(str(parquet_file))

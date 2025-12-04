@@ -47,10 +47,7 @@ class TestQueryExecution:
         """Create a test CSV file."""
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(
-            "name,age,city,salary\n"
-            "Alice,30,NYC,90000\n"
-            "Bob,25,LA,75000\n"
-            "Charlie,35,SF,85000\n"
+            "name,age,city,salary\nAlice,30,NYC,90000\nBob,25,LA,75000\nCharlie,35,SF,85000\n"
         )
         return str(csv_file)
 
@@ -63,7 +60,7 @@ class TestQueryExecution:
         results = result.to_list()
 
         assert len(results) == 2
-        assert all(row['age'] > 25 for row in results)
+        assert all(row["age"] > 25 for row in results)
 
 
 class TestHistoryNavigation:
@@ -212,7 +209,7 @@ class TestSorting:
         app.last_results = [
             {"id": 3, "name": "Charlie"},
             {"id": 1, "name": "Alice"},
-            {"id": 2, "name": "Bob"}
+            {"id": 2, "name": "Bob"},
         ]
         app.sort_column = "id"
         app.sort_reverse = False
@@ -229,7 +226,7 @@ class TestSorting:
         app.last_results = [
             {"id": 3, "name": "Charlie"},
             {"id": 1, "name": "Alice"},
-            {"id": 2, "name": "Bob"}
+            {"id": 2, "name": "Bob"},
         ]
         app.sort_column = "id"
         app.sort_reverse = True
@@ -247,7 +244,7 @@ class TestCLIRegistration:
         from sqlstream.cli.main import cli
 
         commands = [cmd.name for cmd in cli.commands.values()]
-        assert 'shell' in commands
+        assert "shell" in commands
 
 
 class TestFiltering:
@@ -292,7 +289,7 @@ class TestFiltering:
         app.last_results = [
             {"name": "Alice", "city": "NYC"},
             {"name": "Bob", "city": "LA"},
-            {"name": "Charlie", "city": "NYC"}
+            {"name": "Charlie", "city": "NYC"},
         ]
         app.filter_text = "nyc"
 

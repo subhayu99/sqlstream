@@ -81,10 +81,13 @@ class CSVReader(BaseReader):
         if self.is_s3:
             try:
                 import s3fs
+
                 fs = s3fs.S3FileSystem(anon=False)
                 return fs.open(self.path_str, mode="r", encoding=self.encoding)
             except ImportError as e:
-                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]") from e
+                raise ImportError(
+                    "s3fs is required for S3 support. Install with: pip install sqlstream[s3]"
+                ) from e
         else:
             return open(self.path, encoding=self.encoding, newline="")
 
@@ -130,7 +133,8 @@ class CSVReader(BaseReader):
                     # Handle malformed rows gracefully
                     warnings.warn(
                         f"Skipping malformed row {row_num} in {self.path}: {e}",
-                        UserWarning, stacklevel=2,
+                        UserWarning,
+                        stacklevel=2,
                     )
                     continue
 
@@ -169,6 +173,7 @@ class CSVReader(BaseReader):
             Value converted to proper Python type (int, float, Decimal, datetime, etc.)
         """
         from sqlstream.core.types import infer_type_from_string
+
         return infer_type_from_string(value)
 
     def _matches_filter(self, row: Dict[str, Any]) -> bool:
@@ -302,7 +307,7 @@ class CSVReader(BaseReader):
             "encoding": self.encoding,
             "delimiter": self.delimiter,
             "parse_dates": parse_dates,
-            "dtype": dtypes
+            "dtype": dtypes,
         }
 
         if self.is_s3:

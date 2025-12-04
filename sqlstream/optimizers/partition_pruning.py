@@ -17,7 +17,6 @@ Example:
     → Only read year=2024 partitions (skip year=2023)
 """
 
-
 from sqlstream.optimizers.base import Optimizer
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import SelectStatement
@@ -59,7 +58,7 @@ class PartitionPruningOptimizer(Optimizer):
             True if optimization can be applied
         """
         # Reader must support partition pruning
-        if not hasattr(reader, 'supports_partition_pruning'):
+        if not hasattr(reader, "supports_partition_pruning"):
             return False
 
         if not reader.supports_partition_pruning():

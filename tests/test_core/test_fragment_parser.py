@@ -120,7 +120,7 @@ class TestFragmentIntegration:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html_content)
             temp_path = f.name
 
@@ -149,5 +149,6 @@ class TestFragmentIntegration:
         sources = result._discover_sources()
         assert len(sources) > 0
         # Check that a source with the fragment was discovered
-        assert any('markdown' in str(path).lower() or 'sample_data' in path
-                  for path in sources.values())
+        assert any(
+            "markdown" in str(path).lower() or "sample_data" in path for path in sources.values()
+        )

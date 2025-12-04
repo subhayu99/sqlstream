@@ -34,10 +34,7 @@ class TableFormatter(BaseFormatter):
             Formatted table string
         """
         if not RICH_AVAILABLE:
-            raise ImportError(
-                "Table formatter requires rich library. "
-                "Install `sqlstream[cli]`"
-            )
+            raise ImportError("Table formatter requires rich library. Install `sqlstream[cli]`")
 
         if not results:
             return "No results found."
@@ -75,8 +72,7 @@ class TableFormatter(BaseFormatter):
         for row in results:
             # Convert None to "NULL" for display
             values = [
-                str(row[col]) if row[col] is not None else "[dim]NULL[/dim]"
-                for col in columns
+                str(row[col]) if row[col] is not None else "[dim]NULL[/dim]" for col in columns
             ]
             table.add_row(*values)
 

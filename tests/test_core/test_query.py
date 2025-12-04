@@ -90,12 +90,16 @@ class TestEndToEndQueries:
 
     def test_complex_query(self, sample_csv):
         """Test complex query with all clauses"""
-        results = query(str(sample_csv)).sql("""
+        results = (
+            query(str(sample_csv))
+            .sql("""
             SELECT name, salary
             FROM data
             WHERE city = 'NYC' AND age > 25
             LIMIT 10
-        """).to_list()
+        """)
+            .to_list()
+        )
 
         assert len(results) == 2
         assert all(row for row in results)  # All non-empty
@@ -103,11 +107,15 @@ class TestEndToEndQueries:
     def test_real_world_example(self, sample_csv):
         """Test realistic use case"""
         # Find people over 30 in LA
-        results = query(str(sample_csv)).sql("""
+        results = (
+            query(str(sample_csv))
+            .sql("""
             SELECT name, age
             FROM data
             WHERE city = 'LA' AND age > 30
-        """).to_list()
+        """)
+            .to_list()
+        )
 
         assert len(results) == 1
         assert results[0]["name"] == "Eve"
@@ -166,12 +174,19 @@ class TestExplain:
 
     def test_explain(self, sample_csv):
         """Test .explain() method"""
-        plan = query(str(sample_csv)).sql("""
+        plan = (
+            query(str(sample_csv))
+            .sql(
+                """
             SELECT name
             FROM data
             WHERE age > 25
             LIMIT 10
-        """, backend="python").explain()
+        """,
+                backend="python",
+            )
+            .explain()
+        )
 
         assert isinstance(plan, str)
         assert "Limit" in plan

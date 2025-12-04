@@ -89,7 +89,7 @@ class TestInteractiveCLI:
     def sample_csv(self, tmp_path):
         """Create sample CSV file"""
         csv_file = tmp_path / "data.csv"
-        csv_file.write_text("name,age,city\n" "Alice,30,NYC\n" "Bob,25,LA\n")
+        csv_file.write_text("name,age,city\nAlice,30,NYC\nBob,25,LA\n")
         return csv_file
 
     def test_no_interactive_flag(self, sample_csv):
@@ -103,7 +103,9 @@ class TestInteractiveCLI:
         assert result.exit_code == 0
         assert "Alice" in result.output
 
-    @pytest.mark.skip(reason="Interactive shell hangs test suite - requires manual intervention (Ctrl+C)")
+    @pytest.mark.skip(
+        reason="Interactive shell hangs test suite - requires manual intervention (Ctrl+C)"
+    )
     def test_interactive_flag_with_textual_missing(self, sample_csv):
         """Test --interactive flag when textual not installed"""
         # NOTE: This test is skipped because when textual IS installed,

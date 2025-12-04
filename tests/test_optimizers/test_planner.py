@@ -63,9 +63,7 @@ class TestPredicatePushdown:
     def test_pushdown_with_results(self, sample_csv):
         """Test that pushdown produces correct results"""
         # Query with filter
-        results = query(str(sample_csv)).sql(
-            "SELECT * FROM data WHERE age > 30"
-        ).to_list()
+        results = query(str(sample_csv)).sql("SELECT * FROM data WHERE age > 30").to_list()
 
         # Should only get Charlie (35) and Eve (32)
         assert len(results) == 2
@@ -174,11 +172,15 @@ class TestCombinedOptimizations:
 
     def test_end_to_end_optimized_query(self, sample_csv):
         """Test complete optimized query execution"""
-        results = query(str(sample_csv)).sql("""
+        results = (
+            query(str(sample_csv))
+            .sql("""
             SELECT name, department
             FROM data
             WHERE age > 28 AND city = 'NYC'
-        """).to_list()
+        """)
+            .to_list()
+        )
 
         # Should get Alice (30, NYC) and Diana (28 is not > 28, so NOT Diana)
         # Actually Diana is 28, so only Alice qualifies
@@ -205,11 +207,18 @@ class TestExplainPlan:
 
     def test_explain_shows_optimizations(self, sample_csv):
         """Test that explain shows applied optimizations"""
-        plan = query(str(sample_csv)).sql("""
+        plan = (
+            query(str(sample_csv))
+            .sql(
+                """
             SELECT name, age
             FROM data
             WHERE city = 'NYC'
-        """, backend="python").explain()
+        """,
+                backend="python",
+            )
+            .explain()
+        )
 
         # Should show query plan
         assert "Query Plan" in plan
@@ -392,9 +401,7 @@ class TestLimitPushdown:
 
     def test_limit_with_filter(self, sample_csv):
         """Test limit pushdown works with filters"""
-        results = query(str(sample_csv)).sql(
-            "SELECT * FROM data WHERE age > 25 LIMIT 2"
-        ).to_list()
+        results = query(str(sample_csv)).sql("SELECT * FROM data WHERE age > 25 LIMIT 2").to_list()
 
         # Should get 2 rows (Charlie and Eve)
         assert len(results) == 2
@@ -424,31 +431,19 @@ class TestPartitionPruning:
         # Partition 1: year=2023/month=12
         partition_2023_12 = base_dir / "year=2023" / "month=12"
         partition_2023_12.mkdir(parents=True)
-        df1 = pd.DataFrame({
-            "name": ["Alice", "Bob"],
-            "age": [30, 25],
-            "sales": [100, 150]
-        })
+        df1 = pd.DataFrame({"name": ["Alice", "Bob"], "age": [30, 25], "sales": [100, 150]})
         pq.write_table(pa.Table.from_pandas(df1), partition_2023_12 / "data.parquet")
 
         # Partition 2: year=2024/month=01
         partition_2024_01 = base_dir / "year=2024" / "month=1"
         partition_2024_01.mkdir(parents=True)
-        df2 = pd.DataFrame({
-            "name": ["Charlie", "Diana"],
-            "age": [35, 28],
-            "sales": [200, 180]
-        })
+        df2 = pd.DataFrame({"name": ["Charlie", "Diana"], "age": [35, 28], "sales": [200, 180]})
         pq.write_table(pa.Table.from_pandas(df2), partition_2024_01 / "data.parquet")
 
         # Partition 3: year=2024/month=02
         partition_2024_02 = base_dir / "year=2024" / "month=2"
         partition_2024_02.mkdir(parents=True)
-        df3 = pd.DataFrame({
-            "name": ["Eve", "Frank"],
-            "age": [32, 40],
-            "sales": [220, 190]
-        })
+        df3 = pd.DataFrame({"name": ["Eve", "Frank"], "age": [32, 40], "sales": [220, 190]})
         pq.write_table(pa.Table.from_pandas(df3), partition_2024_02 / "data.parquet")
 
         return base_dir

@@ -34,6 +34,7 @@ except ImportError:
 # Try to import duckdb executor
 try:
     from sqlstream.core.duckdb_executor import DuckDBExecutor, is_duckdb_available
+
     DUCKDB_AVAILABLE = is_duckdb_available()
 except ImportError:
     DUCKDB_AVAILABLE = False
@@ -66,22 +67,22 @@ def _can_parse_with_custom_parser(sql: str) -> bool:
 
     # Check for advanced SQL features that require DuckDB
     advanced_keywords = [
-        'WITH',  # CTEs
-        'OVER',  # Window functions
-        'PARTITION BY',  # Window functions
-        'WINDOW',  # Window functions
-        'HAVING',  # HAVING clause
-        'UNION',  # Set operations
-        'INTERSECT',  # Set operations
-        'EXCEPT',  # Set operations
-        'CASE',  # CASE expressions
-        'CAST',  # Type casting
-        'EXTRACT',  # Date extraction
-        'ROW_NUMBER',  # Window functions
-        'RANK',  # Window functions
-        'DENSE_RANK',  # Window functions
-        'LAG',  # Window functions
-        'LEAD',  # Window functions
+        "WITH",  # CTEs
+        "OVER",  # Window functions
+        "PARTITION BY",  # Window functions
+        "WINDOW",  # Window functions
+        "HAVING",  # HAVING clause
+        "UNION",  # Set operations
+        "INTERSECT",  # Set operations
+        "EXCEPT",  # Set operations
+        "CASE",  # CASE expressions
+        "CAST",  # Type casting
+        "EXTRACT",  # Date extraction
+        "ROW_NUMBER",  # Window functions
+        "RANK",  # Window functions
+        "DENSE_RANK",  # Window functions
+        "LAG",  # Window functions
+        "LEAD",  # Window functions
     ]
 
     for keyword in advanced_keywords:
@@ -90,12 +91,13 @@ def _can_parse_with_custom_parser(sql: str) -> bool:
 
     # Check for subqueries - look for SELECT inside parentheses
     # This is a simple heuristic
-    if '(' in sql:
+    if "(" in sql:
         # Extract content inside parentheses
         import re
-        paren_content = re.findall(r'\(([^)]+)\)', sql_upper)
+
+        paren_content = re.findall(r"\(([^)]+)\)", sql_upper)
         for content in paren_content:
-            if 'SELECT' in content:
+            if "SELECT" in content:
                 return False  # Has subquery, needs DuckDB
 
     return True  # Can use custom parser
@@ -155,9 +157,9 @@ class Query:
 
             kwargs = {}
             if format_hint:
-                kwargs['format'] = format_hint
+                kwargs["format"] = format_hint
             if table_hint is not None:
-                kwargs['table'] = table_hint
+                kwargs["table"] = table_hint
             return HTTPReader(source_path, **kwargs)
 
         path = Path(source_path)
@@ -166,37 +168,43 @@ class Query:
         suffix = path.suffix.lower()
 
         # Explicit format from fragment takes precedence
-        if format_hint == 'html' or (not format_hint and suffix in ['.html', '.htm']):
+        if format_hint == "html" or (not format_hint and suffix in [".html", ".htm"]):
             from sqlstream.readers.html_reader import HTMLReader
+
             table = table_hint if table_hint is not None else 0
             return HTMLReader(source_path, table=table)
 
-        elif format_hint == 'markdown' or (not format_hint and suffix in ['.md', '.markdown']):
+        elif format_hint == "markdown" or (not format_hint and suffix in [".md", ".markdown"]):
             from sqlstream.readers.markdown_reader import MarkdownReader
+
             table = table_hint if table_hint is not None else 0
             return MarkdownReader(source_path, table=table)
 
-        elif format_hint == 'xml' or (not format_hint and suffix == '.xml'):
+        elif format_hint == "xml" or (not format_hint and suffix == ".xml"):
             from sqlstream.readers.xml_reader import XMLReader
+
             # For XML, table_hint is used as element name/path
             element = str(table_hint) if table_hint is not None else None
             return XMLReader(source_path, element=element)
 
-        elif format_hint == 'parquet' or (not format_hint and suffix == ".parquet"):
+        elif format_hint == "parquet" or (not format_hint and suffix == ".parquet"):
             from sqlstream.readers.parquet_reader import ParquetReader
+
             return ParquetReader(source_path)
 
-        elif format_hint == 'json' or (not format_hint and suffix == ".json"):
+        elif format_hint == "json" or (not format_hint and suffix == ".json"):
             from sqlstream.readers.json_reader import JSONReader
+
             # Ensure key is a string for JSON lookups
             key = str(table_hint) if table_hint is not None else None
             return JSONReader(source_path, records_key=key)
 
-        elif format_hint == 'jsonl' or (not format_hint and suffix == ".jsonl"):
+        elif format_hint == "jsonl" or (not format_hint and suffix == ".jsonl"):
             from sqlstream.readers.jsonl_reader import JSONLReader
+
             return JSONLReader(source_path)
 
-        elif format_hint == 'csv' or (not format_hint and suffix == ".csv"):
+        elif format_hint == "csv" or (not format_hint and suffix == ".csv"):
             return CSVReader(source_path)
 
         else:
@@ -259,8 +267,14 @@ class Query:
             ast = None
 
         # Create QueryResult with reader factory for JOIN support
-        return QueryResult(ast=ast, reader=self.reader, reader_factory=self._create_reader,
-                          source=self.source, backend=backend, raw_sql=query)
+        return QueryResult(
+            ast=ast,
+            reader=self.reader,
+            reader_factory=self._create_reader,
+            source=self.source,
+            backend=backend,
+            raw_sql=query,
+        )
 
     def schema(self) -> Optional[Schema]:
         """
@@ -275,7 +289,9 @@ class Query:
             Schema(name: STRING, age: INTEGER, salary: FLOAT)
         """
         if not self.reader:
-            raise ValueError("Cannot get schema without a source. Provide a source when creating the Query object.")
+            raise ValueError(
+                "Cannot get schema without a source. Provide a source when creating the Query object."
+            )
         return self.reader.get_schema()
 
 
@@ -439,9 +455,7 @@ class QueryResult:
 
             # Use reader factory to create DataFrames efficiently
             yield from self.executor.execute_raw(
-                self.raw_sql,
-                sources,
-                reader_factory=self.reader_factory
+                self.raw_sql, sources, reader_factory=self.reader_factory
             )
         elif self.use_pandas:
             # Pandas executor takes file path directly
@@ -465,7 +479,7 @@ class QueryResult:
         base_name = os.path.splitext(os.path.basename(clean_path))[0]
 
         # Clean up the name to be SQL-safe (only alphanumeric and underscore)
-        sanitized_name = re.sub(r'[^a-zA-Z0-9_]', '_', base_name)
+        sanitized_name = re.sub(r"[^a-zA-Z0-9_]", "_", base_name)
         return sanitized_name, table_hint
 
     @staticmethod
@@ -530,11 +544,11 @@ class QueryResult:
                     continue
 
                 # Skip SQL keywords
-                if file_path.upper() in ['INNER', 'LEFT', 'RIGHT', 'OUTER', 'CROSS']:
+                if file_path.upper() in ["INNER", "LEFT", "RIGHT", "OUTER", "CROSS"]:
                     continue
 
                 # Only process if it looks like a file path
-                if '/' in file_path or '.' in file_path or '#' in file_path:
+                if "/" in file_path or "." in file_path or "#" in file_path:
                     sanitized_name, _ = self._get_sanitized_name_and_table_hint(file_path)
                     table_name = self._get_table_name(file_path)
 
@@ -556,7 +570,7 @@ class QueryResult:
 
             # Extract from AST for Python/Pandas backends
             # Main table
-            if hasattr(self.ast, 'table') and self.ast.table:
+            if hasattr(self.ast, "table") and self.ast.table:
                 sources[self.ast.table] = self.ast.source
             else:
                 # If no explicit table name, use 'data' as default

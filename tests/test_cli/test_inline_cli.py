@@ -24,14 +24,14 @@ class TestInlineCLI:
     def sample_csv(self, tmp_path):
         """Create sample CSV file"""
         csv_file = tmp_path / "data.csv"
-        csv_file.write_text("name,age,city\n" "Alice,30,NYC\n" "Bob,25,LA\n" "Charlie,35,Chicago\n")
+        csv_file.write_text("name,age,city\nAlice,30,NYC\nBob,25,LA\nCharlie,35,Chicago\n")
         return csv_file
 
     @pytest.fixture
     def second_csv(self, tmp_path):
         """Create second CSV file for JOINs"""
         csv_file = tmp_path / "orders.csv"
-        csv_file.write_text("name,product\n" "Alice,Laptop\n" "Bob,Phone\n")
+        csv_file.write_text("name,product\nAlice,Laptop\nBob,Phone\n")
         return csv_file
 
     def test_inline_simple_query(self, sample_csv):
@@ -47,9 +47,7 @@ class TestInlineCLI:
     def test_inline_with_where(self, sample_csv):
         """Test inline query with WHERE clause"""
         runner = CliRunner()
-        result = runner.invoke(
-            cli, ["query", f"SELECT * FROM '{sample_csv}' WHERE age > 25"]
-        )
+        result = runner.invoke(cli, ["query", f"SELECT * FROM '{sample_csv}' WHERE age > 25"])
 
         assert result.exit_code == 0
         assert "Alice" in result.output

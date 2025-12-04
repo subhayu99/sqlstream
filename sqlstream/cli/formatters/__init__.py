@@ -39,8 +39,6 @@ def get_formatter(format_name: str) -> BaseFormatter:
 
     if format_name not in formatters:
         available = ", ".join(formatters.keys())
-        raise ValueError(
-            f"Unknown format: {format_name}. Available formats: {available}"
-        )
+        raise ValueError(f"Unknown format: {format_name}. Available formats: {available}")
 
     return formatters[format_name]()

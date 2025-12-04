@@ -2,7 +2,6 @@
 Tests for CSV reader
 """
 
-
 import pytest
 
 from sqlstream.core.types import DataType
@@ -307,6 +306,7 @@ Diana,28,LA"""
         # Should handle inconsistent rows gracefully
         # Rows with missing columns are OK, but extra columns may cause issues
         import warnings
+
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             rows = list(reader.read_lazy())
@@ -528,11 +528,11 @@ Bob,"456 Oak Ave, Suite 200",LA"""
 
     def test_quoted_fields_with_newlines(self, tmp_path):
         """Test quoted fields containing newlines"""
-        csv_content = '''name,bio,city
+        csv_content = """name,bio,city
 Alice,"Software
 Engineer",NYC
 Bob,"Data Scientist
-ML Expert",LA'''
+ML Expert",LA"""
 
         csv_file = tmp_path / "multiline.csv"
         csv_file.write_text(csv_content)

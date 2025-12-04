@@ -220,10 +220,7 @@ class HashJoinOperator(Operator):
 
     def explain(self, indent: int = 0) -> List[str]:
         """Generate execution plan explanation"""
-        lines = [
-            " " * indent
-            + f"HashJoin({self.join_type}, {self.left_key} = {self.right_key})"
-        ]
+        lines = [" " * indent + f"HashJoin({self.join_type}, {self.left_key} = {self.right_key})"]
         lines.append(" " * (indent + 2) + "Left:")
         lines.extend(self.left.explain(indent + 4))
         lines.append(" " * (indent + 2) + "Right:")

@@ -23,12 +23,7 @@ class JSONReader(BaseReader):
     - Column pruning
     """
 
-    def __init__(
-        self,
-        path: str,
-        records_key: Optional[str] = None,
-        encoding: str = "utf-8"
-    ):
+    def __init__(self, path: str, records_key: Optional[str] = None, encoding: str = "utf-8"):
         """
         Initialize JSON reader
 
@@ -79,10 +74,13 @@ class JSONReader(BaseReader):
         if self.is_s3:
             try:
                 import s3fs
+
                 fs = s3fs.S3FileSystem(anon=False)
                 return fs.open(self.path_str, mode="r", encoding=self.encoding)
             except ImportError as e:
-                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]") from e
+                raise ImportError(
+                    "s3fs is required for S3 support. Install with: pip install sqlstream[s3]"
+                ) from e
         else:
             return open(self.path, encoding=self.encoding)
 
@@ -156,7 +154,7 @@ class JSONReader(BaseReader):
 
         # If root is a dict, look for common keys
         if isinstance(data, dict):
-            common_keys = ['data', 'records', 'items', 'rows', 'results']
+            common_keys = ["data", "records", "items", "rows", "results"]
             for key in common_keys:
                 if key in data and isinstance(data[key], list):
                     return data[key]
@@ -191,14 +189,14 @@ class JSONReader(BaseReader):
         import re
 
         # Handle flattening first if [] is in the path
-        if '[]' in path:
+        if "[]" in path:
             return self._flatten_path(data, path)
 
         current = data
 
         # Split path into segments (handling dots and brackets)
         # Pattern matches: "key", "key[0]", "key[1]" etc.
-        segments = re.findall(r'([^.\[]+)(\[\d+\])?', path)
+        segments = re.findall(r"([^.\[]+)(\[\d+\])?", path)
 
         for key, bracket in segments:
             if not key:
@@ -233,13 +231,13 @@ class JSONReader(BaseReader):
         - "users[].transactions" → flatten [user["transactions"] for user in data["users"]]
         """
         # Split on [] to find the flattening point
-        parts = path.split('[]')
+        parts = path.split("[]")
 
         if len(parts) != 2:
             raise ValueError("Only one '[]' operator is supported per path")
 
         before_flatten = parts[0]
-        after_flatten = parts[1].lstrip('.')  # Remove leading dot if present
+        after_flatten = parts[1].lstrip(".")  # Remove leading dot if present
 
         # Navigate to the array to flatten (without [] in the path)
         if before_flatten:
@@ -277,7 +275,7 @@ class JSONReader(BaseReader):
         import re
 
         current = data
-        segments = re.findall(r'([^.\[]+)(\[\d+\])?', path)
+        segments = re.findall(r"([^.\[]+)(\[\d+\])?", path)
 
         for key, bracket in segments:
             if not key:

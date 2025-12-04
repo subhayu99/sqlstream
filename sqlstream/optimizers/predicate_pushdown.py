@@ -81,9 +81,7 @@ class PredicatePushdownOptimizer(Optimizer):
             self.applied = True
             self.description = f"{len(pushable)} condition(s)"
 
-    def _extract_pushable_conditions(
-        self, conditions: List[Condition]
-    ) -> List[Condition]:
+    def _extract_pushable_conditions(self, conditions: List[Condition]) -> List[Condition]:
         """
         Determine which conditions can be safely pushed to readers
 

@@ -202,11 +202,11 @@ def query(
             output_format = fmt
             if output and fmt == "table":
                 # User provided -o but not -f, infer format from extension
-                if output.endswith('.json'):
+                if output.endswith(".json"):
                     output_format = "json"
-                elif output.endswith('.csv'):
+                elif output.endswith(".csv"):
                     output_format = "csv"
-                elif output.endswith('.md'):
+                elif output.endswith(".md"):
                     output_format = "markdown"
                 # Otherwise keep as table format
 

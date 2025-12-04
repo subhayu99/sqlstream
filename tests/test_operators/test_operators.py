@@ -101,9 +101,7 @@ class TestFilterOperator:
         """Test filter with multiple AND conditions"""
         reader = MockReader(sample_data)
         scan = Scan(reader)
-        filter_op = Filter(
-            scan, [Condition("age", ">", 25), Condition("city", "=", "NYC")]
-        )
+        filter_op = Filter(scan, [Condition("age", ">", 25), Condition("city", "=", "NYC")])
 
         rows = list(filter_op)
 

@@ -2,7 +2,6 @@
 Tests for JOIN operator
 """
 
-
 import pytest
 
 from sqlstream.core.query import query
@@ -15,13 +14,7 @@ class TestInnerJoin:
     def customers_csv(self, tmp_path):
         """Create customers CSV file"""
         csv_file = tmp_path / "customers.csv"
-        csv_file.write_text(
-            "id,name,city\n"
-            "1,Alice,NYC\n"
-            "2,Bob,LA\n"
-            "3,Charlie,SF\n"
-            "4,David,NYC\n"
-        )
+        csv_file.write_text("id,name,city\n1,Alice,NYC\n2,Bob,LA\n3,Charlie,SF\n4,David,NYC\n")
         return csv_file
 
     @pytest.fixture
@@ -29,12 +22,7 @@ class TestInnerJoin:
         """Create orders CSV file"""
         csv_file = tmp_path / "orders.csv"
         csv_file.write_text(
-            "order_id,customer_id,amount\n"
-            "101,1,100\n"
-            "102,1,200\n"
-            "103,2,150\n"
-            "104,3,300\n"
-            "105,1,50\n"
+            "order_id,customer_id,amount\n101,1,100\n102,1,200\n103,2,150\n104,3,300\n105,1,50\n"
         )
         return csv_file
 
@@ -162,23 +150,14 @@ class TestLeftJoin:
     def customers_csv(self, tmp_path):
         """Create customers CSV file"""
         csv_file = tmp_path / "customers.csv"
-        csv_file.write_text(
-            "id,name\n"
-            "1,Alice\n"
-            "2,Bob\n"
-            "3,Charlie\n"
-        )
+        csv_file.write_text("id,name\n1,Alice\n2,Bob\n3,Charlie\n")
         return csv_file
 
     @pytest.fixture
     def orders_csv(self, tmp_path):
         """Create orders CSV file"""
         csv_file = tmp_path / "orders.csv"
-        csv_file.write_text(
-            "order_id,customer_id,amount\n"
-            "101,1,100\n"
-            "102,2,200\n"
-        )
+        csv_file.write_text("order_id,customer_id,amount\n101,1,100\n102,2,200\n")
         return csv_file
 
     def test_left_join_with_unmatched(self, customers_csv, orders_csv):
@@ -208,11 +187,7 @@ class TestRightJoin:
     def customers_csv(self, tmp_path):
         """Create customers CSV file"""
         csv_file = tmp_path / "customers.csv"
-        csv_file.write_text(
-            "id,name\n"
-            "1,Alice\n"
-            "2,Bob\n"
-        )
+        csv_file.write_text("id,name\n1,Alice\n2,Bob\n")
         return csv_file
 
     @pytest.fixture
@@ -277,12 +252,7 @@ class TestJoinEdgeCases:
         customers.write_text("id,name\n1,Alice\n")
 
         orders = tmp_path / "orders.csv"
-        orders.write_text(
-            "order_id,customer_id,amount\n"
-            "101,1,100\n"
-            "102,1,200\n"
-            "103,1,300\n"
-        )
+        orders.write_text("order_id,customer_id,amount\n101,1,100\n102,1,200\n103,1,300\n")
 
         sql = f"""
             SELECT name, amount
@@ -305,20 +275,11 @@ class TestJoinEdgeCases:
     def test_join_complex_query(self, tmp_path):
         """Test JOIN with WHERE, ORDER BY, and LIMIT"""
         customers = tmp_path / "customers.csv"
-        customers.write_text(
-            "id,name,city\n"
-            "1,Alice,NYC\n"
-            "2,Bob,LA\n"
-            "3,Charlie,NYC\n"
-        )
+        customers.write_text("id,name,city\n1,Alice,NYC\n2,Bob,LA\n3,Charlie,NYC\n")
 
         orders = tmp_path / "orders.csv"
         orders.write_text(
-            "order_id,customer_id,amount\n"
-            "101,1,100\n"
-            "102,2,250\n"
-            "103,3,150\n"
-            "104,1,300\n"
+            "order_id,customer_id,amount\n101,1,100\n102,2,250\n103,3,150\n104,1,300\n"
         )
 
         sql = f"""

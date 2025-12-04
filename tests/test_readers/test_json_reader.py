@@ -10,7 +10,7 @@ def test_json_reader_array(tmp_path):
     data = [
         {"id": 1, "name": "Alice", "age": 30},
         {"id": 2, "name": "Bob", "age": 25},
-        {"id": 3, "name": "Charlie", "age": 35}
+        {"id": 3, "name": "Charlie", "age": 35},
     ]
 
     file_path = tmp_path / "test.json"
@@ -24,14 +24,9 @@ def test_json_reader_array(tmp_path):
     assert rows[0]["name"] == "Alice"
     assert rows[1]["name"] == "Bob"
 
+
 def test_json_reader_records_key(tmp_path):
-    data = {
-        "meta": {"version": 1},
-        "data": [
-            {"id": 1, "name": "Alice"},
-            {"id": 2, "name": "Bob"}
-        ]
-    }
+    data = {"meta": {"version": 1}, "data": [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]}
 
     file_path = tmp_path / "test_key.json"
     with open(file_path, "w") as f:
@@ -49,12 +44,9 @@ def test_json_reader_records_key(tmp_path):
     assert len(rows_auto) == 2
     assert rows_auto[0]["name"] == "Alice"
 
+
 def test_json_reader_filter(tmp_path):
-    data = [
-        {"id": 1, "val": 10},
-        {"id": 2, "val": 20},
-        {"id": 3, "val": 30}
-    ]
+    data = [{"id": 1, "val": 10}, {"id": 2, "val": 20}, {"id": 3, "val": 30}]
 
     file_path = tmp_path / "test_filter.json"
     with open(file_path, "w") as f:
@@ -68,10 +60,11 @@ def test_json_reader_filter(tmp_path):
     assert rows[0]["id"] == 2
     assert rows[1]["id"] == 3
 
+
 def test_json_reader_columns(tmp_path):
     data = [
         {"id": 1, "name": "Alice", "extra": "ignore"},
-        {"id": 2, "name": "Bob", "extra": "ignore"}
+        {"id": 2, "name": "Bob", "extra": "ignore"},
     ]
 
     file_path = tmp_path / "test_cols.json"
@@ -87,6 +80,7 @@ def test_json_reader_columns(tmp_path):
     assert "id" in rows[0]
     assert "name" in rows[0]
 
+
 def test_json_reader_limit(tmp_path):
     data = [{"id": i} for i in range(10)]
 
@@ -101,6 +95,7 @@ def test_json_reader_limit(tmp_path):
     assert len(rows) == 5
     assert rows[-1]["id"] == 4
 
+
 def test_json_reader_invalid_file(tmp_path):
     file_path = tmp_path / "invalid.json"
     with open(file_path, "w") as f:
@@ -109,6 +104,7 @@ def test_json_reader_invalid_file(tmp_path):
     reader = JSONReader(str(file_path))
     with pytest.raises(ValueError, match="Invalid JSON"):
         list(reader.read_lazy())
+
 
 def test_json_reader_no_list(tmp_path):
     file_path = tmp_path / "nolist.json"

@@ -84,9 +84,7 @@ class TestGroupByOperator:
 
         # GROUP BY city, product
         agg = [AggregateFunction("SUM", "amount", "total")]
-        groupby = GroupByOperator(
-            scan, ["city", "product"], agg, ["city", "product", "total"]
-        )
+        groupby = GroupByOperator(scan, ["city", "product"], agg, ["city", "product", "total"])
 
         rows = list(groupby)
 
@@ -111,9 +109,7 @@ class TestGroupByOperator:
             AggregateFunction("SUM", "amount", "total"),
             AggregateFunction("AVG", "amount", "average"),
         ]
-        groupby = GroupByOperator(
-            scan, ["city"], agg, ["city", "count", "total", "average"]
-        )
+        groupby = GroupByOperator(scan, ["city"], agg, ["city", "count", "total", "average"])
 
         rows = list(groupby)
 
@@ -132,9 +128,7 @@ class TestGroupByOperator:
             AggregateFunction("MIN", "amount", "min_amount"),
             AggregateFunction("MAX", "amount", "max_amount"),
         ]
-        groupby = GroupByOperator(
-            scan, ["city"], agg, ["city", "min_amount", "max_amount"]
-        )
+        groupby = GroupByOperator(scan, ["city"], agg, ["city", "min_amount", "max_amount"])
 
         rows = list(groupby)
 
@@ -151,12 +145,7 @@ class TestOrderByOperator:
         """Create a people CSV file for testing"""
         csv_file = tmp_path / "people.csv"
         csv_file.write_text(
-            "name,age,city\n"
-            "Alice,30,NYC\n"
-            "Bob,25,LA\n"
-            "Charlie,35,NYC\n"
-            "David,25,SF\n"
-            "Eve,28,LA\n"
+            "name,age,city\nAlice,30,NYC\nBob,25,LA\nCharlie,35,NYC\nDavid,25,SF\nEve,28,LA\n"
         )
         return csv_file
 
@@ -259,14 +248,7 @@ class TestCombinedGroupByOrderBy:
     def sales_csv(self, tmp_path):
         """Create sales CSV for testing"""
         csv_file = tmp_path / "sales.csv"
-        csv_file.write_text(
-            "city,amount\n"
-            "NYC,100\n"
-            "LA,200\n"
-            "NYC,150\n"
-            "SF,180\n"
-            "LA,120\n"
-        )
+        csv_file.write_text("city,amount\nNYC,100\nLA,200\nNYC,150\nSF,180\nLA,120\n")
         return csv_file
 
     def test_group_by_then_order_by(self, sales_csv):

@@ -120,22 +120,22 @@ def parse_datetime(value: str) -> Optional[datetime]:
     value = value.strip()
 
     # Try ISO 8601 with timezone (handle Z and +HH:MM)
-    if 'T' in value:
+    if "T" in value:
         # Remove timezone suffix for basic parsing
-        base_value = value.replace('Z', '').split('+')[0].split('-')[0:3]
-        base_value = '-'.join(base_value) if len(base_value) == 3 else value.replace('Z', '')
+        base_value = value.replace("Z", "").split("+")[0].split("-")[0:3]
+        base_value = "-".join(base_value) if len(base_value) == 3 else value.replace("Z", "")
 
     formats = [
-        "%Y-%m-%dT%H:%M:%S",           # ISO 8601: 2024-01-15T10:30:00
-        "%Y-%m-%dT%H:%M:%S.%f",        # ISO with microseconds
-        "%Y-%m-%d %H:%M:%S",           # SQL format: 2024-01-15 10:30:00
-        "%Y-%m-%d %H:%M:%S.%f",        # SQL with microseconds
-        "%d/%m/%Y %H:%M:%S",           # EU format: 15/01/2024 10:30:00
-        "%m/%d/%Y %H:%M:%S",           # US format: 01/15/2024 10:30:00
-        "%Y%m%d%H%M%S",                # Compact: 20240115103000
-        "%Y-%m-%d %H:%M",              # Without seconds
-        "%d/%m/%Y %H:%M",              # EU without seconds
-        "%m/%d/%Y %H:%M",              # US without seconds
+        "%Y-%m-%dT%H:%M:%S",  # ISO 8601: 2024-01-15T10:30:00
+        "%Y-%m-%dT%H:%M:%S.%f",  # ISO with microseconds
+        "%Y-%m-%d %H:%M:%S",  # SQL format: 2024-01-15 10:30:00
+        "%Y-%m-%d %H:%M:%S.%f",  # SQL with microseconds
+        "%d/%m/%Y %H:%M:%S",  # EU format: 15/01/2024 10:30:00
+        "%m/%d/%Y %H:%M:%S",  # US format: 01/15/2024 10:30:00
+        "%Y%m%d%H%M%S",  # Compact: 20240115103000
+        "%Y-%m-%d %H:%M",  # Without seconds
+        "%d/%m/%Y %H:%M",  # EU without seconds
+        "%m/%d/%Y %H:%M",  # US without seconds
     ]
 
     for fmt in formats:
@@ -162,12 +162,12 @@ def parse_date(value: str) -> Optional[date]:
     value = value.strip()
 
     formats = [
-        "%Y-%m-%d",      # ISO: 2024-01-15
-        "%d/%m/%Y",      # EU: 15/01/2024
-        "%m/%d/%Y",      # US: 01/15/2024
-        "%Y%m%d",        # Compact: 20240115
-        "%d-%m-%Y",      # EU with dashes: 15-01-2024
-        "%m-%d-%Y",      # US with dashes: 01-15-2024
+        "%Y-%m-%d",  # ISO: 2024-01-15
+        "%d/%m/%Y",  # EU: 15/01/2024
+        "%m/%d/%Y",  # US: 01/15/2024
+        "%Y%m%d",  # Compact: 20240115
+        "%d-%m-%Y",  # EU with dashes: 15-01-2024
+        "%m-%d-%Y",  # US with dashes: 01-15-2024
     ]
 
     for fmt in formats:
@@ -194,11 +194,11 @@ def parse_time(value: str) -> Optional[time]:
     value = value.strip()
 
     formats = [
-        "%H:%M:%S",          # 24-hour: 14:30:00
-        "%H:%M:%S.%f",       # With microseconds: 14:30:00.123456
-        "%H:%M",             # Without seconds: 14:30
-        "%I:%M:%S %p",       # 12-hour with seconds: 02:30:00 PM
-        "%I:%M %p",          # 12-hour: 02:30 PM
+        "%H:%M:%S",  # 24-hour: 14:30:00
+        "%H:%M:%S.%f",  # With microseconds: 14:30:00.123456
+        "%H:%M",  # Without seconds: 14:30
+        "%I:%M:%S %p",  # 12-hour with seconds: 02:30:00 PM
+        "%I:%M %p",  # 12-hour: 02:30 PM
     ]
 
     for fmt in formats:
@@ -225,7 +225,7 @@ def is_json_string(value: str) -> bool:
     value = value.strip()
 
     # Must start with { or [
-    if not (value.startswith('{') or value.startswith('[')):
+    if not (value.startswith("{") or value.startswith("[")):
         return False
 
     # Try to parse as JSON
@@ -310,11 +310,11 @@ def infer_type(value: Any) -> DataType:
         # Float or Decimal
         try:
             # Check if it has decimal point
-            if '.' in value_stripped:
+            if "." in value_stripped:
                 # Check precision - if more than 6 decimal places, use DECIMAL
-                decimal_part = value_stripped.split('.')[1]
+                decimal_part = value_stripped.split(".")[1]
                 # Remove trailing zeros for check
-                significant_decimals = decimal_part.rstrip('0')
+                significant_decimals = decimal_part.rstrip("0")
                 if len(significant_decimals) > 6:
                     Decimal(value_stripped)  # Validate
                     return DataType.DECIMAL
@@ -391,9 +391,9 @@ def infer_type_from_string(value: str) -> Any:
 
     # Float or Decimal
     try:
-        if '.' in value_stripped:
-            decimal_part = value_stripped.split('.')[1]
-            significant_decimals = decimal_part.rstrip('0')
+        if "." in value_stripped:
+            decimal_part = value_stripped.split(".")[1]
+            significant_decimals = decimal_part.rstrip("0")
             if len(significant_decimals) > 6:
                 return Decimal(value_stripped)
         return float(value_stripped)
@@ -569,9 +569,7 @@ class Schema:
         for col_name in all_columns:
             if col_name in self.columns and col_name in other.columns:
                 # Column exists in both - coerce types
-                merged[col_name] = self.columns[col_name].coerce_to(
-                    other.columns[col_name]
-                )
+                merged[col_name] = self.columns[col_name].coerce_to(other.columns[col_name])
             elif col_name in self.columns:
                 # Column only in self
                 merged[col_name] = self.columns[col_name]

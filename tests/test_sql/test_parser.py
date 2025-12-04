@@ -305,9 +305,7 @@ class TestGroupByClause:
 
     def test_group_by_with_order_limit(self):
         """Test GROUP BY with ORDER BY and LIMIT"""
-        ast = parse(
-            "SELECT city, COUNT(*) FROM data GROUP BY city ORDER BY city LIMIT 10"
-        )
+        ast = parse("SELECT city, COUNT(*) FROM data GROUP BY city ORDER BY city LIMIT 10")
 
         assert ast.group_by == ["city"]
         assert ast.order_by is not None
@@ -406,7 +404,9 @@ class TestJoinParsing:
 
     def test_inner_join_explicit(self):
         """Test INNER JOIN with explicit keyword"""
-        ast = parse("SELECT * FROM customers INNER JOIN orders ON customers.id = orders.customer_id")
+        ast = parse(
+            "SELECT * FROM customers INNER JOIN orders ON customers.id = orders.customer_id"
+        )
 
         assert ast.source == "customers"
         assert ast.join is not None
@@ -438,7 +438,9 @@ class TestJoinParsing:
 
     def test_right_join(self):
         """Test RIGHT JOIN"""
-        ast = parse("SELECT * FROM customers RIGHT JOIN orders ON customers.id = orders.customer_id")
+        ast = parse(
+            "SELECT * FROM customers RIGHT JOIN orders ON customers.id = orders.customer_id"
+        )
 
         assert ast.join is not None
         assert ast.join.join_type == "RIGHT"

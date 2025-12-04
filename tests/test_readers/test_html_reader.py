@@ -6,9 +6,11 @@ import pytest
 try:
     import lxml  # noqa: F401
     import pandas  # noqa: F401
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
+
 
 @pytest.mark.skipif(not PANDAS_AVAILABLE, reason="pandas or lxml not installed")
 class TestHTMLReaderBasic:
@@ -28,7 +30,7 @@ class TestHTMLReaderBasic:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -37,10 +39,10 @@ class TestHTMLReaderBasic:
             rows = list(reader.read_lazy())
 
             assert len(rows) == 2
-            assert rows[0]['Name'] == 'Alice'
-            assert rows[0]['Age'] == 30
-            assert rows[1]['Name'] == 'Bob'
-            assert rows[1]['Age'] == 25
+            assert rows[0]["Name"] == "Alice"
+            assert rows[0]["Age"] == 30
+            assert rows[1]["Name"] == "Bob"
+            assert rows[1]["Age"] == 25
         finally:
             os.unlink(temp_path)
 
@@ -55,7 +57,7 @@ class TestHTMLReaderBasic:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -64,8 +66,8 @@ class TestHTMLReaderBasic:
             rows = list(reader.read_lazy())
 
             # Should get first table
-            assert 'A' in rows[0]
-            assert rows[0]['A'] == 1
+            assert "A" in rows[0]
+            assert rows[0]["A"] == 1
         finally:
             os.unlink(temp_path)
 
@@ -81,7 +83,7 @@ class TestHTMLReaderBasic:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -89,14 +91,14 @@ class TestHTMLReaderBasic:
             # Select second table
             reader = HTMLReader(temp_path, table=1)
             rows = list(reader.read_lazy())
-            assert 'B' in rows[0]
-            assert rows[0]['B'] == 2
+            assert "B" in rows[0]
+            assert rows[0]["B"] == 2
 
             # Select third table
             reader = HTMLReader(temp_path, table=2)
             rows = list(reader.read_lazy())
-            assert 'C' in rows[0]
-            assert rows[0]['C'] == 3
+            assert "C" in rows[0]
+            assert rows[0]["C"] == 3
         finally:
             os.unlink(temp_path)
 
@@ -111,7 +113,7 @@ class TestHTMLReaderBasic:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -120,7 +122,7 @@ class TestHTMLReaderBasic:
             # This test verifies our wrapper handles it
             reader = HTMLReader(temp_path, table=1)  # Last table (index 1, not -1)
             rows = list(reader.read_lazy())
-            assert 'B' in rows[0]
+            assert "B" in rows[0]
         finally:
             os.unlink(temp_path)
 
@@ -138,7 +140,7 @@ class TestHTMLReaderBasic:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -146,13 +148,13 @@ class TestHTMLReaderBasic:
             reader = HTMLReader(temp_path)
             schema = reader.get_schema()
 
-            assert 'Name' in schema
-            assert 'Age' in schema
-            assert 'Score' in schema
+            assert "Name" in schema
+            assert "Age" in schema
+            assert "Score" in schema
             # Schema types should be inferred
-            assert schema['Name'] == DataType.STRING
-            assert schema['Age'] == DataType.INTEGER
-            assert schema['Score'] == DataType.FLOAT
+            assert schema["Name"] == DataType.STRING
+            assert schema["Age"] == DataType.INTEGER
+            assert schema["Score"] == DataType.FLOAT
         finally:
             os.unlink(temp_path)
 
@@ -167,7 +169,7 @@ class TestHTMLReaderBasic:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -176,10 +178,10 @@ class TestHTMLReaderBasic:
             tables = reader.list_tables()
 
             assert len(tables) == 2
-            assert 'Table 0' in tables[0]
-            assert 'A, B' in tables[0]
-            assert 'Table 1' in tables[1]
-            assert 'X, Y, Z' in tables[1]
+            assert "Table 0" in tables[0]
+            assert "A, B" in tables[0]
+            assert "Table 1" in tables[1]
+            assert "X, Y, Z" in tables[1]
         finally:
             os.unlink(temp_path)
 
@@ -189,7 +191,7 @@ class TestHTMLReaderBasic:
 
         html = "<html><body><p>No tables here!</p></body></html>"
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -212,7 +214,7 @@ class TestHTMLReaderBasic:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -246,7 +248,7 @@ class TestHTMLReaderIntegration:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -255,8 +257,8 @@ class TestHTMLReaderIntegration:
             rows = result.to_list()
 
             assert len(rows) == 2
-            assert rows[0]['Product'] == 'Apple'
-            assert rows[1]['Product'] == 'Cherry'
+            assert rows[0]["Product"] == "Apple"
+            assert rows[1]["Product"] == "Cherry"
         finally:
             os.unlink(temp_path)
 
@@ -272,7 +274,7 @@ class TestHTMLReaderIntegration:
         </body></html>
         """
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False) as f:
             f.write(html)
             temp_path = f.name
 
@@ -282,7 +284,7 @@ class TestHTMLReaderIntegration:
             rows = result.to_list()
 
             assert len(rows) == 1
-            assert 'Product' in rows[0]
-            assert rows[0]['Product'] == 'Widget'
+            assert "Product" in rows[0]
+            assert rows[0]["Product"] == "Widget"
         finally:
             os.unlink(temp_path)

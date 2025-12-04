@@ -18,6 +18,7 @@ def run_cmd(cmd, check=True):
         sys.exit(1)
     return result
 
+
 def update_version_in_pyproject(new_version):
     """Update the version in pyproject.toml."""
     pyproject_path = Path("pyproject.toml")
@@ -43,6 +44,7 @@ def update_version_in_pyproject(new_version):
     pyproject_path.write_text(updated_content)
     print(f"✅ Updated version to {new_version} in pyproject.toml")
 
+
 def get_current_version():
     """Get current version from pyproject.toml."""
     pyproject_path = Path("pyproject.toml")
@@ -52,6 +54,7 @@ def get_current_version():
     if version_match:
         return version_match.group(1)
     return None
+
 
 def main():
     # Check if version argument is provided
@@ -66,8 +69,10 @@ def main():
     new_version = sys.argv[1]
 
     # Validate version format (basic check)
-    if not re.match(r'^\d+\.\d+\.\d+$', new_version):
-        print(f"Error: Invalid version format '{new_version}'. Use semantic versioning (e.g., 0.1.4)")
+    if not re.match(r"^\d+\.\d+\.\d+$", new_version):
+        print(
+            f"Error: Invalid version format '{new_version}'. Use semantic versioning (e.g., 0.1.4)"
+        )
         sys.exit(1)
 
     # Ensure we're in the right directory
@@ -117,7 +122,7 @@ def main():
 
     # Step 9: Ask for confirmation
     response = input(f"\n9. Upload v{new_version} to PyPI? (y/N): ").strip().lower()
-    if response != 'y':
+    if response != "y":
         print("Cancelled.")
         print("Note: Version has been updated and committed to git.")
         return
@@ -129,10 +134,10 @@ def main():
 
     # Step 11: Create git tag (optional)
     tag_response = input(f"\n11. Create git tag v{new_version}? (y/N): ").strip().lower()
-    if tag_response == 'y':
+    if tag_response == "y":
         run_cmd(f"git tag v{new_version}")
         push_response = input("Push tag to remote? (y/N): ").strip().lower()
-        if push_response == 'y':
+        if push_response == "y":
             run_cmd("git push origin --tags")
 
     print(f"\n✅ Successfully published v{new_version} to PyPI!")
@@ -140,6 +145,7 @@ def main():
     print("  pip install sqlstream")
     print("  uv pip install sqlstream")
     print("  uv tool install sqlstream")
+
 
 def test_upload():
     """Upload to TestPyPI first for testing."""
@@ -178,9 +184,10 @@ def test_upload():
 
     # Ask if they want to commit
     commit_response = input("\nCommit version update to git? (y/N): ").strip().lower()
-    if commit_response == 'y':
+    if commit_response == "y":
         run_cmd("git add pyproject.toml uv.lock")
         run_cmd(f'git commit -m "chore: upgrade to {new_version} (test)"')
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "test":

@@ -15,6 +15,7 @@ from sqlstream.sql.ast_nodes import Condition
 
 try:
     import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -39,13 +40,7 @@ class HTMLReader(BaseReader):
         reader = HTMLReader("data.html", match="Sales Data")
     """
 
-    def __init__(
-        self,
-        source: str,
-        table: int = 0,
-        match: str | None = None,
-        **kwargs
-    ):
+    def __init__(self, source: str, table: int = 0, match: str | None = None, **kwargs):
         """
         Initialize HTML reader
 
@@ -56,10 +51,7 @@ class HTMLReader(BaseReader):
             **kwargs: Additional arguments passed to pandas read_html
         """
         if not PANDAS_AVAILABLE:
-            raise ImportError(
-                "HTML reader requires pandas library. "
-                "Install `sqlstream[pandas]`"
-            )
+            raise ImportError("HTML reader requires pandas library. Install `sqlstream[pandas]`")
 
         self.source = source
         self.table = table
@@ -78,11 +70,7 @@ class HTMLReader(BaseReader):
         try:
             # read_html returns a list of DataFrames
             match_pattern = self.match if self.match else ".+"
-            self.tables = pd.read_html(
-                self.source,
-                match=match_pattern,
-                **self.kwargs
-            )
+            self.tables = pd.read_html(self.source, match=match_pattern, **self.kwargs)
 
             if not self.tables:
                 raise ValueError(f"No tables found in HTML: {self.source}")
@@ -121,7 +109,7 @@ class HTMLReader(BaseReader):
                 df = df[available_cols]
 
         # Yield rows as dictionaries
-        yield from df.to_dict('records')
+        yield from df.to_dict("records")
 
     def _apply_filters(self, df: pd.DataFrame) -> pd.DataFrame:
         """Apply filter conditions to DataFrame"""
@@ -158,15 +146,15 @@ class HTMLReader(BaseReader):
         for col in self.df.columns:
             dtype = str(self.df[col].dtype)
             # Map pandas dtypes to SQL-like types
-            if dtype.startswith('int'):
+            if dtype.startswith("int"):
                 schema[col] = DataType.INTEGER
-            elif dtype.startswith('float'):
+            elif dtype.startswith("float"):
                 schema[col] = DataType.FLOAT
-            elif dtype == 'bool':
+            elif dtype == "bool":
                 schema[col] = DataType.BOOLEAN
-            elif dtype.startswith('datetime'):
+            elif dtype.startswith("datetime"):
                 schema[col] = DataType.DATETIME
-            elif dtype.startswith('timedelta'):
+            elif dtype.startswith("timedelta"):
                 schema[col] = DataType.TIME
             else:
                 # For object/string types, try to infer from content

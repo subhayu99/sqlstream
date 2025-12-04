@@ -2,7 +2,6 @@
 Tests for query executor
 """
 
-
 import pytest
 
 from sqlstream.core.executor import Executor

@@ -124,22 +124,22 @@ class TestJSONDetection:
         assert is_json_string('{"name": "Alice", "age": 30}') is True
 
     def test_json_array(self):
-        assert is_json_string('[1, 2, 3, 4, 5]') is True
+        assert is_json_string("[1, 2, 3, 4, 5]") is True
 
     def test_json_nested(self):
         assert is_json_string('{"user": {"name": "Bob", "age": 25}}') is True
 
     def test_not_json_plain_string(self):
-        assert is_json_string('just a string') is False
+        assert is_json_string("just a string") is False
 
     def test_not_json_number(self):
-        assert is_json_string('42') is False
+        assert is_json_string("42") is False
 
     def test_not_json_boolean(self):
-        assert is_json_string('true') is False
+        assert is_json_string("true") is False
 
     def test_invalid_json(self):
-        assert is_json_string('{invalid json}') is False
+        assert is_json_string("{invalid json}") is False
 
     def test_non_string(self):
         assert is_json_string(42) is False
@@ -181,7 +181,7 @@ class TestTypeInference:
 
     def test_infer_json(self):
         assert infer_type('{"name": "Alice"}') == DataType.JSON
-        assert infer_type('[1, 2, 3]') == DataType.JSON
+        assert infer_type("[1, 2, 3]") == DataType.JSON
 
     def test_infer_string(self):
         assert infer_type("hello world") == DataType.STRING

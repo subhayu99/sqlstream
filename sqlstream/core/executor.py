@@ -137,9 +137,7 @@ class Executor:
         if ast.group_by:
             if not ast.aggregates:
                 raise ValueError("GROUP BY requires aggregate functions in SELECT")
-            plan = GroupByOperator(
-                plan, ast.group_by, ast.aggregates, ast.columns
-            )
+            plan = GroupByOperator(plan, ast.group_by, ast.aggregates, ast.columns)
 
         # Add OrderBy if ORDER BY clause exists
         if ast.order_by:

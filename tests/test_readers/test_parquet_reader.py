@@ -248,9 +248,13 @@ class TestEndToEndWithQuery:
 
     def test_query_with_filter(self, age_stratified_parquet):
         """Test query with WHERE clause (predicate pushdown)"""
-        results = query(str(age_stratified_parquet)).sql("""
+        results = (
+            query(str(age_stratified_parquet))
+            .sql("""
             SELECT * FROM data WHERE age > 50
-        """).to_list()
+        """)
+            .to_list()
+        )
 
         # Should get only ages > 50
         assert all(row["age"] > 50 for row in results)
@@ -258,21 +262,29 @@ class TestEndToEndWithQuery:
 
     def test_query_with_column_selection(self, sample_parquet):
         """Test query with specific columns (column pruning)"""
-        results = query(str(sample_parquet)).sql("""
+        results = (
+            query(str(sample_parquet))
+            .sql("""
             SELECT name, age FROM data LIMIT 10
-        """).to_list()
+        """)
+            .to_list()
+        )
 
         assert len(results) == 10
         assert set(results[0].keys()) == {"name", "age"}
 
     def test_query_optimized(self, age_stratified_parquet):
         """Test fully optimized query"""
-        results = query(str(age_stratified_parquet)).sql("""
+        results = (
+            query(str(age_stratified_parquet))
+            .sql("""
             SELECT name
             FROM data
             WHERE age > 40
             LIMIT 5
-        """).to_list()
+        """)
+            .to_list()
+        )
 
         assert len(results) == 5
         assert set(results[0].keys()) == {"name"}
@@ -289,9 +301,16 @@ class TestExplainPlan:
 
     def test_explain_shows_pruning(self, age_stratified_parquet):
         """Test that explain shows row group pruning"""
-        plan = query(str(age_stratified_parquet)).sql("""
+        plan = (
+            query(str(age_stratified_parquet))
+            .sql(
+                """
             SELECT name FROM data WHERE age > 50
-        """, backend="python").explain()
+        """,
+                backend="python",
+            )
+            .explain()
+        )
 
         # Should show optimizations
         assert "Predicate pushdown" in plan

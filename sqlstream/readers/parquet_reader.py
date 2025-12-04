@@ -55,6 +55,7 @@ class ParquetReader(BaseReader):
         if self.is_s3:
             try:
                 import s3fs
+
                 filesystem = s3fs.S3FileSystem(anon=False)
                 # s3fs expects path without protocol when filesystem is provided
                 path_to_open = path.replace("s3://", "")
@@ -244,9 +245,7 @@ class ParquetReader(BaseReader):
                 max_val = stats.max
 
                 # Check if filter can eliminate this row group
-                if not self._statistics_match_condition(
-                    min_val, max_val, condition
-                ):
+                if not self._statistics_match_condition(min_val, max_val, condition):
                     return False  # Skip this row group!
 
             except Exception:
@@ -255,9 +254,7 @@ class ParquetReader(BaseReader):
 
         return True  # Row group might contain matches
 
-    def _statistics_match_condition(
-        self, min_val: Any, max_val: Any, condition: Condition
-    ) -> bool:
+    def _statistics_match_condition(self, min_val: Any, max_val: Any, condition: Condition) -> bool:
         """
         Check if min/max statistics overlap with a condition
 
@@ -526,7 +523,7 @@ class ParquetReader(BaseReader):
 
         # Parse the path string for partition key=value patterns
         # Match pattern: name=value in directory structure
-        partition_pattern = re.compile(r'([^/=]+)=([^/]+)')
+        partition_pattern = re.compile(r"([^/=]+)=([^/]+)")
 
         matches = partition_pattern.findall(self.path_str)
 
@@ -549,6 +546,7 @@ class ParquetReader(BaseReader):
             Typed value (int, float, or str)
         """
         from sqlstream.core.types import infer_type_from_string
+
         return infer_type_from_string(value)
 
     def _partition_matches_filters(self) -> bool:
@@ -595,9 +593,7 @@ class ParquetReader(BaseReader):
         # All conditions passed
         return True
 
-    def _evaluate_partition_condition(
-        self, actual: Any, operator: str, expected: Any
-    ) -> bool:
+    def _evaluate_partition_condition(self, actual: Any, operator: str, expected: Any) -> bool:
         """
         Evaluate a partition filter condition
 
@@ -642,8 +638,7 @@ class ParquetReader(BaseReader):
             "row_groups_scanned": self.row_groups_scanned,
             "row_groups_skipped": self.total_row_groups - self.row_groups_scanned,
             "pruning_ratio": (
-                (self.total_row_groups - self.row_groups_scanned)
-                / self.total_row_groups
+                (self.total_row_groups - self.row_groups_scanned) / self.total_row_groups
                 if self.total_row_groups > 0
                 else 0
             ),
@@ -660,9 +655,6 @@ class ParquetReader(BaseReader):
 
         # Use pandas read_parquet for performance
         if self.is_s3:
-            return pd.read_parquet(
-                self.path_str,
-                storage_options={"anon": False}
-            )
+            return pd.read_parquet(self.path_str, storage_options={"anon": False})
         else:
             return pd.read_parquet(self.path)

@@ -24,9 +24,7 @@ class APIDocGenerator:
         self.docs_dir = Path(docs_dir)
         self.docs_dir.mkdir(parents=True, exist_ok=True)
 
-        self.ignore_patterns = {
-            '__pycache__', '__init__.py', 'test_', '.pyc', '.pyo'
-        }
+        self.ignore_patterns = {"__pycache__", "__init__.py", "test_", ".pyc", ".pyo"}
 
         # Category definitions with nice titles
         self.category_titles = {
@@ -66,7 +64,7 @@ class APIDocGenerator:
             rel_path = Path(root).relative_to(self.source_dir)
 
             # Determine category (top-level subdirectory)
-            if rel_path == Path('.'):
+            if rel_path == Path("."):
                 # Root level files - skip
                 continue
 
@@ -75,10 +73,12 @@ class APIDocGenerator:
 
             # Process Python files in this directory
             for file in files:
-                if file.endswith('.py') and not any(pattern in file for pattern in self.ignore_patterns):
+                if file.endswith(".py") and not any(
+                    pattern in file for pattern in self.ignore_patterns
+                ):
                     # Build the module path
-                    module_parts = ['sqlstream'] + list(parts) + [file[:-3]]  # Remove .py
-                    module_path = '.'.join(module_parts)
+                    module_parts = ["sqlstream"] + list(parts) + [file[:-3]]  # Remove .py
+                    module_path = ".".join(module_parts)
 
                     if category not in modules_by_category:
                         modules_by_category[category] = []
@@ -111,12 +111,14 @@ class APIDocGenerator:
                 classes.append(node.name)
             elif isinstance(node, ast.FunctionDef):
                 # Skip private functions
-                if not node.name.startswith('_'):
+                if not node.name.startswith("_"):
                     functions.append(node.name)
 
         return {"classes": classes, "functions": functions}
 
-    def generate_mkdocstrings_block(self, module_path: str, item_name: str, item_type: str = "class") -> str:
+    def generate_mkdocstrings_block(
+        self, module_path: str, item_name: str, item_type: str = "class"
+    ) -> str:
         """Generate mkdocstrings syntax for a class or function"""
         full_path = f"{module_path}.{item_name}"
 
@@ -132,7 +134,9 @@ class APIDocGenerator:
     def generate_category_doc(self, category_name: str, modules: List[str]) -> str:
         """Generate markdown file for a category"""
         title = self.category_titles.get(category_name, f"{category_name.title()} Reference")
-        description = self.category_descriptions.get(category_name, f"Auto-generated API documentation for {category_name}.")
+        description = self.category_descriptions.get(
+            category_name, f"Auto-generated API documentation for {category_name}."
+        )
 
         lines = [f"# {title}\n"]
         lines.append(f"{description}\n")
@@ -142,20 +146,22 @@ class APIDocGenerator:
             items = self.get_classes_and_functions(module_path)
 
             # Skip modules with no public classes or functions
-            if not items['classes'] and not items['functions']:
+            if not items["classes"] and not items["functions"]:
                 continue
 
             # Add classes
-            for class_name in sorted(items['classes']):
+            for class_name in sorted(items["classes"]):
                 lines.append(self.generate_mkdocstrings_block(module_path, class_name, "class"))
 
             # Add functions
-            for func_name in sorted(items['functions']):
+            for func_name in sorted(items["functions"]):
                 lines.append(self.generate_mkdocstrings_block(module_path, func_name, "function"))
 
         return "\n".join(lines)
 
-    def update_mkdocs_nav(self, modules_by_category: Dict[str, List[str]], mkdocs_file: str = "mkdocs.yml"):
+    def update_mkdocs_nav(
+        self, modules_by_category: Dict[str, List[str]], mkdocs_file: str = "mkdocs.yml"
+    ):
         """Update mkdocs.yml navigation with generated API reference pages using text manipulation"""
         mkdocs_path = Path(mkdocs_file)
 
@@ -180,27 +186,32 @@ class APIDocGenerator:
         # Replace the Python API section with updated navigation
         # We'll look for the pattern and replace what's between API Reference and Guides
 
-        pattern = r'(  - Advanced Patterns: python-module/advanced-patterns.md)(.*?)(  - CLI Tool:)'
+        pattern = r"(  - Advanced Patterns: python-module/advanced-patterns.md)(.*?)(  - CLI Tool:)"
 
-        replacement_section = f'''\\1
+        replacement_section = f"""\\1
 {api_ref_section}
-\\3'''
+\\3"""
 
         new_content = re.sub(pattern, replacement_section, content, flags=re.DOTALL)
 
         # Write back
-        with open(mkdocs_path, 'w') as f:
+        with open(mkdocs_path, "w") as f:
             f.write(new_content)
 
-        print(f"\n✓ Updated navigation in {mkdocs_file} with {len(modules_by_category)} API reference pages")
+        print(
+            f"\n✓ Updated navigation in {mkdocs_file} with {len(modules_by_category)} API reference pages"
+        )
 
 
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Generate API reference documentation')
-    parser.add_argument('--skip-nav-update', action='store_true',
-                        help='Skip updating mkdocs.yml navigation (for CI/CD builds)')
+    parser = argparse.ArgumentParser(description="Generate API reference documentation")
+    parser.add_argument(
+        "--skip-nav-update",
+        action="store_true",
+        help="Skip updating mkdocs.yml navigation (for CI/CD builds)",
+    )
     args = parser.parse_args()
 
     generator = APIDocGenerator()
@@ -210,15 +221,15 @@ def main():
     modules_by_category = generator.discover_modules()
 
     # Special handling for 'core' - split into query and types
-    if 'core' in modules_by_category:
-        core_modules = modules_by_category.pop('core')
-        query_modules = [m for m in core_modules if 'query' in m]
-        type_modules = [m for m in core_modules if 'types' in m]
+    if "core" in modules_by_category:
+        core_modules = modules_by_category.pop("core")
+        query_modules = [m for m in core_modules if "query" in m]
+        type_modules = [m for m in core_modules if "types" in m]
 
         if query_modules:
-            modules_by_category['query'] = query_modules
+            modules_by_category["query"] = query_modules
         if type_modules:
-            modules_by_category['types'] = type_modules
+            modules_by_category["types"] = type_modules
 
     # Generate docs
     print("\nGenerating API reference documentation...")
@@ -226,7 +237,7 @@ def main():
         output_file = generator.docs_dir / f"{category_name}.md"
         content = generator.generate_category_doc(category_name, modules)
 
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             f.write(content)
 
         print(f"  ✓ Generated {output_file} ({len(modules)} modules)")

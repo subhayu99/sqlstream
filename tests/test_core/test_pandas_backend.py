@@ -4,7 +4,6 @@ Tests for Pandas backend
 Compares pandas backend results with Python backend to ensure correctness.
 """
 
-
 import pytest
 
 try:
@@ -39,14 +38,12 @@ class TestPandasBackendBasic:
     def test_select_all(self, sample_csv):
         """Test SELECT * with both backends"""
         # Python backend
-        python_result = query(str(sample_csv)).sql(
-            "SELECT * FROM data", backend="python"
-        ).to_list()
+        python_result = query(str(sample_csv)).sql("SELECT * FROM data", backend="python").to_list()
 
         # Pandas backend
-        pandas_result = query(str(sample_csv)).sql(
-            f"SELECT * FROM {sample_csv}", backend="pandas"
-        ).to_list()
+        pandas_result = (
+            query(str(sample_csv)).sql(f"SELECT * FROM {sample_csv}", backend="pandas").to_list()
+        )
 
         assert len(python_result) == len(pandas_result) == 4
         # Results should match (pandas may have different types, so compare values)
@@ -56,26 +53,32 @@ class TestPandasBackendBasic:
 
     def test_select_columns(self, sample_csv):
         """Test SELECT specific columns"""
-        python_result = query(str(sample_csv)).sql(
-            "SELECT name, age FROM data", backend="python"
-        ).to_list()
+        python_result = (
+            query(str(sample_csv)).sql("SELECT name, age FROM data", backend="python").to_list()
+        )
 
-        pandas_result = query(str(sample_csv)).sql(
-            f"SELECT name, age FROM {sample_csv}", backend="pandas"
-        ).to_list()
+        pandas_result = (
+            query(str(sample_csv))
+            .sql(f"SELECT name, age FROM {sample_csv}", backend="pandas")
+            .to_list()
+        )
 
         assert len(python_result) == len(pandas_result) == 4
         assert list(python_result[0].keys()) == list(pandas_result[0].keys())
 
     def test_where_filter(self, sample_csv):
         """Test WHERE clause"""
-        python_result = query(str(sample_csv)).sql(
-            "SELECT * FROM data WHERE age > 28", backend="python"
-        ).to_list()
+        python_result = (
+            query(str(sample_csv))
+            .sql("SELECT * FROM data WHERE age > 28", backend="python")
+            .to_list()
+        )
 
-        pandas_result = query(str(sample_csv)).sql(
-            f"SELECT * FROM {sample_csv} WHERE age > 28", backend="pandas"
-        ).to_list()
+        pandas_result = (
+            query(str(sample_csv))
+            .sql(f"SELECT * FROM {sample_csv} WHERE age > 28", backend="pandas")
+            .to_list()
+        )
 
         assert len(python_result) == len(pandas_result) == 2
         # Should be Alice and Charlie
@@ -84,13 +87,15 @@ class TestPandasBackendBasic:
 
     def test_limit(self, sample_csv):
         """Test LIMIT clause"""
-        python_result = query(str(sample_csv)).sql(
-            "SELECT * FROM data LIMIT 2", backend="python"
-        ).to_list()
+        python_result = (
+            query(str(sample_csv)).sql("SELECT * FROM data LIMIT 2", backend="python").to_list()
+        )
 
-        pandas_result = query(str(sample_csv)).sql(
-            f"SELECT * FROM {sample_csv} LIMIT 2", backend="pandas"
-        ).to_list()
+        pandas_result = (
+            query(str(sample_csv))
+            .sql(f"SELECT * FROM {sample_csv} LIMIT 2", backend="pandas")
+            .to_list()
+        )
 
         assert len(python_result) == len(pandas_result) == 2
 
@@ -103,25 +108,26 @@ class TestPandasBackendGroupBy:
         """Create sales CSV file"""
         csv_file = tmp_path / "sales.csv"
         csv_file.write_text(
-            "region,product,sales\n"
-            "East,A,100\n"
-            "East,B,150\n"
-            "West,A,200\n"
-            "West,B,120\n"
-            "East,A,80\n"
+            "region,product,sales\nEast,A,100\nEast,B,150\nWest,A,200\nWest,B,120\nEast,A,80\n"
         )
         return csv_file
 
     def test_groupby_sum(self, sales_csv):
         """Test GROUP BY with SUM"""
-        python_result = query(str(sales_csv)).sql(
-            "SELECT region, SUM(sales) FROM data GROUP BY region", backend="python"
-        ).to_list()
+        python_result = (
+            query(str(sales_csv))
+            .sql("SELECT region, SUM(sales) FROM data GROUP BY region", backend="python")
+            .to_list()
+        )
 
-        pandas_result = query(str(sales_csv)).sql(
-            f"SELECT region, SUM(sales) FROM {sales_csv} GROUP BY region",
-            backend="pandas",
-        ).to_list()
+        pandas_result = (
+            query(str(sales_csv))
+            .sql(
+                f"SELECT region, SUM(sales) FROM {sales_csv} GROUP BY region",
+                backend="pandas",
+            )
+            .to_list()
+        )
 
         assert len(python_result) == len(pandas_result) == 2
 
@@ -134,14 +140,20 @@ class TestPandasBackendGroupBy:
 
     def test_groupby_count(self, sales_csv):
         """Test GROUP BY with COUNT"""
-        python_result = query(str(sales_csv)).sql(
-            "SELECT region, COUNT(*) FROM data GROUP BY region", backend="python"
-        ).to_list()
+        python_result = (
+            query(str(sales_csv))
+            .sql("SELECT region, COUNT(*) FROM data GROUP BY region", backend="python")
+            .to_list()
+        )
 
-        pandas_result = query(str(sales_csv)).sql(
-            f"SELECT region, COUNT(*) FROM {sales_csv} GROUP BY region",
-            backend="pandas",
-        ).to_list()
+        pandas_result = (
+            query(str(sales_csv))
+            .sql(
+                f"SELECT region, COUNT(*) FROM {sales_csv} GROUP BY region",
+                backend="pandas",
+            )
+            .to_list()
+        )
 
         assert len(python_result) == len(pandas_result) == 2
 
@@ -153,20 +165,22 @@ class TestPandasBackendOrderBy:
     def sample_csv(self, tmp_path):
         """Create sample CSV file"""
         csv_file = tmp_path / "data.csv"
-        csv_file.write_text(
-            "name,age\n" "Charlie,35\n" "Alice,30\n" "Bob,25\n" "David,28\n"
-        )
+        csv_file.write_text("name,age\nCharlie,35\nAlice,30\nBob,25\nDavid,28\n")
         return csv_file
 
     def test_order_by_asc(self, sample_csv):
         """Test ORDER BY ASC"""
-        python_result = query(str(sample_csv)).sql(
-            "SELECT * FROM data ORDER BY age ASC", backend="python"
-        ).to_list()
+        python_result = (
+            query(str(sample_csv))
+            .sql("SELECT * FROM data ORDER BY age ASC", backend="python")
+            .to_list()
+        )
 
-        pandas_result = query(str(sample_csv)).sql(
-            f"SELECT * FROM {sample_csv} ORDER BY age ASC", backend="pandas"
-        ).to_list()
+        pandas_result = (
+            query(str(sample_csv))
+            .sql(f"SELECT * FROM {sample_csv} ORDER BY age ASC", backend="pandas")
+            .to_list()
+        )
 
         assert len(python_result) == len(pandas_result) == 4
 
@@ -178,9 +192,11 @@ class TestPandasBackendOrderBy:
 
     def test_order_by_desc(self, sample_csv):
         """Test ORDER BY DESC"""
-        pandas_result = query(str(sample_csv)).sql(
-            f"SELECT * FROM {sample_csv} ORDER BY age DESC", backend="pandas"
-        ).to_list()
+        pandas_result = (
+            query(str(sample_csv))
+            .sql(f"SELECT * FROM {sample_csv} ORDER BY age DESC", backend="pandas")
+            .to_list()
+        )
 
         ages = [r["age"] for r in pandas_result]
         assert ages == [35, 30, 28, 25]
@@ -200,18 +216,19 @@ class TestPandasBackendJoin:
     def orders_csv(self, tmp_path):
         """Create orders CSV file"""
         csv_file = tmp_path / "orders.csv"
-        csv_file.write_text(
-            "order_id,customer_id,amount\n" "101,1,100\n" "102,2,200\n" "103,1,150\n"
-        )
+        csv_file.write_text("order_id,customer_id,amount\n101,1,100\n102,2,200\n103,1,150\n")
         return csv_file
 
     def test_inner_join(self, customers_csv, orders_csv):
         """Test INNER JOIN"""
-        pandas_result = query(str(customers_csv)).sql(
-            f"SELECT * FROM {customers_csv} "
-            f"INNER JOIN {orders_csv} ON id = customer_id",
-            backend="pandas",
-        ).to_list()
+        pandas_result = (
+            query(str(customers_csv))
+            .sql(
+                f"SELECT * FROM {customers_csv} INNER JOIN {orders_csv} ON id = customer_id",
+                backend="pandas",
+            )
+            .to_list()
+        )
 
         assert len(pandas_result) == 3
 
@@ -221,11 +238,14 @@ class TestPandasBackendJoin:
 
     def test_left_join(self, customers_csv, orders_csv):
         """Test LEFT JOIN"""
-        pandas_result = query(str(customers_csv)).sql(
-            f"SELECT * FROM {customers_csv} "
-            f"LEFT JOIN {orders_csv} ON id = customer_id",
-            backend="pandas",
-        ).to_list()
+        pandas_result = (
+            query(str(customers_csv))
+            .sql(
+                f"SELECT * FROM {customers_csv} LEFT JOIN {orders_csv} ON id = customer_id",
+                backend="pandas",
+            )
+            .to_list()
+        )
 
         # Should have 4 rows (Alice twice, Bob once, Charlie once with NULL)
         assert len(pandas_result) == 4
@@ -247,9 +267,7 @@ class TestPandasBackendAuto:
 
     def test_auto_uses_pandas(self, sample_csv):
         """Test that auto backend selects pandas when available"""
-        result = query(str(sample_csv)).sql(
-            f"SELECT * FROM {sample_csv}", backend="auto"
-        )
+        result = query(str(sample_csv)).sql(f"SELECT * FROM {sample_csv}", backend="auto")
 
         # Check that pandas backend was selected
         assert result.use_pandas is True
@@ -257,9 +275,7 @@ class TestPandasBackendAuto:
 
     def test_can_force_python(self, sample_csv):
         """Test that python backend can be forced"""
-        result = query(str(sample_csv)).sql(
-            "SELECT * FROM data", backend="python"
-        )
+        result = query(str(sample_csv)).sql("SELECT * FROM data", backend="python")
 
         assert result.use_pandas is False
         assert result.backend == "python"
@@ -297,6 +313,7 @@ class TestPandasBackendJSON:
     def simple_json(self, tmp_path):
         """Create simple JSON array file"""
         import json
+
         json_file = tmp_path / "data.json"
         data = [
             {"id": 1, "name": "Alice", "age": 30, "city": "NYC"},
@@ -311,6 +328,7 @@ class TestPandasBackendJSON:
     def nested_json(self, tmp_path):
         """Create nested JSON file with records key"""
         import json
+
         json_file = tmp_path / "api_response.json"
         data = {
             "status": "success",
@@ -321,16 +339,14 @@ class TestPandasBackendJSON:
                     {"id": 3, "name": "Charlie", "score": 92},
                 ]
             },
-            "meta": {"count": 3}
+            "meta": {"count": 3},
         }
         json_file.write_text(json.dumps(data, indent=2))
         return json_file
 
     def test_json_select_all(self, simple_json):
         """Test SELECT * on JSON file"""
-        result = query(str(simple_json)).sql(
-            "SELECT * FROM data", backend="pandas"
-        ).to_list()
+        result = query(str(simple_json)).sql("SELECT * FROM data", backend="pandas").to_list()
 
         assert len(result) == 4
         assert result[0]["name"] == "Alice"
@@ -338,9 +354,9 @@ class TestPandasBackendJSON:
 
     def test_json_select_columns(self, simple_json):
         """Test SELECT specific columns from JSON"""
-        result = query(str(simple_json)).sql(
-            "SELECT name, city FROM data", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(simple_json)).sql("SELECT name, city FROM data", backend="pandas").to_list()
+        )
 
         assert len(result) == 4
         assert list(result[0].keys()) == ["name", "city"]
@@ -349,9 +365,11 @@ class TestPandasBackendJSON:
 
     def test_json_where_filter(self, simple_json):
         """Test WHERE clause on JSON data"""
-        result = query(str(simple_json)).sql(
-            "SELECT * FROM data WHERE age > 28", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(simple_json))
+            .sql("SELECT * FROM data WHERE age > 28", backend="pandas")
+            .to_list()
+        )
 
         assert len(result) == 2
         names = sorted([r["name"] for r in result])
@@ -359,9 +377,11 @@ class TestPandasBackendJSON:
 
     def test_json_where_string_filter(self, simple_json):
         """Test WHERE clause with string comparison"""
-        result = query(str(simple_json)).sql(
-            "SELECT name, age FROM data WHERE city = 'NYC'", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(simple_json))
+            .sql("SELECT name, age FROM data WHERE city = 'NYC'", backend="pandas")
+            .to_list()
+        )
 
         assert len(result) == 2
         names = sorted([r["name"] for r in result])
@@ -369,26 +389,30 @@ class TestPandasBackendJSON:
 
     def test_json_limit(self, simple_json):
         """Test LIMIT on JSON data"""
-        result = query(str(simple_json)).sql(
-            "SELECT * FROM data LIMIT 2", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(simple_json)).sql("SELECT * FROM data LIMIT 2", backend="pandas").to_list()
+        )
 
         assert len(result) == 2
 
     def test_json_order_by(self, simple_json):
         """Test ORDER BY on JSON data"""
-        result = query(str(simple_json)).sql(
-            "SELECT name, age FROM data ORDER BY age ASC", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(simple_json))
+            .sql("SELECT name, age FROM data ORDER BY age ASC", backend="pandas")
+            .to_list()
+        )
 
         ages = [r["age"] for r in result]
         assert ages == [25, 28, 30, 35]
 
     def test_json_nested_with_fragment(self, nested_json):
         """Test JSON with nested path using fragment syntax"""
-        result = query(f"{nested_json}#json:data.users").sql(
-            "SELECT * FROM users", backend="pandas"
-        ).to_list()
+        result = (
+            query(f"{nested_json}#json:data.users")
+            .sql("SELECT * FROM users", backend="pandas")
+            .to_list()
+        )
 
         assert len(result) == 3
         assert result[0]["name"] == "Alice"
@@ -396,9 +420,7 @@ class TestPandasBackendJSON:
 
     def test_json_auto_backend(self, simple_json):
         """Test that auto backend works with JSON files"""
-        result = query(str(simple_json)).sql(
-            "SELECT * FROM data WHERE age > 25", backend="auto"
-        )
+        result = query(str(simple_json)).sql("SELECT * FROM data WHERE age > 25", backend="auto")
 
         # Verify pandas backend was selected
         assert result.use_pandas is True
@@ -415,6 +437,7 @@ class TestPandasBackendJSONL:
     def logs_jsonl(self, tmp_path):
         """Create JSONL log file"""
         import json
+
         jsonl_file = tmp_path / "logs.jsonl"
         logs = [
             {"timestamp": "2024-01-01T10:00:00", "level": "INFO", "message": "Server started"},
@@ -428,18 +451,18 @@ class TestPandasBackendJSONL:
 
     def test_jsonl_select_all(self, logs_jsonl):
         """Test SELECT * on JSONL file"""
-        result = query(str(logs_jsonl)).sql(
-            "SELECT * FROM logs", backend="pandas"
-        ).to_list()
+        result = query(str(logs_jsonl)).sql("SELECT * FROM logs", backend="pandas").to_list()
 
         assert len(result) == 5
         assert result[0]["level"] == "INFO"
 
     def test_jsonl_where_filter(self, logs_jsonl):
         """Test WHERE clause on JSONL data"""
-        result = query(str(logs_jsonl)).sql(
-            "SELECT * FROM logs WHERE level = 'ERROR'", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(logs_jsonl))
+            .sql("SELECT * FROM logs WHERE level = 'ERROR'", backend="pandas")
+            .to_list()
+        )
 
         assert len(result) == 2
         messages = [r["message"] for r in result]
@@ -448,18 +471,20 @@ class TestPandasBackendJSONL:
 
     def test_jsonl_select_columns(self, logs_jsonl):
         """Test SELECT specific columns from JSONL"""
-        result = query(str(logs_jsonl)).sql(
-            "SELECT level, message FROM logs", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(logs_jsonl))
+            .sql("SELECT level, message FROM logs", backend="pandas")
+            .to_list()
+        )
 
         assert len(result) == 5
         assert list(result[0].keys()) == ["level", "message"]
 
     def test_jsonl_limit(self, logs_jsonl):
         """Test LIMIT on JSONL data"""
-        result = query(str(logs_jsonl)).sql(
-            "SELECT * FROM logs LIMIT 3", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(logs_jsonl)).sql("SELECT * FROM logs LIMIT 3", backend="pandas").to_list()
+        )
 
         assert len(result) == 3
 
@@ -522,9 +547,7 @@ class TestPandasBackendXML:
 
     def test_xml_select_all(self, simple_xml):
         """Test SELECT * on XML file"""
-        result = query(str(simple_xml)).sql(
-            "SELECT * FROM data", backend="pandas"
-        ).to_list()
+        result = query(str(simple_xml)).sql("SELECT * FROM data", backend="pandas").to_list()
 
         assert len(result) == 3
         assert result[0]["name"] == "Alice"
@@ -532,18 +555,20 @@ class TestPandasBackendXML:
 
     def test_xml_select_columns(self, simple_xml):
         """Test SELECT specific columns from XML"""
-        result = query(str(simple_xml)).sql(
-            "SELECT name, city FROM data", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(simple_xml)).sql("SELECT name, city FROM data", backend="pandas").to_list()
+        )
 
         assert len(result) == 3
         assert list(result[0].keys()) == ["name", "city"]
 
     def test_xml_where_filter(self, simple_xml):
         """Test WHERE clause on XML data"""
-        result = query(str(simple_xml)).sql(
-            "SELECT * FROM data WHERE age > 28", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(simple_xml))
+            .sql("SELECT * FROM data WHERE age > 28", backend="pandas")
+            .to_list()
+        )
 
         assert len(result) == 2
         names = sorted([r["name"] for r in result])
@@ -551,18 +576,22 @@ class TestPandasBackendXML:
 
     def test_xml_with_element_selection(self, simple_xml):
         """Test XML with explicit element selection"""
-        result = query(f"{simple_xml}#xml:record").sql(
-            "SELECT name, age FROM data", backend="pandas"
-        ).to_list()
+        result = (
+            query(f"{simple_xml}#xml:record")
+            .sql("SELECT name, age FROM data", backend="pandas")
+            .to_list()
+        )
 
         assert len(result) == 3
         assert result[0]["name"] == "Alice"
 
     def test_xml_with_attributes(self, products_xml):
         """Test XML with attributes (@ prefix)"""
-        result = query(f"{products_xml}#xml:product").sql(
-            "SELECT name, price, stock FROM data WHERE price > 50", backend="pandas"
-        ).to_list()
+        result = (
+            query(f"{products_xml}#xml:product")
+            .sql("SELECT name, price, stock FROM data WHERE price > 50", backend="pandas")
+            .to_list()
+        )
 
         assert len(result) == 2
         names = sorted([r["name"] for r in result])
@@ -570,9 +599,11 @@ class TestPandasBackendXML:
 
     def test_xml_order_by(self, simple_xml):
         """Test ORDER BY on XML data"""
-        result = query(str(simple_xml)).sql(
-            "SELECT name, age FROM data ORDER BY age DESC", backend="pandas"
-        ).to_list()
+        result = (
+            query(str(simple_xml))
+            .sql("SELECT name, age FROM data ORDER BY age DESC", backend="pandas")
+            .to_list()
+        )
 
         ages = [r["age"] for r in result]
         assert ages == [35, 30, 25]
@@ -606,12 +637,16 @@ class TestPandasBackendMultiFormat:
         """Test JOIN between CSV and JSON files with pandas backend"""
         csv_file, json_file = setup_multiformat
 
-        result = query(str(csv_file)).sql(
-            f"SELECT u.name, o.order_id, o.amount "
-            f"FROM {csv_file} u "
-            f"INNER JOIN {json_file} o ON u.id = o.user_id",
-            backend="pandas"
-        ).to_list()
+        result = (
+            query(str(csv_file))
+            .sql(
+                f"SELECT u.name, o.order_id, o.amount "
+                f"FROM {csv_file} u "
+                f"INNER JOIN {json_file} o ON u.id = o.user_id",
+                backend="pandas",
+            )
+            .to_list()
+        )
 
         assert len(result) == 3
 

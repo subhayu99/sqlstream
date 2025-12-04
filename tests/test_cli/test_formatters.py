@@ -285,7 +285,9 @@ class TestMarkdownFormatter:
         formatter = MarkdownFormatter()
         results = [{"name": "Alice", "age": 30, "score": 95.5}]
 
-        output = formatter.format(results, align={"name": "left", "age": "center", "score": "right"})
+        output = formatter.format(
+            results, align={"name": "left", "age": "center", "score": "right"}
+        )
 
         # Check mixed alignments
         assert "| :--- | :---: | ---: |" in output

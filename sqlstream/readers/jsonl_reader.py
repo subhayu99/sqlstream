@@ -75,10 +75,13 @@ class JSONLReader(BaseReader):
         if self.is_s3:
             try:
                 import s3fs
+
                 fs = s3fs.S3FileSystem(anon=False)
                 return fs.open(self.path_str, mode="r", encoding=self.encoding)
             except ImportError as e:
-                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]") from e
+                raise ImportError(
+                    "s3fs is required for S3 support. Install with: pip install sqlstream[s3]"
+                ) from e
         else:
             return open(self.path, encoding=self.encoding)
 
@@ -98,7 +101,9 @@ class JSONLReader(BaseReader):
                     row = json.loads(line)
 
                     if not isinstance(row, dict):
-                        warnings.warn(f"Skipping non-dict row at line {line_num}", UserWarning, stacklevel=2)
+                        warnings.warn(
+                            f"Skipping non-dict row at line {line_num}", UserWarning, stacklevel=2
+                        )
                         continue
 
                     # Apply filters
@@ -117,7 +122,9 @@ class JSONLReader(BaseReader):
                         break
 
                 except json.JSONDecodeError:
-                    warnings.warn(f"Skipping invalid JSON at line {line_num}", UserWarning, stacklevel=2)
+                    warnings.warn(
+                        f"Skipping invalid JSON at line {line_num}", UserWarning, stacklevel=2
+                    )
                     continue
 
     def _matches_filter(self, row: Dict[str, Any]) -> bool:

@@ -38,10 +38,7 @@ class PandasExecutor:
     def __init__(self):
         """Initialize pandas executor"""
         if not PANDAS_AVAILABLE:
-            raise ImportError(
-                "Pandas backend requires pandas library. "
-                "Install `sqlstream[pandas]`"
-            )
+            raise ImportError("Pandas backend requires pandas library. Install `sqlstream[pandas]`")
 
     def execute(
         self, ast: SelectStatement, source: str, right_source: str | None = None
@@ -101,6 +98,7 @@ class PandasExecutor:
         """
         # Parse URL fragment if present (e.g., "data.html#html:1")
         from sqlstream.core.fragment_parser import parse_source_fragment
+
         source_path, format_hint, table_hint = parse_source_fragment(source)
 
         # Use format hint from fragment if not explicitly provided
@@ -122,20 +120,20 @@ class PandasExecutor:
             # If format not specified, detect from reader
             if not format:
                 delegate_type = type(reader.delegate_reader).__name__
-                if 'HTML' in delegate_type:
-                    format = 'html'
-                elif 'Markdown' in delegate_type:
-                    format = 'markdown'
-                elif 'Parquet' in delegate_type:
-                    format = 'parquet'
-                elif 'JSON' in delegate_type and 'JSONL' not in delegate_type:
-                    format = 'json'
-                elif 'JSONL' in delegate_type:
-                    format = 'jsonl'
-                elif 'XML' in delegate_type:
-                    format = 'xml'
+                if "HTML" in delegate_type:
+                    format = "html"
+                elif "Markdown" in delegate_type:
+                    format = "markdown"
+                elif "Parquet" in delegate_type:
+                    format = "parquet"
+                elif "JSON" in delegate_type and "JSONL" not in delegate_type:
+                    format = "json"
+                elif "JSONL" in delegate_type:
+                    format = "jsonl"
+                elif "XML" in delegate_type:
+                    format = "xml"
                 else:
-                    format = 'csv'
+                    format = "csv"
 
         # If format explicitly specified, use it
         if format:
@@ -156,6 +154,7 @@ class PandasExecutor:
             elif format == "markdown":
                 # Use our markdown reader with table selection
                 from sqlstream.readers.markdown_reader import MarkdownReader
+
                 table_index = table_hint if table_hint is not None else 0
                 reader = MarkdownReader(source_path, table=table_index)
                 # Convert to DataFrame
@@ -163,22 +162,26 @@ class PandasExecutor:
             elif format == "json":
                 # Use our JSON reader with records key support
                 from sqlstream.readers.json_reader import JSONReader
+
                 key = str(table_hint) if table_hint is not None else None
                 reader = JSONReader(source_path, records_key=key)
                 return reader.to_dataframe()
             elif format == "jsonl":
                 # Use our JSONL reader
                 from sqlstream.readers.jsonl_reader import JSONLReader
+
                 reader = JSONLReader(source_path)
                 return reader.to_dataframe()
             elif format == "xml":
                 # Use our XML reader with element selection
                 from sqlstream.readers.xml_reader import XMLReader
+
                 element = str(table_hint) if table_hint is not None else None
                 reader = XMLReader(source_path, element=element)
                 return reader.to_dataframe()
             else:  # csv
                 from sqlstream.readers.csv_reader import CSVReader
+
                 return CSVReader(source_path).to_dataframe()
 
         # Auto-detect from extension
@@ -192,36 +195,41 @@ class PandasExecutor:
             table_index = table_hint if table_hint is not None else 0
             if table_index >= len(tables):
                 raise ValueError(
-                    f"Table index {table_index} out of range. "
-                    f"HTML contains {len(tables)} table(s)."
+                    f"Table index {table_index} out of range. HTML contains {len(tables)} table(s)."
                 )
             return tables[table_index]
         elif source_lower.endswith((".md", ".markdown")):
             from sqlstream.readers.markdown_reader import MarkdownReader
+
             table_index = table_hint if table_hint is not None else 0
             reader = MarkdownReader(source_path, table=table_index)
             return pd.DataFrame(reader.rows)
         elif source_lower.endswith(".json"):
             from sqlstream.readers.json_reader import JSONReader
+
             key = str(table_hint) if table_hint is not None else None
             reader = JSONReader(source_path, records_key=key)
             return reader.to_dataframe()
         elif source_lower.endswith(".jsonl"):
             from sqlstream.readers.jsonl_reader import JSONLReader
+
             reader = JSONLReader(source_path)
             return reader.to_dataframe()
         elif source_lower.endswith(".xml"):
             from sqlstream.readers.xml_reader import XMLReader
+
             element = str(table_hint) if table_hint is not None else None
             reader = XMLReader(source_path, element=element)
             return reader.to_dataframe()
         elif source_lower.endswith(".csv"):
             from sqlstream.readers.csv_reader import CSVReader
+
             return CSVReader(source_path).to_dataframe()
         else:
             # Try CSV as default
             try:
                 from sqlstream.readers.csv_reader import CSVReader
+
                 return CSVReader(source_path).to_dataframe()
             except Exception as e:
                 raise ValueError(f"Unsupported file format: {source_path}") from e
@@ -253,9 +261,7 @@ class PandasExecutor:
 
         return result
 
-    def _apply_filter(
-        self, df: pd.DataFrame, conditions: list[Condition]
-    ) -> pd.DataFrame:
+    def _apply_filter(self, df: pd.DataFrame, conditions: list[Condition]) -> pd.DataFrame:
         """Apply WHERE conditions"""
         mask = pd.Series([True] * len(df), index=df.index)
 
@@ -284,9 +290,7 @@ class PandasExecutor:
 
         return df[mask]
 
-    def _apply_groupby(
-        self, df: pd.DataFrame, ast: SelectStatement
-    ) -> pd.DataFrame:
+    def _apply_groupby(self, df: pd.DataFrame, ast: SelectStatement) -> pd.DataFrame:
         """Apply GROUP BY with aggregations"""
         # Build aggregation dictionary and track rename mapping
         agg_dict = {}
@@ -362,9 +366,7 @@ class PandasExecutor:
 
         return grouped
 
-    def _apply_orderby(
-        self, df: pd.DataFrame, ast: SelectStatement
-    ) -> pd.DataFrame:
+    def _apply_orderby(self, df: pd.DataFrame, ast: SelectStatement) -> pd.DataFrame:
         """Apply ORDER BY"""
         # Build column list and ascending flags
         by_cols = []
@@ -377,9 +379,7 @@ class PandasExecutor:
         # Sort (na_position='last' to match SQL NULL behavior)
         return df.sort_values(by=by_cols, ascending=ascending, na_position="last")
 
-    def _apply_projection(
-        self, df: pd.DataFrame, columns: list[str]
-    ) -> pd.DataFrame:
+    def _apply_projection(self, df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
         """Apply column selection (PROJECT)"""
         if columns == ["*"]:
             return df
@@ -415,14 +415,10 @@ class PandasExecutor:
 
         if ast.group_by:
             aggs = ", ".join(f"{a.function}({a.column})" for a in ast.aggregates)
-            operations.append(
-                f"4. GroupBy {', '.join(ast.group_by)} with {aggs}"
-            )
+            operations.append(f"4. GroupBy {', '.join(ast.group_by)} with {aggs}")
 
         if ast.order_by:
-            order_spec = ", ".join(
-                f"{o.column} {o.direction}" for o in ast.order_by
-            )
+            order_spec = ", ".join(f"{o.column} {o.direction}" for o in ast.order_by)
             operations.append(f"5. Sort by {order_spec}")
 
         if ast.columns != ["*"]:
@@ -432,8 +428,6 @@ class PandasExecutor:
             operations.append(f"7. Limit to {ast.limit} rows")
 
         operations.append("")
-        operations.append(
-            "Note: Pandas backend uses vectorized operations for high performance"
-        )
+        operations.append("Note: Pandas backend uses vectorized operations for high performance")
 
         return "\n".join(operations)

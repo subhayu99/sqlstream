@@ -88,9 +88,7 @@ class CostModel:
         return row_count * cls.COST_PER_ROW_SCAN
 
     @classmethod
-    def estimate_filter_cost(
-        cls, row_count: int, selectivity: float = 0.1
-    ) -> float:
+    def estimate_filter_cost(cls, row_count: int, selectivity: float = 0.1) -> float:
         """
         Estimate cost of filtering rows
 
@@ -108,9 +106,7 @@ class CostModel:
         return filter_cost
 
     @classmethod
-    def estimate_join_cost(
-        cls, left_rows: int, right_rows: int, selectivity: float = 0.1
-    ) -> float:
+    def estimate_join_cost(cls, left_rows: int, right_rows: int, selectivity: float = 0.1) -> float:
         """
         Estimate cost of hash join
 
@@ -156,7 +152,9 @@ class CostModel:
         return row_count * math.log2(row_count) * cls.COST_PER_ROW_SORT
 
     @classmethod
-    def estimate_selectivity(cls, condition: Condition, stats: Optional[ColumnStatistics] = None) -> float:
+    def estimate_selectivity(
+        cls, condition: Condition, stats: Optional[ColumnStatistics] = None
+    ) -> float:
         """
         Estimate selectivity of a filter condition
 

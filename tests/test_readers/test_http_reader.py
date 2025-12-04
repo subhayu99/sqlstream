@@ -216,9 +216,7 @@ class TestHTTPReaderWithQuery:
             mock_stream.return_value.__enter__.return_value = mock_response
 
             # Query with WHERE clause
-            results = query(url).sql(
-                "SELECT name, city FROM data WHERE city = 'NYC'"
-            ).to_list()
+            results = query(url).sql("SELECT name, city FROM data WHERE city = 'NYC'").to_list()
 
             assert len(results) == 1
             assert results[0]["name"] == "Alice"
@@ -492,7 +490,9 @@ class TestHTTPAdditionalFormats:
     def test_html_format_detection(self, tmp_path):
         """Test HTML format detection from URL"""
         url = "https://example.com/table.html"
-        html_data = b"<table><tr><th>name</th><th>age</th></tr><tr><td>Alice</td><td>30</td></tr></table>"
+        html_data = (
+            b"<table><tr><th>name</th><th>age</th></tr><tr><td>Alice</td><td>30</td></tr></table>"
+        )
 
         mock_response = Mock()
         mock_response.iter_bytes = Mock(return_value=[html_data])

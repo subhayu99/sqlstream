@@ -84,9 +84,7 @@ class OrderByOperator(Operator):
 
     def explain(self, indent: int = 0) -> List[str]:
         """Generate execution plan explanation"""
-        order_spec = ", ".join(
-            f"{col.column} {col.direction}" for col in self.order_by
-        )
+        order_spec = ", ".join(f"{col.column} {col.direction}" for col in self.order_by)
         lines = [" " * indent + f"OrderBy({order_spec})"]
         lines.extend(self.child.explain(indent + 2))
         return lines

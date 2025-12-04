@@ -58,7 +58,7 @@ class MarkdownReader(BaseReader):
     def _parse_markdown(self) -> None:
         """Parse all tables from Markdown file"""
         # Read file content
-        with open(self.source, encoding='utf-8') as f:
+        with open(self.source, encoding="utf-8") as f:
             content = f.read()
 
         # Find all tables
@@ -75,8 +75,8 @@ class MarkdownReader(BaseReader):
 
         # Select the table to work with
         self.data = self.tables[self.table]
-        self.columns = self.data['columns']
-        self.rows = self.data['rows']
+        self.columns = self.data["columns"]
+        self.rows = self.data["rows"]
 
     def _extract_tables(self, content: str) -> list[dict[str, Any]]:
         """
@@ -86,14 +86,14 @@ class MarkdownReader(BaseReader):
             List of table dicts with 'columns' and 'rows' keys
         """
         tables = []
-        lines = content.split('\n')
+        lines = content.split("\n")
 
         i = 0
         while i < len(lines):
             # Check if this line looks like a table header
             line = lines[i].strip()
 
-            if line.startswith('|') and '|' in line[1:]:
+            if line.startswith("|") and "|" in line[1:]:
                 # Potential table start
                 # Check if next line is separator
                 if i + 1 < len(lines):
@@ -104,7 +104,7 @@ class MarkdownReader(BaseReader):
                         if table:
                             tables.append(table)
                         # Skip past this table
-                        i += table.get('line_count', 2)
+                        i += table.get("line_count", 2)
                         continue
 
             i += 1
@@ -113,15 +113,15 @@ class MarkdownReader(BaseReader):
 
     def _is_separator_line(self, line: str) -> bool:
         """Check if line is a table separator (e.g., |:---|---:|)"""
-        if not line.startswith('|'):
+        if not line.startswith("|"):
             return False
 
         # Remove outer pipes and split
-        parts = line.strip('|').split('|')
+        parts = line.strip("|").split("|")
 
         # Check if all parts match separator pattern
         # Separators can be: ---, :---, ---:, :---:
-        separator_pattern = re.compile(r'^:?-+:?$')
+        separator_pattern = re.compile(r"^:?-+:?$")
 
         return all(separator_pattern.match(p.strip()) for p in parts if p.strip())
 
@@ -143,7 +143,7 @@ class MarkdownReader(BaseReader):
             line = lines[i].strip()
 
             # Stop if we hit an empty line or non-table content
-            if not line or not line.startswith('|'):
+            if not line or not line.startswith("|"):
                 break
 
             # Skip if it's another separator (shouldn't happen in valid markdown)
@@ -165,16 +165,12 @@ class MarkdownReader(BaseReader):
 
             i += 1
 
-        return {
-            'columns': columns,
-            'rows': rows,
-            'line_count': i - start_idx
-        }
+        return {"columns": columns, "rows": rows, "line_count": i - start_idx}
 
     def _parse_row(self, line: str, infer_types: bool = True) -> list[Any]:
         """Parse a single table row"""
         # Remove leading/trailing pipes and whitespace
-        line = line.strip('|').strip()
+        line = line.strip("|").strip()
 
         # Split by pipes, handling escaped pipes
         parts = []
@@ -182,27 +178,27 @@ class MarkdownReader(BaseReader):
         escaped = False
 
         for char in line:
-            if char == '\\' and not escaped:
+            if char == "\\" and not escaped:
                 escaped = True
                 continue
-            elif char == '|' and not escaped:
+            elif char == "|" and not escaped:
                 parts.append(current.strip())
                 current = ""
             else:
                 if escaped:
-                    current += '\\'
+                    current += "\\"
                     escaped = False
                 current += char
 
         # Add last part
-        if current or line.endswith('|'):
+        if current or line.endswith("|"):
             parts.append(current.strip())
 
         # Clean up values
         cleaned = []
         for part in parts:
             # Convert empty strings and common null representations to None
-            if not part or part.lower() in ('null', 'none', 'n/a', '-'):
+            if not part or part.lower() in ("null", "none", "n/a", "-"):
                 cleaned.append(None)
             else:
                 # Try to infer types if requested
@@ -216,6 +212,7 @@ class MarkdownReader(BaseReader):
     def _infer_type(self, value: str) -> Any:
         """Infer and convert value to appropriate type"""
         from sqlstream.core.types import infer_type_from_string
+
         return infer_type_from_string(value)
 
     def read_lazy(self) -> Iterator[dict[str, Any]]:
@@ -228,10 +225,7 @@ class MarkdownReader(BaseReader):
 
             # Apply column selection if any
             if self.required_columns:
-                filtered_row = {
-                    k: v for k, v in row.items()
-                    if k in self.required_columns
-                }
+                filtered_row = {k: v for k, v in row.items() if k in self.required_columns}
                 yield filtered_row
             else:
                 yield row
@@ -285,10 +279,7 @@ class MarkdownReader(BaseReader):
 
         for col in self.columns:
             # Collect non-None values
-            values = [
-                row[col] for row in self.rows[:sample_size]
-                if row.get(col) is not None
-            ]
+            values = [row[col] for row in self.rows[:sample_size] if row.get(col) is not None]
 
             if not values:
                 schema[col] = DataType.STRING
@@ -327,11 +318,11 @@ class MarkdownReader(BaseReader):
         """
         descriptions = []
         for i, table in enumerate(self.tables):
-            cols = table['columns'][:3]
+            cols = table["columns"][:3]
             col_str = ", ".join(cols)
-            if len(table['columns']) > 3:
+            if len(table["columns"]) > 3:
                 col_str += ", ..."
-            row_count = len(table['rows'])
+            row_count = len(table["rows"])
             descriptions.append(f"Table {i}: {col_str} ({row_count} rows)")
         return descriptions
 

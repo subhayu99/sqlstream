@@ -86,8 +86,7 @@ class TestQueryInline:
         # Use unqualified column names in JOIN condition
         results = list(
             q.sql(
-                f"SELECT name, age, product FROM '{sample_csv}' "
-                f"JOIN '{second_csv}' ON name = name"
+                f"SELECT name, age, product FROM '{sample_csv}' JOIN '{second_csv}' ON name = name"
             )
         )
 
@@ -99,9 +98,7 @@ class TestQueryInline:
     def test_inline_aggregates(self, sample_csv):
         """Test inline file path with aggregate functions"""
         q = Query()
-        results = list(
-            q.sql(f"SELECT city, COUNT(*) FROM '{sample_csv}' GROUP BY city")
-        )
+        results = list(q.sql(f"SELECT city, COUNT(*) FROM '{sample_csv}' GROUP BY city"))
 
         assert len(results) == 3  # 3 cities
         assert all("count_*" in r or "COUNT(*)" in str(r) for r in results)
@@ -118,9 +115,7 @@ class TestQueryInline:
             import pandas  # noqa: F401
 
             q = Query()
-            results = list(
-                q.sql(f"SELECT * FROM '{sample_csv}' WHERE age > 25", backend="pandas")
-            )
+            results = list(q.sql(f"SELECT * FROM '{sample_csv}' WHERE age > 25", backend="pandas"))
 
             assert len(results) == 2
             assert all(r["age"] > 25 for r in results)
@@ -130,9 +125,7 @@ class TestQueryInline:
     def test_inline_with_python_backend(self, sample_csv):
         """Test inline file path with pure Python backend"""
         q = Query()
-        results = list(
-            q.sql(f"SELECT * FROM '{sample_csv}' WHERE age > 25", backend="python")
-        )
+        results = list(q.sql(f"SELECT * FROM '{sample_csv}' WHERE age > 25", backend="python"))
 
         assert len(results) == 2
         assert all(r["age"] > 25 for r in results)
