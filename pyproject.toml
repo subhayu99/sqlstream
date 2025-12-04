@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sqlstream"
-version = "0.5.5"
+version = "0.6.0"
 description = "A lightweight SQL query engine for data exploration with lazy evaluation and intelligent optimizations"
 readme = "README.md"
 requires-python = ">=3.8"
