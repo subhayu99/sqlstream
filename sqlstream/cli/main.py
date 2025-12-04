@@ -36,8 +36,15 @@ def cli():
 
 
 @cli.command()
-@click.argument("file_or_sql", type=str)
+@click.argument("file_or_sql", type=str, required=False)
 @click.argument("sql", type=str, required=False)
+@click.option(
+    "--sql-file",
+    "-q",
+    type=click.Path(exists=True),
+    default=None,
+    help="Read SQL query from file",
+)
 @click.option(
     "--format",
     "-f",
@@ -95,8 +102,9 @@ def cli():
     help="Disable auto-detection of interactive mode",
 )
 def query(
-    file_or_sql: str,
+    file_or_sql: Optional[str],
     sql: Optional[str],
+    sql_file: Optional[str],
     format: str,
     backend: str,
     limit: Optional[int],
@@ -119,6 +127,11 @@ def query(
         \b
         # NEW SYNTAX: Inline file paths in SQL
         $ sqlstream query "SELECT * FROM 'data.csv' WHERE age > 25"
+
+        \b
+        # Read SQL from file
+        $ sqlstream query --sql-file query.sql
+        $ sqlstream query -q complex_join.sql
 
         \b
         # Multi-file JOIN with inline paths
@@ -145,8 +158,20 @@ def query(
     try:
         start_time = time.time()
 
+        # Read SQL from file if --sql-file is provided
+        if sql_file:
+            with open(sql_file, 'r') as f:
+                sql_from_file = f.read().strip()
+            # If file_or_sql is provided with --sql-file, treat it as data file
+            if file_or_sql:
+                file = file_or_sql
+                sql_query = sql_from_file
+            else:
+                # No data file, SQL has inline paths
+                file = None
+                sql_query = sql_from_file
         # Determine if we're using old syntax (file + sql) or new syntax (just sql)
-        if sql is None:
+        elif sql is None:
             # New syntax: file_or_sql is the SQL query with inline file paths
             sql_query = file_or_sql
             file = None
@@ -218,7 +243,7 @@ def query(
                 # Add execution time if requested
                 if show_time:
                     elapsed = time.time() - start_time
-                    time_text = f"\nExecution time: {elapsed:.3f}s"
+                    time_text = f"Processed {len(results_list)} in {elapsed:.3f}s"
                     if output_format == "table" and not no_color:
                         # Add colored time for table format
                         try:
