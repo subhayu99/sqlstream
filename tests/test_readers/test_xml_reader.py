@@ -399,7 +399,7 @@ class TestXMLReaderIntegration:
             reader = XMLReader(temp_path, element="record")
 
             try:
-                import pandas as pd
+                import pandas as pd  # noqa: F401
                 df = reader.to_dataframe()
                 assert len(df) == 2
                 assert sorted(df.columns) == ['age', 'name']

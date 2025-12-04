@@ -336,7 +336,7 @@ class TestStatisticsEdgeCases:
             reader = ParquetReader(str(age_stratified_parquet))
             reader.set_filter([Condition("age", op, value)])
 
-            rows = list(reader.read_lazy())
+            list(reader.read_lazy())
 
             # Just verify we get some results (exact count depends on data)
             # The important thing is that pruning happens and results are correct
@@ -641,7 +641,7 @@ class TestErrorHandling:
         with open(parquet_file, "wb") as f:
             f.write(b"This is not a valid Parquet file!")
 
-        with pytest.raises(Exception):  # PyArrow raises various exceptions
+        with pytest.raises(Exception):  # PyArrow raises various exceptions  # noqa: B017
             ParquetReader(str(parquet_file))
 
     def test_empty_file(self, tmp_path):
@@ -650,7 +650,7 @@ class TestErrorHandling:
         # Create empty file
         parquet_file.touch()
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             ParquetReader(str(parquet_file))
 
     def test_missing_column_in_filter(self, sample_parquet):

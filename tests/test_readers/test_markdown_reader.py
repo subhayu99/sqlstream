@@ -228,8 +228,8 @@ Some text
 
         try:
             try:
-                reader = MarkdownReader(temp_path)
-                assert False, "Should have raised ValueError"
+                MarkdownReader(temp_path)
+                raise AssertionError("Should have raised ValueError")
             except ValueError as e:
                 assert "No tables found" in str(e)
         finally:
@@ -251,8 +251,8 @@ Some text
 
         try:
             try:
-                reader = MarkdownReader(temp_path, table=5)
-                assert False, "Should have raised ValueError"
+                MarkdownReader(temp_path, table=5)
+                raise AssertionError("Should have raised ValueError")
             except ValueError as e:
                 assert "out of range" in str(e)
         finally:

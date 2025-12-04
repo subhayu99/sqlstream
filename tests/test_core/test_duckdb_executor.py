@@ -7,13 +7,13 @@ Ensures DuckDB backend works correctly with full SQL support.
 import pytest
 
 try:
-    import duckdb
+    import duckdb  # noqa: F401
     DUCKDB_AVAILABLE = True
 except ImportError:
     DUCKDB_AVAILABLE = False
 
 try:
-    import pandas as pd
+    import pandas as pd  # noqa: F401
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False

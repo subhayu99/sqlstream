@@ -21,7 +21,7 @@ from sqlstream.readers.csv_reader import CSVReader
 def _is_pandas_available():
     """Check if pandas is installed."""
     try:
-        import pandas
+        import pandas  # noqa: F401
         return True
     except ImportError:
         return False
@@ -30,7 +30,7 @@ def _is_pandas_available():
 def _is_duckdb_available():
     """Check if duckdb is installed."""
     try:
-        import duckdb
+        import duckdb  # noqa: F401
         return True
     except ImportError:
         return False

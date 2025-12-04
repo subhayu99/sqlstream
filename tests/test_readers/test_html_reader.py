@@ -4,8 +4,8 @@ import tempfile
 import pytest
 
 try:
-    import lxml
-    import pandas
+    import lxml  # noqa: F401
+    import pandas  # noqa: F401
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -195,8 +195,8 @@ class TestHTMLReaderBasic:
 
         try:
             try:
-                reader = HTMLReader(temp_path)
-                assert False, "Should have raised ValueError"
+                HTMLReader(temp_path)
+                raise AssertionError("Should have raised ValueError")
             except ValueError as e:
                 assert "No tables found" in str(e)
         finally:
@@ -218,8 +218,8 @@ class TestHTMLReaderBasic:
 
         try:
             try:
-                reader = HTMLReader(temp_path, table=5)
-                assert False, "Should have raised ValueError"
+                HTMLReader(temp_path, table=5)
+                raise AssertionError("Should have raised ValueError")
             except ValueError as e:
                 assert "out of range" in str(e)
                 assert "contains 1 table" in str(e)
