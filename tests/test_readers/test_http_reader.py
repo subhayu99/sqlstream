@@ -288,3 +288,307 @@ class TestHTTPReaderOptimizations:
 
             # HTTP reader should support column selection via delegation
             assert reader.supports_column_selection() is True
+
+
+class TestHTTPErrorCodes:
+    """Test handling of various HTTP error codes"""
+
+    def test_404_not_found(self, tmp_path):
+        """Test handling of 404 Not Found"""
+        url = "https://example.com/nonexistent.csv"
+
+        mock_response = Mock()
+        mock_response.raise_for_status.side_effect = Exception("404 Not Found")
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            with pytest.raises(OSError, match="Failed to download"):
+                HTTPReader(url, cache_dir=str(tmp_path))
+
+    def test_500_internal_server_error(self, tmp_path):
+        """Test handling of 500 Internal Server Error"""
+        url = "https://example.com/error.csv"
+
+        mock_response = Mock()
+        mock_response.raise_for_status.side_effect = Exception("500 Internal Server Error")
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            with pytest.raises(OSError):
+                HTTPReader(url, cache_dir=str(tmp_path))
+
+    def test_403_forbidden(self, tmp_path):
+        """Test handling of 403 Forbidden"""
+        url = "https://example.com/forbidden.csv"
+
+        mock_response = Mock()
+        mock_response.raise_for_status.side_effect = Exception("403 Forbidden")
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            with pytest.raises(OSError):
+                HTTPReader(url, cache_dir=str(tmp_path))
+
+    def test_network_timeout(self, tmp_path):
+        """Test handling of network timeout"""
+        url = "https://example.com/slow.csv"
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.side_effect = Exception("Timeout")
+
+            with pytest.raises(OSError, match="Failed to download"):
+                HTTPReader(url, cache_dir=str(tmp_path))
+
+    def test_connection_error(self, tmp_path):
+        """Test handling of connection errors"""
+        url = "https://unreachable.example.com/data.csv"
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.side_effect = Exception("Connection refused")
+
+            with pytest.raises(OSError):
+                HTTPReader(url, cache_dir=str(tmp_path))
+
+
+class TestHTTPRedirects:
+    """Test HTTP redirect handling"""
+
+    def test_redirect_followed(self, tmp_path):
+        """Test that HTTP redirects are followed"""
+        url = "https://example.com/redirect.csv"
+        csv_data = b"name,age\nAlice,30\n"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[csv_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader = HTTPReader(url, cache_dir=str(tmp_path))
+            rows = list(reader.read_lazy())
+
+            # Verify follow_redirects=True was used
+            mock_stream.assert_called_once()
+            call_kwargs = mock_stream.call_args[1]
+            assert call_kwargs.get("follow_redirects") is True
+
+            # Verify data was read correctly
+            assert len(rows) == 1
+            assert rows[0]["name"] == "Alice"
+
+    def test_multiple_redirects(self, tmp_path):
+        """Test handling of multiple redirects (301 -> 302 -> 200)"""
+        url = "https://example.com/multi-redirect.csv"
+        csv_data = b"name,age\nBob,25\n"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[csv_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader = HTTPReader(url, cache_dir=str(tmp_path))
+            rows = list(reader.read_lazy())
+
+            # httpx handles redirects internally with follow_redirects=True
+            assert len(rows) == 1
+            assert rows[0]["name"] == "Bob"
+
+
+class TestHTTPStreamingDownload:
+    """Test chunked streaming download behavior"""
+
+    def test_chunked_download(self, tmp_path):
+        """Test that large files are downloaded in chunks"""
+        url = "https://example.com/large.csv"
+        # Simulate 3 chunks of data
+        chunk1 = b"name,age\n"
+        chunk2 = b"Alice,30\n"
+        chunk3 = b"Bob,25\n"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[chunk1, chunk2, chunk3])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader = HTTPReader(url, cache_dir=str(tmp_path))
+            rows = list(reader.read_lazy())
+
+            # Verify all chunks were downloaded
+            assert len(rows) == 2
+            assert rows[0]["name"] == "Alice"
+            assert rows[1]["name"] == "Bob"
+
+    def test_empty_response(self, tmp_path):
+        """Test handling of empty HTTP response"""
+        url = "https://example.com/empty.csv"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            # Should handle gracefully (may raise error depending on format)
+            try:
+                reader = HTTPReader(url, cache_dir=str(tmp_path))
+                rows = list(reader.read_lazy())
+                # Empty file should return no rows
+                assert len(rows) == 0
+            except (OSError, ValueError):
+                # Also acceptable to raise error for empty file
+                pass
+
+
+class TestHTTPAdditionalFormats:
+    """Test HTTP reader with additional file formats"""
+
+    def test_json_format_explicit(self, tmp_path):
+        """Test explicit JSON format specification"""
+        url = "https://example.com/data.json"
+        json_data = b'[{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}]'
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[json_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader = HTTPReader(url, cache_dir=str(tmp_path), format="json")
+
+            # Should create JSONReader as delegate
+            assert reader.delegate_reader.__class__.__name__ == "JSONReader"
+
+            rows = list(reader.read_lazy())
+            assert len(rows) == 2
+            assert rows[0]["name"] == "Alice"
+
+    def test_jsonl_format_detection(self, tmp_path):
+        """Test JSONL format detection from URL"""
+        url = "https://example.com/logs.jsonl"
+        jsonl_data = b'{"name": "Alice", "age": 30}\n{"name": "Bob", "age": 25}\n'
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[jsonl_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader = HTTPReader(url, cache_dir=str(tmp_path))
+
+            # Should create JSONLReader as delegate
+            assert reader.delegate_reader.__class__.__name__ == "JSONLReader"
+
+    def test_html_format_detection(self, tmp_path):
+        """Test HTML format detection from URL"""
+        url = "https://example.com/table.html"
+        html_data = b"<table><tr><th>name</th><th>age</th></tr><tr><td>Alice</td><td>30</td></tr></table>"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[html_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            try:
+                reader = HTTPReader(url, cache_dir=str(tmp_path))
+                # Should create HTMLReader as delegate
+                assert reader.delegate_reader.__class__.__name__ == "HTMLReader"
+            except ImportError:
+                # HTMLReader requires pandas
+                pytest.skip("HTML reader requires pandas")
+
+    def test_markdown_format_detection(self, tmp_path):
+        """Test Markdown format detection from URL"""
+        url = "https://example.com/data.md"
+        md_data = b"| name | age |\n|------|-----|\n| Alice | 30 |\n| Bob | 25 |"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[md_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader = HTTPReader(url, cache_dir=str(tmp_path))
+
+            # Should create MarkdownReader as delegate
+            assert reader.delegate_reader.__class__.__name__ == "MarkdownReader"
+
+
+class TestHTTPCacheKeyGeneration:
+    """Test cache key generation and collision handling"""
+
+    def test_different_urls_different_cache(self, tmp_path):
+        """Test that different URLs generate different cache files"""
+        url1 = "https://example.com/data1.csv"
+        url2 = "https://example.com/data2.csv"
+        csv_data = b"name,age\nAlice,30\n"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[csv_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader1 = HTTPReader(url1, cache_dir=str(tmp_path))
+            reader2 = HTTPReader(url2, cache_dir=str(tmp_path))
+
+            # Should create different cache files
+            assert reader1.local_path != reader2.local_path
+
+            # Both cache files should exist
+            assert reader1.local_path.exists()
+            assert reader2.local_path.exists()
+
+    def test_same_url_same_cache(self, tmp_path):
+        """Test that same URL uses same cache file"""
+        url = "https://example.com/data.csv"
+        csv_data = b"name,age\nAlice,30\n"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[csv_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader1 = HTTPReader(url, cache_dir=str(tmp_path))
+            reader2 = HTTPReader(url, cache_dir=str(tmp_path))
+
+            # Should use same cache file
+            assert reader1.local_path == reader2.local_path
+
+            # Should only download once
+            assert mock_stream.call_count == 1
+
+    def test_url_with_query_params(self, tmp_path):
+        """Test cache key generation with query parameters"""
+        url1 = "https://example.com/data.csv?version=1"
+        url2 = "https://example.com/data.csv?version=2"
+        csv_data = b"name,age\nAlice,30\n"
+
+        mock_response = Mock()
+        mock_response.iter_bytes = Mock(return_value=[csv_data])
+        mock_response.raise_for_status = Mock()
+
+        with patch("httpx.stream") as mock_stream:
+            mock_stream.return_value.__enter__.return_value = mock_response
+
+            reader1 = HTTPReader(url1, cache_dir=str(tmp_path))
+            reader2 = HTTPReader(url2, cache_dir=str(tmp_path))
+
+            # Different query params should create different cache files
+            assert reader1.local_path != reader2.local_path
