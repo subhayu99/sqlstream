@@ -93,11 +93,11 @@ class PandasExecutor:
         """
         Load data file into DataFrame
 
-        Supports CSV, Parquet, HTML, and Markdown formats, including HTTP URLs.
+        Supports CSV, Parquet, JSON, JSONL, XML, HTML, and Markdown formats, including HTTP URLs.
 
         Args:
             source: Path or URL to data file (may include fragment like 'file.html#html:1')
-            format: Optional explicit format (csv, parquet, html, markdown)
+            format: Optional explicit format (csv, parquet, json, jsonl, xml, html, markdown)
         """
         # Parse URL fragment if present (e.g., "data.html#html:1")
         from sqlstream.core.fragment_parser import parse_source_fragment
@@ -128,6 +128,12 @@ class PandasExecutor:
                     format = 'markdown'
                 elif 'Parquet' in delegate_type:
                     format = 'parquet'
+                elif 'JSON' in delegate_type and 'JSONL' not in delegate_type:
+                    format = 'json'
+                elif 'JSONL' in delegate_type:
+                    format = 'jsonl'
+                elif 'XML' in delegate_type:
+                    format = 'xml'
                 else:
                     format = 'csv'
 
@@ -154,6 +160,23 @@ class PandasExecutor:
                 reader = MarkdownReader(source_path, table=table_index)
                 # Convert to DataFrame
                 return pd.DataFrame(reader.rows)
+            elif format == "json":
+                # Use our JSON reader with records key support
+                from sqlstream.readers.json_reader import JSONReader
+                key = str(table_hint) if table_hint is not None else None
+                reader = JSONReader(source_path, records_key=key)
+                return reader.to_dataframe()
+            elif format == "jsonl":
+                # Use our JSONL reader
+                from sqlstream.readers.jsonl_reader import JSONLReader
+                reader = JSONLReader(source_path)
+                return reader.to_dataframe()
+            elif format == "xml":
+                # Use our XML reader with element selection
+                from sqlstream.readers.xml_reader import XMLReader
+                element = str(table_hint) if table_hint is not None else None
+                reader = XMLReader(source_path, element=element)
+                return reader.to_dataframe()
             else:  # csv
                 from sqlstream.readers.csv_reader import CSVReader
                 return CSVReader(source_path).to_dataframe()
@@ -178,6 +201,20 @@ class PandasExecutor:
             table_index = table_hint if table_hint is not None else 0
             reader = MarkdownReader(source_path, table=table_index)
             return pd.DataFrame(reader.rows)
+        elif source_lower.endswith(".json"):
+            from sqlstream.readers.json_reader import JSONReader
+            key = str(table_hint) if table_hint is not None else None
+            reader = JSONReader(source_path, records_key=key)
+            return reader.to_dataframe()
+        elif source_lower.endswith(".jsonl"):
+            from sqlstream.readers.jsonl_reader import JSONLReader
+            reader = JSONLReader(source_path)
+            return reader.to_dataframe()
+        elif source_lower.endswith(".xml"):
+            from sqlstream.readers.xml_reader import XMLReader
+            element = str(table_hint) if table_hint is not None else None
+            reader = XMLReader(source_path, element=element)
+            return reader.to_dataframe()
         elif source_lower.endswith(".csv"):
             from sqlstream.readers.csv_reader import CSVReader
             return CSVReader(source_path).to_dataframe()

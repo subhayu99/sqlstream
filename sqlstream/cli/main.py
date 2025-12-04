@@ -57,7 +57,7 @@ def cli():
     "-b",
     type=click.Choice(["auto", "pandas", "python", "duckdb"], case_sensitive=False),
     default="auto",
-    help="Execution backend (default: auto, tries pandas > duckdb > python)",
+    help="Execution backend (default: auto - smart selection based on query complexity)",
 )
 @click.option(
     "--limit",
