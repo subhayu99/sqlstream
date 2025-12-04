@@ -2,8 +2,6 @@
 Tests for CLI main commands
 """
 
-import tempfile
-from pathlib import Path
 
 import pytest
 

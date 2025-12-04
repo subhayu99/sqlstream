@@ -312,7 +312,6 @@ class TestEdgeCases:
                 return False
 
         # Create a dummy file
-        import tempfile
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
             f.write("name,age\nAlice,30")

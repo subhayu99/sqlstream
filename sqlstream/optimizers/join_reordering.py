@@ -16,7 +16,7 @@ from typing import List, Tuple
 
 from sqlstream.optimizers.base import Optimizer
 from sqlstream.readers.base import BaseReader
-from sqlstream.sql.ast_nodes import JoinClause, SelectStatement
+from sqlstream.sql.ast_nodes import SelectStatement
 
 
 class JoinReorderingOptimizer(Optimizer):

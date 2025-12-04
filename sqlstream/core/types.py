@@ -3,11 +3,11 @@
 This module provides type definitions, inference, and validation for query execution.
 """
 
-from enum import Enum
-from typing import Any, Optional, Dict, List
+import json
 from datetime import date, datetime, time
 from decimal import Decimal, InvalidOperation
-import json
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class DataType(Enum):
@@ -17,19 +17,19 @@ class DataType(Enum):
     INTEGER = "INTEGER"
     FLOAT = "FLOAT"
     DECIMAL = "DECIMAL"
-    
+
     # String types
     STRING = "STRING"
     JSON = "JSON"
-    
+
     # Boolean
     BOOLEAN = "BOOLEAN"
-    
+
     # Temporal types
     DATE = "DATE"
     TIME = "TIME"
     DATETIME = "DATETIME"
-    
+
     # Special
     NULL = "NULL"
 
@@ -39,7 +39,7 @@ class DataType(Enum):
     def is_numeric(self) -> bool:
         """Check if type is numeric (INTEGER, FLOAT, or DECIMAL)."""
         return self in (DataType.INTEGER, DataType.FLOAT, DataType.DECIMAL)
-    
+
     def is_temporal(self) -> bool:
         """Check if type is temporal (DATE, TIME, or DATETIME)."""
         return self in (DataType.DATE, DataType.TIME, DataType.DATETIME)
@@ -57,7 +57,7 @@ class DataType(Enum):
         # Numeric types are comparable with each other
         if self.is_numeric() and other.is_numeric():
             return True
-        
+
         # Temporal types are comparable with each other
         if self.is_temporal() and other.is_temporal():
             return True
@@ -89,12 +89,12 @@ class DataType(Enum):
         if self in numeric_hierarchy and other in numeric_hierarchy:
             # Return higher precedence type
             return self if numeric_hierarchy[self] > numeric_hierarchy[other] else other
-        
+
         # Temporal coercion: DATE/TIME -> DATETIME
         if self == DataType.DATETIME or other == DataType.DATETIME:
             if self.is_temporal() and other.is_temporal():
                 return DataType.DATETIME
-        
+
         # JSON coercion
         if self == DataType.JSON and other == DataType.JSON:
             return DataType.JSON
@@ -116,15 +116,15 @@ def parse_datetime(value: str) -> Optional[datetime]:
     """
     if not isinstance(value, str):
         return None
-    
+
     value = value.strip()
-    
+
     # Try ISO 8601 with timezone (handle Z and +HH:MM)
     if 'T' in value:
         # Remove timezone suffix for basic parsing
         base_value = value.replace('Z', '').split('+')[0].split('-')[0:3]
         base_value = '-'.join(base_value) if len(base_value) == 3 else value.replace('Z', '')
-    
+
     formats = [
         "%Y-%m-%dT%H:%M:%S",           # ISO 8601: 2024-01-15T10:30:00
         "%Y-%m-%dT%H:%M:%S.%f",        # ISO with microseconds
@@ -137,13 +137,13 @@ def parse_datetime(value: str) -> Optional[datetime]:
         "%d/%m/%Y %H:%M",              # EU without seconds
         "%m/%d/%Y %H:%M",              # US without seconds
     ]
-    
+
     for fmt in formats:
         try:
             return datetime.strptime(value, fmt)
         except ValueError:
             continue
-    
+
     return None
 
 
@@ -158,9 +158,9 @@ def parse_date(value: str) -> Optional[date]:
     """
     if not isinstance(value, str):
         return None
-    
+
     value = value.strip()
-    
+
     formats = [
         "%Y-%m-%d",      # ISO: 2024-01-15
         "%d/%m/%Y",      # EU: 15/01/2024
@@ -169,13 +169,13 @@ def parse_date(value: str) -> Optional[date]:
         "%d-%m-%Y",      # EU with dashes: 15-01-2024
         "%m-%d-%Y",      # US with dashes: 01-15-2024
     ]
-    
+
     for fmt in formats:
         try:
             return datetime.strptime(value, fmt).date()
         except ValueError:
             continue
-    
+
     return None
 
 
@@ -190,9 +190,9 @@ def parse_time(value: str) -> Optional[time]:
     """
     if not isinstance(value, str):
         return None
-    
+
     value = value.strip()
-    
+
     formats = [
         "%H:%M:%S",          # 24-hour: 14:30:00
         "%H:%M:%S.%f",       # With microseconds: 14:30:00.123456
@@ -200,13 +200,13 @@ def parse_time(value: str) -> Optional[time]:
         "%I:%M:%S %p",       # 12-hour with seconds: 02:30:00 PM
         "%I:%M %p",          # 12-hour: 02:30 PM
     ]
-    
+
     for fmt in formats:
         try:
             return datetime.strptime(value, fmt).time()
         except ValueError:
             continue
-    
+
     return None
 
 
@@ -221,13 +221,13 @@ def is_json_string(value: str) -> bool:
     """
     if not isinstance(value, str):
         return False
-    
+
     value = value.strip()
-    
+
     # Must start with { or [
     if not (value.startswith('{') or value.startswith('[')):
         return False
-    
+
     # Try to parse as JSON
     try:
         parsed = json.loads(value)
@@ -271,42 +271,42 @@ def infer_type(value: Any) -> DataType:
 
     if isinstance(value, float):
         return DataType.FLOAT
-    
+
     if isinstance(value, Decimal):
         return DataType.DECIMAL
 
     if isinstance(value, datetime):
         return DataType.DATETIME
-    
+
     if isinstance(value, date):
         return DataType.DATE
-    
+
     if isinstance(value, time):
         return DataType.TIME
 
     # 3. String value inference
     if isinstance(value, str):
         value_stripped = value.strip()
-        
+
         # Empty string → NULL
         if not value_stripped:
             return DataType.NULL
-        
+
         # Boolean literals
         if value_stripped.lower() in ("true", "false"):
             return DataType.BOOLEAN
-        
+
         # JSON (must check early - before numeric)
         if is_json_string(value_stripped):
             return DataType.JSON
-        
+
         # Integer
         try:
             int(value_stripped)
             return DataType.INTEGER
         except ValueError:
             pass
-        
+
         # Float or Decimal
         try:
             # Check if it has decimal point
@@ -322,22 +322,22 @@ def infer_type(value: Any) -> DataType:
             return DataType.FLOAT
         except (ValueError, InvalidOperation):
             pass
-        
+
         # DateTime (check before Date to catch timestamps)
         dt = parse_datetime(value_stripped)
         if dt is not None:
             return DataType.DATETIME
-        
+
         # Date
         d = parse_date(value_stripped)
         if d is not None:
             return DataType.DATE
-        
+
         # Time
         t = parse_time(value_stripped)
         if t is not None:
             return DataType.TIME
-        
+
         # Default to STRING
         return DataType.STRING
 
@@ -366,29 +366,29 @@ def infer_type_from_string(value: str) -> Any:
     """
     if not isinstance(value, str):
         return value
-    
+
     value_stripped = value.strip()
-    
+
     # Empty → None
     if not value_stripped:
         return None
-    
+
     # Boolean
     if value_stripped.lower() == "true":
         return True
     if value_stripped.lower() == "false":
         return False
-    
+
     # JSON - keep as string for now (DuckDB will handle it)
     if is_json_string(value_stripped):
         return value_stripped
-    
+
     # Integer
     try:
         return int(value_stripped)
     except ValueError:
         pass
-    
+
     # Float or Decimal
     try:
         if '.' in value_stripped:
@@ -399,22 +399,22 @@ def infer_type_from_string(value: str) -> Any:
         return float(value_stripped)
     except (ValueError, InvalidOperation):
         pass
-    
+
     # DateTime
     dt = parse_datetime(value_stripped)
     if dt is not None:
         return dt
-    
+
     # Date
     d = parse_date(value_stripped)
     if d is not None:
         return d
-    
+
     # Time
     t = parse_time(value_stripped)
     if t is not None:
         return t
-    
+
     # Return as string
     return value
 

@@ -150,7 +150,7 @@ class TestSchemaInference:
 
     def test_get_schema(self, sample_csv):
         """Test .schema() method"""
-        from sqlstream.core.types import Schema, DataType
+        from sqlstream.core.types import DataType, Schema
 
         schema = query(str(sample_csv)).schema()
 

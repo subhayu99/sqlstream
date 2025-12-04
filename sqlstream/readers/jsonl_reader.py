@@ -7,9 +7,9 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
+from sqlstream.core.types import Schema
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
-from sqlstream.core.types import Schema
 
 
 class JSONLReader(BaseReader):
@@ -88,15 +88,15 @@ class JSONLReader(BaseReader):
         """
         with self._get_file_handle() as f:
             rows_yielded = 0
-            
+
             for line_num, line in enumerate(f, start=1):
                 line = line.strip()
                 if not line:
                     continue
-                    
+
                 try:
                     row = json.loads(line)
-                    
+
                     if not isinstance(row, dict):
                         warnings.warn(f"Skipping non-dict row at line {line_num}", UserWarning)
                         continue
@@ -131,14 +131,14 @@ class JSONLReader(BaseReader):
         """Evaluate single condition"""
         if condition.column not in row:
             return False
-            
+
         value = row[condition.column]
         if value is None:
             return False
-            
+
         op = condition.operator
         expected = condition.value
-        
+
         try:
             if op == "=": return value == expected
             elif op == ">": return value > expected
@@ -153,7 +153,7 @@ class JSONLReader(BaseReader):
     def get_schema(self, sample_size: int = 100) -> Optional[Schema]:
         """Infer schema by sampling first N lines"""
         sample_rows = []
-        
+
         try:
             iterator = self.read_lazy()
             for _ in range(sample_size):
@@ -163,8 +163,8 @@ class JSONLReader(BaseReader):
                     break
         except Exception:
             pass
-            
+
         if not sample_rows:
             return None
-            
+
         return Schema.from_rows(sample_rows)

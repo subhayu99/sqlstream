@@ -5,7 +5,7 @@ Provides COUNT, SUM, AVG, MIN, MAX aggregations.
 Each aggregator maintains state and can be updated incrementally.
 """
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 
 class Aggregator:

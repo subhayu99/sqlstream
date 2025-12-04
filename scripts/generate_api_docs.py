@@ -13,8 +13,7 @@ import ast
 import os
 import re
 from pathlib import Path
-from typing import Dict, List, Set
-import yaml
+from typing import Dict, List
 
 
 class APIDocGenerator:
@@ -97,7 +96,7 @@ class APIDocGenerator:
         if not file_path.exists():
             return {"classes": [], "functions": []}
 
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             try:
                 tree = ast.parse(f.read())
             except SyntaxError:
@@ -175,7 +174,7 @@ class APIDocGenerator:
         api_ref_section = "\n".join(api_ref_lines)
 
         # Read the current mkdocs.yml
-        with open(mkdocs_path, 'r') as f:
+        with open(mkdocs_path) as f:
             content = f.read()
 
         # Replace the Python API section with updated navigation

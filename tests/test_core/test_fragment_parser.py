@@ -3,7 +3,12 @@ Test URL fragment parsing and integration with readers
 """
 
 import pytest
-from sqlstream.core.fragment_parser import parse_source_fragment, build_source_fragment, FragmentParseError
+
+from sqlstream.core.fragment_parser import (
+    FragmentParseError,
+    build_source_fragment,
+    parse_source_fragment,
+)
 
 
 class TestFragmentParser:
@@ -105,8 +110,8 @@ class TestFragmentIntegration:
     def test_query_with_html_extension_and_table(self):
         """Test HTML file with table selection via fragment"""
         # Create a test HTML file first
-        import tempfile
         import os
+        import tempfile
 
         html_content = """
         <html><body>
@@ -139,10 +144,10 @@ class TestFragmentIntegration:
         # This verifies fragment parsing works in SQL queries
         result = q.sql('SELECT * FROM "examples/sample_data.md#markdown:0" LIMIT 1')
         assert result is not None
-        
+
         # Verify sources are discovered correctly
         sources = result._discover_sources()
         assert len(sources) > 0
         # Check that a source with the fragment was discovered
-        assert any('markdown' in str(path).lower() or 'sample_data' in path 
+        assert any('markdown' in str(path).lower() or 'sample_data' in path
                   for path in sources.values())

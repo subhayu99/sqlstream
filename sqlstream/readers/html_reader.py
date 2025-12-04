@@ -7,12 +7,11 @@ Supports multiple tables per file with table selection.
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
+from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
-from sqlstream.core.types import Schema, DataType
 
 try:
     import pandas as pd
@@ -105,7 +104,7 @@ class HTMLReader(BaseReader):
             raise
         except Exception as e:
             # Only wrap actual I/O errors
-            raise IOError(f"Failed to read HTML tables from {self.source}: {e}")
+            raise OSError(f"Failed to read HTML tables from {self.source}: {e}")
 
     def read_lazy(self) -> Iterator[Dict[str, Any]]:
         """Read data lazily from the selected table"""
@@ -173,7 +172,7 @@ class HTMLReader(BaseReader):
                 # For object/string types, try to infer from content
                 # This is important for JSON or date strings that pandas didn't parse
                 from sqlstream.core.types import infer_type
-                
+
                 # Sample non-null values
                 sample_values = self.df[col].dropna().head(10)
                 if not sample_values.empty:

@@ -4,10 +4,9 @@ Validates that shell components work correctly without running the full TUI
 (to avoid terminal keybinding conflicts).
 """
 
+from unittest.mock import MagicMock
+
 import pytest
-import tempfile
-from pathlib import Path
-from unittest.mock import patch, MagicMock
 
 
 class TestShellComponents:

@@ -137,7 +137,7 @@ class HTTPReader(BaseReader):
                 return target_path
 
         except Exception as e:
-            raise IOError(f"Failed to download {self.url}: {e}")
+            raise OSError(f"Failed to download {self.url}: {e}")
 
     def _create_delegate_reader(self) -> BaseReader:
         """Create appropriate reader based on file format"""
@@ -225,7 +225,7 @@ class HTTPReader(BaseReader):
             stripped = header.strip()
             if stripped.startswith(b'[') or (stripped.startswith(b'{') and b'"records":' in stripped):
                  return "json"
-            
+
             # Check for JSONL (multiple lines starting with {)
             lines = header.split(b'\n')
             if len(lines) > 1 and lines[0].strip().startswith(b'{') and lines[1].strip().startswith(b'{'):

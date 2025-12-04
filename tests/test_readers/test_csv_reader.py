@@ -2,14 +2,12 @@
 Tests for CSV reader
 """
 
-import tempfile
-from pathlib import Path
 
 import pytest
 
+from sqlstream.core.types import DataType
 from sqlstream.readers.csv_reader import CSVReader
 from sqlstream.sql.ast_nodes import Condition
-from sqlstream.core.types import DataType
 
 
 @pytest.fixture

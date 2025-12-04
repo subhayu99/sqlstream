@@ -8,12 +8,11 @@ Supports XPath-like selection for specific elements.
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET
-from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
+from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
-from sqlstream.core.types import Schema, DataType
 
 
 class XMLReader(BaseReader):
@@ -113,9 +112,9 @@ class XMLReader(BaseReader):
                 raise ValueError(f"No data rows extracted from XML: {self.source}")
 
         except ET.ParseError as e:
-            raise IOError(f"Failed to parse XML file {self.source}: {e}")
+            raise OSError(f"Failed to parse XML file {self.source}: {e}")
         except FileNotFoundError:
-            raise IOError(f"XML file not found: {self.source}")
+            raise OSError(f"XML file not found: {self.source}")
 
     def _find_repeating_elements(self, root: ET.Element) -> List[ET.Element]:
         """

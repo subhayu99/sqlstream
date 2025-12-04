@@ -7,8 +7,8 @@ for the query engine.
 
 from typing import Any, Dict, Iterator, List, Optional
 
-from sqlstream.sql.ast_nodes import Condition
 from sqlstream.core.types import Schema
+from sqlstream.sql.ast_nodes import Condition
 
 
 class BaseReader:

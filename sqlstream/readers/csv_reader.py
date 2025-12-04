@@ -9,9 +9,9 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
+from sqlstream.core.types import Schema
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
-from sqlstream.core.types import Schema
 
 
 class CSVReader(BaseReader):
@@ -271,14 +271,15 @@ class CSVReader(BaseReader):
         Convert to pandas DataFrame efficiently, respecting inferred types.
         """
         import pandas as pd
+
         from sqlstream.core.types import DataType
 
         # Get schema to guide pandas parsing
         schema = self.get_schema()
-        
+
         parse_dates = []
         dtypes = {}
-        
+
         if schema:
             for col, dtype in schema.columns.items():
                 if dtype == DataType.DATETIME or dtype == DataType.DATE:
@@ -290,7 +291,7 @@ class CSVReader(BaseReader):
                 elif dtype == DataType.DECIMAL:
                     # Pandas doesn't support native Decimal well in read_csv
                     # We'll let it be object or float, or handle it post-load if needed
-                    pass 
+                    pass
                 elif dtype == DataType.STRING:
                     dtypes[col] = "string"
                 elif dtype == DataType.BOOLEAN:

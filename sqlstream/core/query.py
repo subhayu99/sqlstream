@@ -12,17 +12,17 @@ Example:
 """
 
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Tuple
 
 from sqlstream.core.executor import Executor
 from sqlstream.core.fragment_parser import parse_source_fragment
+from sqlstream.core.types import Schema
 from sqlstream.readers.base import BaseReader
 from sqlstream.readers.csv_reader import CSVReader
 from sqlstream.sql.ast_nodes import SelectStatement
 from sqlstream.sql.parser import parse
-from sqlstream.core.types import Schema
 
 # Try to import pandas executor
 try:

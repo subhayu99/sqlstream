@@ -5,12 +5,8 @@ Tests for SQL parser
 import pytest
 
 from sqlstream.sql.ast_nodes import (
-    AggregateFunction,
-    Condition,
     JoinClause,
-    OrderByColumn,
     SelectStatement,
-    WhereClause,
 )
 from sqlstream.sql.parser import ParseError, parse
 

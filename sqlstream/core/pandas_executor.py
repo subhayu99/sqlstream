@@ -343,7 +343,7 @@ class PandasExecutor:
                 else:
                     val = None
                 result[col] = [val]
-            
+
             grouped = pd.DataFrame(result)
 
         # Rename aggregated columns to match expected output

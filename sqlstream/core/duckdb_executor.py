@@ -146,7 +146,7 @@ class DuckDBExecutor:
                 escaped_path = re.escape(file_path)
                 # Pattern: match file path when NOT surrounded by alphanumeric/underscore/dot/slash
                 # This ensures we match complete paths
-                pattern = f'(?<![\\w/.])' + escaped_path + '(?![\\w/.])'
+                pattern = '(?<![\\w/.])' + escaped_path + '(?![\\w/.])'
                 transformed_sql = re.sub(pattern, quoted_table, transformed_sql)
 
         return transformed_sql
@@ -209,7 +209,7 @@ class DuckDBExecutor:
                 # DuckDB can query pandas DataFrames directly!
                 self.conn.register(table_name, df)
 
-            except Exception as e:
+            except Exception:
                 self._register_source(table_name, file_path)
 
 

@@ -2,8 +2,8 @@
 Test MarkdownReader - parsing and querying markdown tables
 """
 
-import tempfile
 import os
+import tempfile
 
 
 class TestMarkdownReaderBasic:
@@ -167,8 +167,8 @@ Some text
 
     def test_schema_inference(self):
         """Test schema inference from markdown table"""
-        from sqlstream.readers.markdown_reader import MarkdownReader
         from sqlstream.core.types import DataType
+        from sqlstream.readers.markdown_reader import MarkdownReader
 
         md = """
 | Name   | Age | Score | Active |

@@ -6,25 +6,42 @@ Allows users to write and execute queries, view results, browse schemas,
 and export data - all from a beautiful terminal interface.
 """
 
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-import json
 
 from textual import work
+from textual._text_area_theme import _BUILTIN_THEMES as _TEXT_AREA_BUILTIN_THEMES
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
-from textual.screen import ModalScreen
-from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList, TabbedContent, TabPane, ContentSwitcher, Select, Switch
-from textual.widgets.text_area import Selection
-from textual.geometry import Offset
 from textual.events import Key
+from textual.geometry import Offset
+from textual.screen import ModalScreen
 from textual.theme import BUILTIN_THEMES as _BUILTIN_THEMES
-from textual._text_area_theme import _BUILTIN_THEMES as _TEXT_AREA_BUILTIN_THEMES
+from textual.widgets import (
+    Button,
+    ContentSwitcher,
+    DataTable,
+    DirectoryTree,
+    Footer,
+    Header,
+    Input,
+    Label,
+    OptionList,
+    Select,
+    Static,
+    Switch,
+    TabbedContent,
+    TabPane,
+    TextArea,
+    Tree,
+)
+from textual.widgets.text_area import Selection
 
 try:
-    from sqlstream.core.query import query, parse, Query
+    from sqlstream.core.query import Query, parse, query
     from sqlstream.core.types import Schema
 except ImportError:
     # Fallback for development

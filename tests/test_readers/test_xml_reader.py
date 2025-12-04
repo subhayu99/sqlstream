@@ -149,8 +149,8 @@ class TestXMLReaderBasic:
 
     def test_xml_type_inference(self):
         """Test that types are inferred correctly"""
-        from sqlstream.readers.xml_reader import XMLReader
         from sqlstream.core.types import DataType
+        from sqlstream.readers.xml_reader import XMLReader
 
         xml_content = """<?xml version="1.0"?>
 <data>
@@ -260,16 +260,18 @@ class TestXMLReaderErrors:
 
     def test_file_not_found(self):
         """Test handling of missing file"""
-        from sqlstream.readers.xml_reader import XMLReader
         import pytest
+
+        from sqlstream.readers.xml_reader import XMLReader
 
         with pytest.raises(IOError, match="not found"):
             XMLReader("/nonexistent/file.xml")
 
     def test_invalid_xml(self):
         """Test handling of malformed XML"""
-        from sqlstream.readers.xml_reader import XMLReader
         import pytest
+
+        from sqlstream.readers.xml_reader import XMLReader
 
         xml_content = """<?xml version="1.0"?>
 <data>
@@ -290,8 +292,9 @@ class TestXMLReaderErrors:
 
     def test_element_not_found(self):
         """Test error when specified element doesn't exist"""
-        from sqlstream.readers.xml_reader import XMLReader
         import pytest
+
+        from sqlstream.readers.xml_reader import XMLReader
 
         xml_content = """<?xml version="1.0"?>
 <data>
@@ -312,8 +315,9 @@ class TestXMLReaderErrors:
 
     def test_no_repeating_elements(self):
         """Test error when no repeating elements found"""
-        from sqlstream.readers.xml_reader import XMLReader
         import pytest
+
+        from sqlstream.readers.xml_reader import XMLReader
 
         xml_content = """<?xml version="1.0"?>
 <data>
@@ -371,8 +375,9 @@ class TestXMLReaderIntegration:
 
     def test_xml_to_dataframe(self):
         """Test converting XML reader to DataFrame"""
-        from sqlstream.readers.xml_reader import XMLReader
         import pytest
+
+        from sqlstream.readers.xml_reader import XMLReader
 
         xml_content = """<?xml version="1.0"?>
 <data>

@@ -4,9 +4,9 @@ Verifies that readers correctly handle S3 paths and attempt to use s3fs.
 Mocks s3fs to avoid actual network calls.
 """
 
+from unittest.mock import MagicMock, mock_open, patch
+
 import pytest
-import sys
-from unittest.mock import MagicMock, patch, mock_open
 
 
 class TestS3CSVReader:
@@ -73,8 +73,9 @@ class TestS3CSVReader:
 
     def test_csv_reader_local_path_unchanged(self, tmp_path):
         """Test that local paths still work normally."""
-        from sqlstream.readers.csv_reader import CSVReader
         import csv
+
+        from sqlstream.readers.csv_reader import CSVReader
 
         # Create test CSV
         csv_file = tmp_path / "test.csv"
@@ -144,9 +145,10 @@ class TestS3ParquetReader:
 
     def test_parquet_reader_local_path_unchanged(self, tmp_path):
         """Test that local paths still work normally."""
-        from sqlstream.readers.parquet_reader import ParquetReader
         import pyarrow as pa
         import pyarrow.parquet as pq
+
+        from sqlstream.readers.parquet_reader import ParquetReader
 
         # Create test Parquet file
         parquet_file = tmp_path / "test.parquet"

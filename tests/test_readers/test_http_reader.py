@@ -2,8 +2,6 @@
 Tests for HTTP reader with streaming and caching
 """
 
-import tempfile
-from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest

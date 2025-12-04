@@ -2,8 +2,6 @@
 Tests for JOIN operator
 """
 
-import tempfile
-from pathlib import Path
 
 import pytest
 

@@ -160,7 +160,7 @@ def query(
 
         # Read SQL from file if --sql-file is provided
         if sql_file:
-            with open(sql_file, 'r') as f:
+            with open(sql_file) as f:
                 sql_from_file = f.read().strip()
             # If file_or_sql is provided with --sql-file, treat it as data file
             if file_or_sql:
@@ -215,7 +215,7 @@ def query(
                 results_list = results_list[:limit]
 
             # Check if interactive mode should be used
-            from sqlstream.cli.interactive import should_use_interactive, launch_interactive
+            from sqlstream.cli.interactive import launch_interactive, should_use_interactive
 
             if should_use_interactive(
                 results_list,

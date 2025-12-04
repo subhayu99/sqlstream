@@ -1,13 +1,14 @@
 """Tests for type system."""
 
-import pytest
 from datetime import date, datetime
+
+import pytest
 
 from sqlstream.core.types import (
     DataType,
-    infer_type,
-    infer_common_type,
     Schema,
+    infer_common_type,
+    infer_type,
 )
 
 

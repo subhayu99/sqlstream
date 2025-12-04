@@ -1,11 +1,11 @@
-import tempfile
 import os
-from pathlib import Path
+import tempfile
+
 import pytest
 
 try:
-    import pandas
     import lxml
+    import pandas
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -126,8 +126,8 @@ class TestHTMLReaderBasic:
 
     def test_schema_inference(self):
         """Test schema inference from HTML table"""
-        from sqlstream.readers.html_reader import HTMLReader
         from sqlstream.core.types import DataType
+        from sqlstream.readers.html_reader import HTMLReader
 
         html = """
         <html><body>

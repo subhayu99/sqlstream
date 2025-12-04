@@ -19,7 +19,12 @@ Example:
 
 from sqlstream.optimizers.base import Optimizer, OptimizerPipeline
 from sqlstream.optimizers.column_pruning import ColumnPruningOptimizer
-from sqlstream.optimizers.cost_based import CostBasedOptimizer, CostModel, TableStatistics, ColumnStatistics
+from sqlstream.optimizers.cost_based import (
+    ColumnStatistics,
+    CostBasedOptimizer,
+    CostModel,
+    TableStatistics,
+)
 from sqlstream.optimizers.join_reordering import JoinReorderingOptimizer
 from sqlstream.optimizers.limit_pushdown import LimitPushdownOptimizer
 from sqlstream.optimizers.partition_pruning import PartitionPruningOptimizer

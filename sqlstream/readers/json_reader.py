@@ -3,13 +3,12 @@ JSON Reader for reading standard JSON files
 """
 
 import json
-import warnings
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional
 
+from sqlstream.core.types import Schema
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
-from sqlstream.core.types import Schema
 
 
 class JSONReader(BaseReader):
@@ -25,8 +24,8 @@ class JSONReader(BaseReader):
     """
 
     def __init__(
-        self, 
-        path: str, 
+        self,
+        path: str,
         records_key: Optional[str] = None,
         encoding: str = "utf-8"
     ):
@@ -102,12 +101,12 @@ class JSONReader(BaseReader):
 
         # Locate records
         records = self._locate_records(data)
-        
+
         rows_yielded = 0
         for row in records:
             if not isinstance(row, dict):
                 continue
-                
+
             # Apply filters
             if self.filter_conditions:
                 if not self._matches_filter(row):
@@ -137,10 +136,10 @@ class JSONReader(BaseReader):
         # If no records_key specified, use auto-detection
         if not self.records_key:
             return self._auto_detect_records(data)
-        
+
         # Navigate using the path
         result = self._navigate_path(data, self.records_key)
-        
+
         # Ensure result is a list of dicts
         if isinstance(result, list):
             return result
@@ -148,30 +147,30 @@ class JSONReader(BaseReader):
             return [result]
         else:
             raise ValueError(f"Path '{self.records_key}' did not resolve to a list or object")
-    
+
     def _auto_detect_records(self, data: Any) -> List[Dict[str, Any]]:
         """Auto-detect records when no path is specified"""
         # If root is a list, that's our data
         if isinstance(data, list):
             return data
-            
+
         # If root is a dict, look for common keys
         if isinstance(data, dict):
             common_keys = ['data', 'records', 'items', 'rows', 'results']
             for key in common_keys:
                 if key in data and isinstance(data[key], list):
                     return data[key]
-            
+
             # Look for any list value
             for key, value in data.items():
                 if isinstance(value, list) and len(value) > 0:
                     return value
-                    
+
             # If single object, treat as one-row table
             return [data]
 
         raise ValueError("JSON content must be a list or an object containing a list")
-    
+
     def _navigate_path(self, data: Any, path: str) -> Any:
         """
         Navigate through JSON using a path string.
@@ -190,21 +189,21 @@ class JSONReader(BaseReader):
         - "users[].transactions" → flatten [user["transactions"] for user in data["users"]]
         """
         import re
-        
+
         # Handle flattening first if [] is in the path
         if '[]' in path:
             return self._flatten_path(data, path)
-        
+
         current = data
-        
+
         # Split path into segments (handling dots and brackets)
         # Pattern matches: "key", "key[0]", "key[1]" etc.
         segments = re.findall(r'([^.\[]+)(\[\d+\])?', path)
-        
+
         for key, bracket in segments:
             if not key:
                 continue
-                
+
             # Access key in current dict
             if isinstance(current, dict):
                 if key not in current:
@@ -212,7 +211,7 @@ class JSONReader(BaseReader):
                 current = current[key]
             else:
                 raise ValueError(f"Cannot access key '{key}' on non-dict type")
-            
+
             # Handle bracket notation (numeric index only)
             if bracket:
                 # Extract index [0], [1], etc.
@@ -222,9 +221,9 @@ class JSONReader(BaseReader):
                 if index < 0 or index >= len(current):
                     raise ValueError(f"Index {index} out of range for '{key}'")
                 current = current[index]
-        
+
         return current
-    
+
     def _flatten_path(self, data: Any, path: str) -> List[Any]:
         """
         Handle flattening for paths with [].
@@ -235,23 +234,23 @@ class JSONReader(BaseReader):
         """
         # Split on [] to find the flattening point
         parts = path.split('[]')
-        
+
         if len(parts) != 2:
             raise ValueError("Only one '[]' operator is supported per path")
-        
+
         before_flatten = parts[0]
         after_flatten = parts[1].lstrip('.')  # Remove leading dot if present
-        
+
         # Navigate to the array to flatten (without [] in the path)
         if before_flatten:
             # Use simple navigation without []
             array = self._navigate_simple(data, before_flatten)
         else:
             array = data
-        
+
         if not isinstance(array, list):
             raise ValueError(f"Cannot flatten non-list at '{before_flatten}'")
-        
+
         # Flatten and optionally extract nested keys
         result = []
         for item in array:
@@ -270,27 +269,27 @@ class JSONReader(BaseReader):
                 # Just flatten the array
                 if isinstance(item, dict):
                     result.append(item)
-        
+
         return result
-    
+
     def _navigate_simple(self, data: Any, path: str) -> Any:
         """Navigate a simple path without [] operators"""
         import re
-        
+
         current = data
         segments = re.findall(r'([^.\[]+)(\[\d+\])?', path)
-        
+
         for key, bracket in segments:
             if not key:
                 continue
-                
+
             if isinstance(current, dict):
                 if key not in current:
                     raise ValueError(f"Key '{key}' not found in JSON")
                 current = current[key]
             else:
                 raise ValueError(f"Cannot access key '{key}' on non-dict type")
-            
+
             if bracket:
                 index = int(bracket[1:-1])
                 if not isinstance(current, list):
@@ -298,7 +297,7 @@ class JSONReader(BaseReader):
                 if index < 0 or index >= len(current):
                     raise ValueError(f"Index {index} out of range for '{key}'")
                 current = current[index]
-        
+
         return current
 
     def _matches_filter(self, row: Dict[str, Any]) -> bool:
@@ -312,14 +311,14 @@ class JSONReader(BaseReader):
         """Evaluate single condition"""
         if condition.column not in row:
             return False
-            
+
         value = row[condition.column]
         if value is None:
             return False
-            
+
         op = condition.operator
         expected = condition.value
-        
+
         try:
             if op == "=": return value == expected
             elif op == ">": return value > expected
@@ -343,10 +342,10 @@ class JSONReader(BaseReader):
                     rows.append(next(iterator))
                 except StopIteration:
                     break
-            
+
             if not rows:
                 return None
-                
+
             return Schema.from_rows(rows)
         except Exception:
             return None

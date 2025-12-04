@@ -13,12 +13,12 @@ def test_version():
 
 def test_import():
     """Test that package can be imported"""
+    import sqlstream.cli
     import sqlstream.core
-    import sqlstream.sql
-    import sqlstream.readers
     import sqlstream.operators
     import sqlstream.optimizers
-    import sqlstream.cli
+    import sqlstream.readers
+    import sqlstream.sql
     import sqlstream.utils
 
     # All subpackages should be importable

@@ -17,11 +17,10 @@ Example:
     → Only read year=2024 partitions (skip year=2023)
 """
 
-from typing import Dict, List, Set
 
 from sqlstream.optimizers.base import Optimizer
 from sqlstream.readers.base import BaseReader
-from sqlstream.sql.ast_nodes import Condition, SelectStatement
+from sqlstream.sql.ast_nodes import SelectStatement
 
 
 class PartitionPruningOptimizer(Optimizer):

@@ -7,12 +7,11 @@ Parses GitHub Flavored Markdown tables and makes them queryable.
 from __future__ import annotations
 
 import re
-from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 
+from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
-from sqlstream.core.types import Schema, DataType
 
 
 class MarkdownReader(BaseReader):
@@ -59,7 +58,7 @@ class MarkdownReader(BaseReader):
     def _parse_markdown(self) -> None:
         """Parse all tables from Markdown file"""
         # Read file content
-        with open(self.source, 'r', encoding='utf-8') as f:
+        with open(self.source, encoding='utf-8') as f:
             content = f.read()
 
         # Find all tables

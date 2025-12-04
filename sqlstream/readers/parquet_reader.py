@@ -12,9 +12,9 @@ from typing import Any, Dict, Iterator, List, Optional
 
 import pyarrow.parquet as pq
 
+from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition
-from sqlstream.core.types import Schema, DataType
 
 
 class ParquetReader(BaseReader):

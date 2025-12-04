@@ -7,7 +7,7 @@ This is the main entry point for query optimization.
 
 from typing import List
 
-from sqlstream.optimizers.base import OptimizerPipeline, Optimizer
+from sqlstream.optimizers.base import Optimizer, OptimizerPipeline
 from sqlstream.optimizers.column_pruning import ColumnPruningOptimizer
 from sqlstream.optimizers.join_reordering import JoinReorderingOptimizer
 from sqlstream.optimizers.limit_pushdown import LimitPushdownOptimizer

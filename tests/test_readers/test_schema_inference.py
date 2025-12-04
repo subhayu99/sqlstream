@@ -1,11 +1,11 @@
 """Tests for schema inference in readers."""
 
-import pytest
-from pathlib import Path
 import csv
 
-from sqlstream.readers.csv_reader import CSVReader
+import pytest
+
 from sqlstream.core.types import DataType
+from sqlstream.readers.csv_reader import CSVReader
 
 
 @pytest.fixture
