@@ -96,7 +96,7 @@ class DuckDBExecutor:
 
             # Step 5: Yield results as dictionaries
             for row in result.fetchall():
-                yield dict(zip(columns, row))
+                yield dict(zip(columns, row, strict=False))
 
         except Exception as e:
             raise RuntimeError(f"DuckDB execution error: {e}") from e

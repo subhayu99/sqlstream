@@ -47,7 +47,7 @@ class TestPandasBackendBasic:
 
         assert len(python_result) == len(pandas_result) == 4
         # Results should match (pandas may have different types, so compare values)
-        for py_row, pd_row in zip(python_result, pandas_result):
+        for py_row, pd_row in zip(python_result, pandas_result, strict=True):
             assert py_row["name"] == pd_row["name"]
             assert py_row["age"] == pd_row["age"]
 
