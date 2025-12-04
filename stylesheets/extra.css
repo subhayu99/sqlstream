@@ -1,5 +1,11 @@
 :root  > * {
   /* --md-primary-fg-color:        rgb(49, 94, 110); */
-  --md-primary-fg-color: #2c6c72;
-  --md-accent-fg-color:  #2e7980;
+  --md-primary-fg-color: #0c636b;
+  --md-accent-fg-color:  #11aab8;
+  --md-typeset-a-color:  #11aab8;
+  --md-typeset-link-color: #11aab8;
+}
+
+.md-typeset .grid {
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); /* Example: forces more columns to fit */
 }

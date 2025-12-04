@@ -5,34 +5,6 @@
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/contributing/</loc>
-         <lastmod>2025-12-04</lastmod>
-    </url>
-    <url>
-         <loc>https://subhayu99.github.io/sqlstream/faq/</loc>
-         <lastmod>2025-12-04</lastmod>
-    </url>
-    <url>
-         <loc>https://subhayu99.github.io/sqlstream/limitations/</loc>
-         <lastmod>2025-12-04</lastmod>
-    </url>
-    <url>
-         <loc>https://subhayu99.github.io/sqlstream/performance/</loc>
-         <lastmod>2025-12-04</lastmod>
-    </url>
-    <url>
-         <loc>https://subhayu99.github.io/sqlstream/troubleshooting/</loc>
-         <lastmod>2025-12-04</lastmod>
-    </url>
-    <url>
-         <loc>https://subhayu99.github.io/sqlstream/api/overview/</loc>
-         <lastmod>2025-12-04</lastmod>
-    </url>
-    <url>
-         <loc>https://subhayu99.github.io/sqlstream/api/guides/advanced/</loc>
-         <lastmod>2025-12-04</lastmod>
-    </url>
-    <url>
          <loc>https://subhayu99.github.io/sqlstream/api/reference/cli/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
@@ -65,31 +37,27 @@
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/architecture/design/</loc>
+         <loc>https://subhayu99.github.io/sqlstream/cli-tool/output-formats/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/architecture/optimizations/</loc>
+         <loc>https://subhayu99.github.io/sqlstream/cli-tool/overview/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/architecture/volcano-model/</loc>
+         <loc>https://subhayu99.github.io/sqlstream/cli-tool/query-command/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/cli/interactive-mode/</loc>
+         <loc>https://subhayu99.github.io/sqlstream/cli-tool/quickstart/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/cli/output-formats/</loc>
+         <loc>https://subhayu99.github.io/sqlstream/cli-tool/scripting-patterns/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
-         <loc>https://subhayu99.github.io/sqlstream/cli/overview/</loc>
-         <lastmod>2025-12-04</lastmod>
-    </url>
-    <url>
-         <loc>https://subhayu99.github.io/sqlstream/cli/query-command/</loc>
+         <loc>https://subhayu99.github.io/sqlstream/cli-tool/examples/bash-scripts/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
@@ -126,6 +94,10 @@
     </url>
     <url>
          <loc>https://subhayu99.github.io/sqlstream/examples/real-world/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/examples/xml-data/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
@@ -173,6 +145,10 @@
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
+         <loc>https://subhayu99.github.io/sqlstream/features/xml/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
          <loc>https://subhayu99.github.io/sqlstream/getting-started/core-concepts/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
@@ -185,7 +161,75 @@
          <lastmod>2025-12-04</lastmod>
     </url>
     <url>
+         <loc>https://subhayu99.github.io/sqlstream/guides/contributing/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/guides/faq/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/guides/performance/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/guides/troubleshooting/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/guides/which-mode/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/interactive-shell/interface-guide/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/interactive-shell/keyboard-shortcuts/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/interactive-shell/quickstart/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/interactive-shell/workflows/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/python-module/advanced-patterns/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/python-module/basic-usage/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/python-module/quickstart/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/python-module/examples/simple-queries/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/reference/limitations/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
          <loc>https://subhayu99.github.io/sqlstream/reference/url-fragments/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/reference/architecture/design/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/reference/architecture/optimizations/</loc>
+         <lastmod>2025-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://subhayu99.github.io/sqlstream/reference/architecture/volcano-model/</loc>
          <lastmod>2025-12-04</lastmod>
     </url>
 </urlset>
