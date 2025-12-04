@@ -6,7 +6,7 @@ SQLStream offers multiple installation options depending on your needs.
 
 ## Requirements
 
-- **Python**: 3.8 or higher
+- **Python**: 3.10 or higher
 - **OS**: Linux, macOS, Windows
 
 ---

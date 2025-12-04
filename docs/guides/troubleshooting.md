@@ -117,10 +117,10 @@ pip install sqlstream
 
 ### Problem: Python version incompatibility
 
-**Symptom:** `ERROR: Package 'sqlstream' requires a different Python: 3.8.0 not in '>=3.9'`
+**Symptom:** `ERROR: Package 'sqlstream' requires a different Python: 3.9.0 not in '>=3.10'`
 
 **Solution:**
-- SQLstream requires Python 3.9 or higher
+- SQLstream requires Python 3.10 or higher
 - Upgrade Python or use a virtual environment:
 
 ```bash

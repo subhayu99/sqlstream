@@ -378,15 +378,14 @@ SQLStream is **read-only**. No support for:
 ### Python Versions
 
 **Supported**:
-- ✅ Python 3.8+
-- ✅ Python 3.9
-- ✅ Python 3.10
+- ✅ Python 3.10+
 - ✅ Python 3.11
 - ✅ Python 3.12
+- ✅ Python 3.13
 
 **Not supported**:
 - ❌ Python 2.7
-- ❌ Python 3.7 and older
+- ❌ Python 3.9 and older
 
 ---
 
