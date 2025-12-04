@@ -13,7 +13,7 @@ from __future__ import annotations
 import hashlib
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Iterator
 from urllib.parse import urlparse
 
 try:
@@ -54,9 +54,9 @@ class HTTPReader(BaseReader):
     def __init__(
         self,
         url: str,
-        cache_dir: Optional[str] = None,
+        cache_dir: str | None = None,
         force_download: bool = False,
-        format: Optional[str] = None,
+        format: str | None = None,
         **kwargs,
     ):
         """
@@ -92,8 +92,8 @@ class HTTPReader(BaseReader):
         self.delegate_reader = self._create_delegate_reader()
 
         # Delegate filter conditions and column selection
-        self.filter_conditions: List[Condition] = []
-        self.required_columns: List[str] = []
+        self.filter_conditions: list[Condition] = []
+        self.required_columns: list[str] = []
 
     def _get_cache_path(self) -> Path:
         """Generate cache file path based on URL hash"""
@@ -137,7 +137,7 @@ class HTTPReader(BaseReader):
                 return target_path
 
         except Exception as e:
-            raise OSError(f"Failed to download {self.url}: {e}")
+            raise OSError(f"Failed to download {self.url}: {e}") from e
 
     def _create_delegate_reader(self) -> BaseReader:
         """Create appropriate reader based on file format"""
@@ -176,11 +176,11 @@ class HTTPReader(BaseReader):
             try:
                 from sqlstream.readers.html_reader import HTMLReader
                 return HTMLReader(str(self.local_path), **self.reader_kwargs)
-            except ImportError:
+            except ImportError as e:
                 raise ImportError(
                     "HTML reader requires pandas library. "
                     "Install `sqlstream[pandas]`"
-                )
+                ) from e
 
         elif format_to_use == "markdown":
             from sqlstream.readers.markdown_reader import MarkdownReader
@@ -199,8 +199,8 @@ class HTTPReader(BaseReader):
         else:  # csv or unknown - default to CSV
             try:
                 return CSVReader(str(self.local_path))
-            except Exception:
-                raise ValueError(f"Unknown file format: {format_to_use}")
+            except Exception as e:
+                raise ValueError(f"Unknown file format: {format_to_use}") from e
 
     def _detect_format_from_content(self) -> str:
         """Try to detect format by peeking at file content"""
@@ -238,7 +238,7 @@ class HTTPReader(BaseReader):
             # If detection fails, default to CSV
             return "csv"
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """Read data lazily, delegating to underlying reader"""
         # Apply filter conditions to delegate
         if self.filter_conditions:
@@ -251,7 +251,7 @@ class HTTPReader(BaseReader):
         # Delegate to underlying reader
         yield from self.delegate_reader.read_lazy()
 
-    def get_schema(self) -> Dict[str, str]:
+    def get_schema(self) -> dict[str, str]:
         """Get schema from delegate reader"""
         return self.delegate_reader.get_schema()
 
@@ -263,11 +263,11 @@ class HTTPReader(BaseReader):
         """HTTP reader supports column selection via delegation"""
         return self.delegate_reader.supports_column_selection()
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         """Set filter conditions (will be pushed to delegate)"""
         self.filter_conditions = conditions
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         """Set required columns (will be pushed to delegate)"""
         self.required_columns = columns
 
@@ -278,7 +278,7 @@ class HTTPReader(BaseReader):
             cache_path.unlink()
 
     @staticmethod
-    def clear_all_cache(cache_dir: Optional[str] = None) -> int:
+    def clear_all_cache(cache_dir: str | None = None) -> int:
         """
         Clear all cached files
 

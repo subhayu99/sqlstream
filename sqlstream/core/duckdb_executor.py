@@ -7,7 +7,7 @@ This backend bypasses SQLStream's parser and uses DuckDB's native SQL engine.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Iterator, Optional
+from typing import Any, Callable, Iterator
 
 from sqlstream.readers.base import BaseReader
 
@@ -57,11 +57,11 @@ class DuckDBExecutor:
     def execute_raw(
         self,
         sql: str,
-        sources: Dict[str, str],
+        sources: dict[str, str],
         read_only: bool = True,
         use_dataframes: bool = True,
-        reader_factory: Optional[Callable[[str], Any]] = None
-    ) -> Iterator[Dict[str, Any]]:
+        reader_factory: Callable[[str], Any] | None = None
+    ) -> Iterator[dict[str, Any]]:
         """
         Execute raw SQL query with DuckDB
 
@@ -101,7 +101,7 @@ class DuckDBExecutor:
         except Exception as e:
             raise RuntimeError(f"DuckDB execution error: {e}") from e
 
-    def _replace_sources_in_sql(self, sql: str, sources: Dict[str, str]) -> str:
+    def _replace_sources_in_sql(self, sql: str, sources: dict[str, str]) -> str:
         """
         Replace file paths in SQL with registered table names
 
@@ -151,7 +151,7 @@ class DuckDBExecutor:
 
         return transformed_sql
 
-    def _register_sources_with_readers(self, sources: Dict[str, str], reader_factory: Callable[[str], BaseReader]):
+    def _register_sources_with_readers(self, sources: dict[str, str], reader_factory: Callable[[str], BaseReader]):
         """
         Register sources using Reader objects to get DataFrames
         """
@@ -171,7 +171,7 @@ class DuckDBExecutor:
                 print(f"Warning: Could not load {file_path} via Reader, using file-based: {e}")
                 self._register_source(table_name, file_path)
 
-    def _register_sources_as_dataframes(self, sources: Dict[str, str]):
+    def _register_sources_as_dataframes(self, sources: dict[str, str]):
         """
         Legacy method: Load files as pandas DataFrames manually
         (Kept for backward compatibility or when no reader_factory provided)
@@ -290,7 +290,7 @@ class DuckDBExecutor:
             # httpfs might already be loaded or not needed
             pass
 
-    def explain(self, sql: str, sources: Dict[str, str]) -> str:
+    def explain(self, sql: str, sources: dict[str, str]) -> str:
         """
         Get DuckDB query execution plan
 

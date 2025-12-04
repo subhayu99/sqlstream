@@ -83,8 +83,8 @@ class CSVReader(BaseReader):
                 import s3fs
                 fs = s3fs.S3FileSystem(anon=False)
                 return fs.open(self.path_str, mode="r", encoding=self.encoding)
-            except ImportError:
-                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]")
+            except ImportError as e:
+                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]") from e
         else:
             return open(self.path, encoding=self.encoding, newline="")
 
@@ -130,7 +130,7 @@ class CSVReader(BaseReader):
                     # Handle malformed rows gracefully
                     warnings.warn(
                         f"Skipping malformed row {row_num} in {self.path}: {e}",
-                        UserWarning,
+                        UserWarning, stacklevel=2,
                     )
                     continue
 
@@ -226,7 +226,7 @@ class CSVReader(BaseReader):
                 return value != expected
             else:
                 # Unknown operator, skip this condition
-                warnings.warn(f"Unknown operator: {op}", UserWarning)
+                warnings.warn(f"Unknown operator: {op}", UserWarning, stacklevel=2)
                 return True
 
         except TypeError:

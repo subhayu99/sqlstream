@@ -15,11 +15,11 @@ from sqlstream.sql.ast_nodes import Condition
 class JSONLReader(BaseReader):
     """
     Reader for JSONL (JSON Lines) files.
-    
+
     Format:
     {"id": 1, "name": "Alice"}
     {"id": 2, "name": "Bob"}
-    
+
     Features:
     - True lazy loading (line-by-line)
     - Handle malformed lines
@@ -77,8 +77,8 @@ class JSONLReader(BaseReader):
                 import s3fs
                 fs = s3fs.S3FileSystem(anon=False)
                 return fs.open(self.path_str, mode="r", encoding=self.encoding)
-            except ImportError:
-                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]")
+            except ImportError as e:
+                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]") from e
         else:
             return open(self.path, encoding=self.encoding)
 
@@ -98,7 +98,7 @@ class JSONLReader(BaseReader):
                     row = json.loads(line)
 
                     if not isinstance(row, dict):
-                        warnings.warn(f"Skipping non-dict row at line {line_num}", UserWarning)
+                        warnings.warn(f"Skipping non-dict row at line {line_num}", UserWarning, stacklevel=2)
                         continue
 
                     # Apply filters
@@ -117,7 +117,7 @@ class JSONLReader(BaseReader):
                         break
 
                 except json.JSONDecodeError:
-                    warnings.warn(f"Skipping invalid JSON at line {line_num}", UserWarning)
+                    warnings.warn(f"Skipping invalid JSON at line {line_num}", UserWarning, stacklevel=2)
                     continue
 
     def _matches_filter(self, row: Dict[str, Any]) -> bool:
@@ -140,13 +140,20 @@ class JSONLReader(BaseReader):
         expected = condition.value
 
         try:
-            if op == "=": return value == expected
-            elif op == ">": return value > expected
-            elif op == "<": return value < expected
-            elif op == ">=": return value >= expected
-            elif op == "<=": return value <= expected
-            elif op == "!=": return value != expected
-            else: return True
+            if op == "=":
+                return value == expected
+            elif op == ">":
+                return value > expected
+            elif op == "<":
+                return value < expected
+            elif op == ">=":
+                return value >= expected
+            elif op == "<=":
+                return value <= expected
+            elif op == "!=":
+                return value != expected
+            else:
+                return True
         except TypeError:
             return False
 

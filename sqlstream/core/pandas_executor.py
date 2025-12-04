@@ -7,7 +7,7 @@ Falls back gracefully if pandas is not available.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Iterator
 
 try:
     import pandas as pd
@@ -44,8 +44,8 @@ class PandasExecutor:
             )
 
     def execute(
-        self, ast: SelectStatement, source: str, right_source: Optional[str] = None
-    ) -> Iterator[Dict[str, Any]]:
+        self, ast: SelectStatement, source: str, right_source: str | None = None
+    ) -> Iterator[dict[str, Any]]:
         """
         Execute query using pandas
 
@@ -89,7 +89,7 @@ class PandasExecutor:
         # Step 8: Convert to dictionaries and yield
         yield from df.to_dict("records")
 
-    def _load_dataframe(self, source: str, format: Optional[str] = None) -> pd.DataFrame:
+    def _load_dataframe(self, source: str, format: str | None = None) -> pd.DataFrame:
         """
         Load data file into DataFrame
 
@@ -223,8 +223,8 @@ class PandasExecutor:
             try:
                 from sqlstream.readers.csv_reader import CSVReader
                 return CSVReader(source_path).to_dataframe()
-            except Exception:
-                raise ValueError(f"Unsupported file format: {source_path}")
+            except Exception as e:
+                raise ValueError(f"Unsupported file format: {source_path}") from e
 
     def _apply_join(
         self, df: pd.DataFrame, ast: SelectStatement, right_source: str
@@ -254,7 +254,7 @@ class PandasExecutor:
         return result
 
     def _apply_filter(
-        self, df: pd.DataFrame, conditions: List[Condition]
+        self, df: pd.DataFrame, conditions: list[Condition]
     ) -> pd.DataFrame:
         """Apply WHERE conditions"""
         mask = pd.Series([True] * len(df), index=df.index)
@@ -378,7 +378,7 @@ class PandasExecutor:
         return df.sort_values(by=by_cols, ascending=ascending, na_position="last")
 
     def _apply_projection(
-        self, df: pd.DataFrame, columns: List[str]
+        self, df: pd.DataFrame, columns: list[str]
     ) -> pd.DataFrame:
         """Apply column selection (PROJECT)"""
         if columns == ["*"]:

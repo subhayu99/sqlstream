@@ -7,7 +7,7 @@ Parses GitHub Flavored Markdown tables and makes them queryable.
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Iterator
 
 from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader
@@ -52,8 +52,8 @@ class MarkdownReader(BaseReader):
         self._parse_markdown()
 
         # Filter conditions and columns
-        self.filter_conditions: List[Condition] = []
-        self.required_columns: List[str] = []
+        self.filter_conditions: list[Condition] = []
+        self.required_columns: list[str] = []
 
     def _parse_markdown(self) -> None:
         """Parse all tables from Markdown file"""
@@ -78,7 +78,7 @@ class MarkdownReader(BaseReader):
         self.columns = self.data['columns']
         self.rows = self.data['rows']
 
-    def _extract_tables(self, content: str) -> List[Dict[str, Any]]:
+    def _extract_tables(self, content: str) -> list[dict[str, Any]]:
         """
         Extract all tables from Markdown content
 
@@ -125,7 +125,7 @@ class MarkdownReader(BaseReader):
 
         return all(separator_pattern.match(p.strip()) for p in parts if p.strip())
 
-    def _parse_table(self, lines: List[str], start_idx: int) -> Optional[Dict[str, Any]]:
+    def _parse_table(self, lines: list[str], start_idx: int) -> dict[str, Any] | None:
         """Parse a single table starting at the given index"""
         # Parse header
         header_line = lines[start_idx].strip()
@@ -171,7 +171,7 @@ class MarkdownReader(BaseReader):
             'line_count': i - start_idx
         }
 
-    def _parse_row(self, line: str, infer_types: bool = True) -> List[Any]:
+    def _parse_row(self, line: str, infer_types: bool = True) -> list[Any]:
         """Parse a single table row"""
         # Remove leading/trailing pipes and whitespace
         line = line.strip('|').strip()
@@ -218,7 +218,7 @@ class MarkdownReader(BaseReader):
         from sqlstream.core.types import infer_type_from_string
         return infer_type_from_string(value)
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """Read data lazily from the selected table"""
         for row in self.rows:
             # Apply filters if any
@@ -236,7 +236,7 @@ class MarkdownReader(BaseReader):
             else:
                 yield row
 
-    def _matches_filters(self, row: Dict[str, Any]) -> bool:
+    def _matches_filters(self, row: dict[str, Any]) -> bool:
         """Check if row matches all filter conditions"""
         for condition in self.filter_conditions:
             col = condition.column
@@ -310,15 +310,15 @@ class MarkdownReader(BaseReader):
         """Markdown reader supports column selection"""
         return True
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         """Set filter conditions"""
         self.filter_conditions = conditions
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         """Set required columns"""
         self.required_columns = columns
 
-    def list_tables(self) -> List[str]:
+    def list_tables(self) -> list[str]:
         """
         List all tables found in the Markdown file
 
@@ -341,7 +341,7 @@ class MarkdownReader(BaseReader):
         """
         try:
             import pandas as pd
-        except ImportError:
-            raise ImportError("Pandas is required for to_dataframe()")
+        except ImportError as e:
+            raise ImportError("Pandas is required for to_dataframe()") from e
 
         return pd.DataFrame(self.rows)

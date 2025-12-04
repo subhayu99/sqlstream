@@ -42,7 +42,6 @@ from textual.widgets.text_area import Selection
 
 try:
     from sqlstream.core.query import Query, parse, query
-    from sqlstream.core.types import Schema
 except ImportError:
     # Fallback for development
     from sqlstream import query
@@ -650,7 +649,7 @@ class FilterSidebar(Container):
             # Simple date detection could go here if data is Python datetime objects
 
         # Populate Operators based on Type
-        if col_type == float: # Numbers
+        if col_type is float: # Numbers
             ops = [
                 ("Equals (=)", "eq"),
                 ("Greater Than (>)", "gt"),
@@ -660,7 +659,7 @@ class FilterSidebar(Container):
             op_select.set_options(ops)
             op_select.value = "eq"
 
-        elif col_type == bool: # Booleans
+        elif col_type is bool: # Booleans
             ops = [("Is", "is")]
             op_select.set_options(ops)
             op_select.value = "is"
@@ -2247,14 +2246,16 @@ class SQLShellApp(App):
         try:
             cols = list(self.last_results[0].keys())
             self.query_one(FilterSidebar).update_columns(cols)
-        except: pass
+        except Exception:
+            pass
 
         # Update Export Sidebar
         try:
             # FIX: Check filter_active flag
             count = len(self.filtered_results) if self.filter_active else len(self.last_results)
             self.query_one(ExportSidebar).update_info(count)
-        except: pass
+        except Exception:
+            pass
 
     # Renamed from action_export_results to perform_export (called by sidebar)
     def perform_export(self, path: Path, fmt: str) -> None:

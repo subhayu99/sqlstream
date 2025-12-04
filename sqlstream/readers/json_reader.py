@@ -81,15 +81,15 @@ class JSONReader(BaseReader):
                 import s3fs
                 fs = s3fs.S3FileSystem(anon=False)
                 return fs.open(self.path_str, mode="r", encoding=self.encoding)
-            except ImportError:
-                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]")
+            except ImportError as e:
+                raise ImportError("s3fs is required for S3 support. Install with: pip install sqlstream[s3]") from e
         else:
             return open(self.path, encoding=self.encoding)
 
     def read_lazy(self) -> Iterator[Dict[str, Any]]:
         """
         Read JSON file and yield records.
-        
+
         Note: Standard JSON parsing loads the whole file into memory.
         For large files, use JSONL format.
         """
@@ -97,7 +97,7 @@ class JSONReader(BaseReader):
             try:
                 data = json.load(f)
             except json.JSONDecodeError as e:
-                raise ValueError(f"Invalid JSON file {self.path_str}: {e}")
+                raise ValueError(f"Invalid JSON file {self.path_str}: {e}") from e
 
         # Locate records
         records = self._locate_records(data)
@@ -125,7 +125,7 @@ class JSONReader(BaseReader):
     def _locate_records(self, data: Any) -> List[Dict[str, Any]]:
         """
         Find the list of records in the JSON data.
-        
+
         Supports JSONPath-like syntax:
         - "key" - simple key access
         - "key.nested" - nested object access
@@ -162,7 +162,7 @@ class JSONReader(BaseReader):
                     return data[key]
 
             # Look for any list value
-            for key, value in data.items():
+            for _, value in data.items():
                 if isinstance(value, list) and len(value) > 0:
                     return value
 
@@ -174,14 +174,14 @@ class JSONReader(BaseReader):
     def _navigate_path(self, data: Any, path: str) -> Any:
         """
         Navigate through JSON using a path string.
-        
+
         Supports:
         - "key" - simple key
         - "key.nested.deep" - dot notation
         - "key[0]" - array indexing
         - "key[]" - flatten arrays
         - "key[].nested" - combinations
-        
+
         Examples:
         - "users" → data["users"]
         - "result.orders" → data["result"]["orders"]
@@ -227,7 +227,7 @@ class JSONReader(BaseReader):
     def _flatten_path(self, data: Any, path: str) -> List[Any]:
         """
         Handle flattening for paths with [].
-        
+
         Examples:
         - "users[]" → flatten data["users"]
         - "users[].transactions" → flatten [user["transactions"] for user in data["users"]]
@@ -320,13 +320,20 @@ class JSONReader(BaseReader):
         expected = condition.value
 
         try:
-            if op == "=": return value == expected
-            elif op == ">": return value > expected
-            elif op == "<": return value < expected
-            elif op == ">=": return value >= expected
-            elif op == "<=": return value <= expected
-            elif op == "!=": return value != expected
-            else: return True
+            if op == "=":
+                return value == expected
+            elif op == ">":
+                return value > expected
+            elif op == "<":
+                return value < expected
+            elif op == ">=":
+                return value >= expected
+            elif op == "<=":
+                return value <= expected
+            elif op == "!=":
+                return value != expected
+            else:
+                return True
         except TypeError:
             return False
 

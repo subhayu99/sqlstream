@@ -58,8 +58,8 @@ class ParquetReader(BaseReader):
                 filesystem = s3fs.S3FileSystem(anon=False)
                 # s3fs expects path without protocol when filesystem is provided
                 path_to_open = path.replace("s3://", "")
-            except ImportError:
-                raise ImportError("s3fs is required for S3 support. Install `sqlstream[s3]`")
+            except ImportError as e:
+                raise ImportError("s3fs is required for S3 support. Install `sqlstream[s3]`") from e
         else:
             self.path = Path(path)
             path_to_open = str(self.path)

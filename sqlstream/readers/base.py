@@ -184,8 +184,8 @@ class BaseReader:
         """
         try:
             import pandas as pd
-        except ImportError:
-            raise ImportError("Pandas is required for to_dataframe()")
+        except ImportError as e:
+            raise ImportError("Pandas is required for to_dataframe()") from e
 
         # Default implementation: materialize iterator
         return pd.DataFrame(list(self.read_lazy()))

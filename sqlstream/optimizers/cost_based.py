@@ -104,7 +104,7 @@ class CostModel:
         # Cost to evaluate filter on all rows
         filter_cost = row_count * cls.COST_PER_ROW_FILTER
         # Output row count for downstream operations
-        output_rows = row_count * selectivity
+        row_count * selectivity
         return filter_cost
 
     @classmethod
@@ -133,7 +133,7 @@ class CostModel:
         probe_cost = probe_rows * cls.COST_PER_ROW_JOIN
 
         # Output row count
-        output_rows = left_rows * right_rows * selectivity
+        left_rows * right_rows * selectivity
 
         return build_cost + probe_cost
 

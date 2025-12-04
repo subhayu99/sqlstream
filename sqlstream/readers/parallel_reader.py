@@ -92,10 +92,10 @@ class ParallelReader:
 
                     yield row
 
-                except queue.Empty:
+                except queue.Empty as e:
                     # Check if workers encountered error
                     if self.error:
-                        raise self.error
+                        raise self.error from e
 
                     # Check if all workers finished
                     if not any(w.is_alive() for w in self.workers):

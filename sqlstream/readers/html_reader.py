@@ -7,7 +7,7 @@ Supports multiple tables per file with table selection.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Iterator
 
 from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader
@@ -43,7 +43,7 @@ class HTMLReader(BaseReader):
         self,
         source: str,
         table: int = 0,
-        match: Optional[str] = None,
+        match: str | None = None,
         **kwargs
     ):
         """
@@ -70,8 +70,8 @@ class HTMLReader(BaseReader):
         self._load_tables()
 
         # Filter conditions and columns
-        self.filter_conditions: List[Condition] = []
-        self.required_columns: List[str] = []
+        self.filter_conditions: list[Condition] = []
+        self.required_columns: list[str] = []
 
     def _load_tables(self) -> None:
         """Load all tables from HTML source"""
@@ -104,9 +104,9 @@ class HTMLReader(BaseReader):
             raise
         except Exception as e:
             # Only wrap actual I/O errors
-            raise OSError(f"Failed to read HTML tables from {self.source}: {e}")
+            raise OSError(f"Failed to read HTML tables from {self.source}: {e}") from e
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """Read data lazily from the selected table"""
         df = self.df
 
@@ -190,15 +190,15 @@ class HTMLReader(BaseReader):
         """HTML reader supports column selection"""
         return True
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         """Set filter conditions"""
         self.filter_conditions = conditions
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         """Set required columns"""
         self.required_columns = columns
 
-    def list_tables(self) -> List[str]:
+    def list_tables(self) -> list[str]:
         """
         List all tables found in the HTML
 

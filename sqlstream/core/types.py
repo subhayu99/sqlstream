@@ -107,10 +107,10 @@ class DataType(Enum):
 
 def parse_datetime(value: str) -> Optional[datetime]:
     """Try to parse datetime from string using multiple formats.
-    
+
     Args:
         value: String to parse
-        
+
     Returns:
         datetime object if successful, None otherwise
     """
@@ -149,10 +149,10 @@ def parse_datetime(value: str) -> Optional[datetime]:
 
 def parse_date(value: str) -> Optional[date]:
     """Try to parse date from string using multiple formats.
-    
+
     Args:
         value: String to parse
-        
+
     Returns:
         date object if successful, None otherwise
     """
@@ -181,10 +181,10 @@ def parse_date(value: str) -> Optional[date]:
 
 def parse_time(value: str) -> Optional[time]:
     """Try to parse time from string using multiple formats.
-    
+
     Args:
         value: String to parse
-        
+
     Returns:
         time object if successful, None otherwise
     """
@@ -212,10 +212,10 @@ def parse_time(value: str) -> Optional[time]:
 
 def is_json_string(value: str) -> bool:
     """Check if a string contains valid JSON (object or array).
-    
+
     Args:
         value: String to check
-        
+
     Returns:
         True if valid JSON object/array, False otherwise
     """
@@ -347,15 +347,15 @@ def infer_type(value: Any) -> DataType:
 
 def infer_type_from_string(value: str) -> Any:
     """Parse a string value and return the typed Python value.
-    
+
     This is used by readers to convert string data into proper Python types.
-    
+
     Args:
         value: String value to parse
-        
+
     Returns:
         Typed Python value (int, float, Decimal, datetime, bool, str, etc.)
-    
+
     Examples:
         >>> infer_type_from_string("42")
         42

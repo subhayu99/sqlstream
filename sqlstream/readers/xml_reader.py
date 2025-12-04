@@ -8,7 +8,7 @@ Supports XPath-like selection for specific elements.
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Iterator
 
 from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader
@@ -47,7 +47,7 @@ class XMLReader(BaseReader):
     def __init__(
         self,
         source: str,
-        element: Optional[str] = None,
+        element: str | None = None,
         **kwargs
     ):
         """
@@ -67,8 +67,8 @@ class XMLReader(BaseReader):
         self._parse_xml()
 
         # Filter conditions and columns
-        self.filter_conditions: List[Condition] = []
-        self.required_columns: List[str] = []
+        self.filter_conditions: list[Condition] = []
+        self.required_columns: list[str] = []
 
     def _parse_xml(self) -> None:
         """Parse XML file and extract tabular data"""
@@ -112,11 +112,11 @@ class XMLReader(BaseReader):
                 raise ValueError(f"No data rows extracted from XML: {self.source}")
 
         except ET.ParseError as e:
-            raise OSError(f"Failed to parse XML file {self.source}: {e}")
-        except FileNotFoundError:
-            raise OSError(f"XML file not found: {self.source}")
+            raise OSError(f"Failed to parse XML file {self.source}: {e}") from e
+        except FileNotFoundError as e:
+            raise OSError(f"XML file not found: {self.source}") from e
 
-    def _find_repeating_elements(self, root: ET.Element) -> List[ET.Element]:
+    def _find_repeating_elements(self, root: ET.Element) -> list[ET.Element]:
         """
         Find the first type of repeating element in XML
 
@@ -134,7 +134,7 @@ class XMLReader(BaseReader):
             tag_counts[tag].append(child)
 
         # Return the first tag that has multiple occurrences
-        for tag, elements in tag_counts.items():
+        for _, elements in tag_counts.items():
             if len(elements) > 1:
                 return elements
 
@@ -146,7 +146,7 @@ class XMLReader(BaseReader):
 
         return []
 
-    def _element_to_dict(self, elem: ET.Element) -> Dict[str, Any]:
+    def _element_to_dict(self, elem: ET.Element) -> dict[str, Any]:
         """
         Convert an XML element to a dictionary
 
@@ -196,7 +196,7 @@ class XMLReader(BaseReader):
         from sqlstream.core.types import infer_type_from_string
         return infer_type_from_string(value)
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """Read data lazily from parsed XML"""
         for row in self.rows:
             # Apply filters if any
@@ -217,7 +217,7 @@ class XMLReader(BaseReader):
                 complete_row = {col: row.get(col) for col in self.columns}
                 yield complete_row
 
-    def _matches_filters(self, row: Dict[str, Any]) -> bool:
+    def _matches_filters(self, row: dict[str, Any]) -> bool:
         """Check if row matches all filter conditions"""
         for condition in self.filter_conditions:
             col = condition.column
@@ -285,11 +285,11 @@ class XMLReader(BaseReader):
         """XML reader supports column selection"""
         return True
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         """Set filter conditions"""
         self.filter_conditions = conditions
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         """Set required columns"""
         self.required_columns = columns
 
@@ -299,8 +299,8 @@ class XMLReader(BaseReader):
         """
         try:
             import pandas as pd
-        except ImportError:
-            raise ImportError("Pandas is required for to_dataframe()")
+        except ImportError as e:
+            raise ImportError("Pandas is required for to_dataframe()") from e
 
         # Ensure all rows have all columns
         complete_rows = [

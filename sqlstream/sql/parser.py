@@ -418,8 +418,8 @@ class SQLParser:
             if limit < 0:
                 raise ParseError(f"LIMIT must be non-negative, got {limit}")
             return limit
-        except ValueError:
-            raise ParseError(f"LIMIT must be an integer, got '{limit_str}'")
+        except ValueError as e:
+            raise ParseError(f"LIMIT must be an integer, got '{limit_str}'") from e
 
     def _parse_join(self) -> JoinClause:
         """
