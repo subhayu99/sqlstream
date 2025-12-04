@@ -17,6 +17,7 @@ from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Button, DataTable, DirectoryTree, Footer, Header, Input, Label, Static, TextArea, Tree, OptionList, TabbedContent, TabPane, ContentSwitcher, Select, Switch
+from textual.widgets.text_area import Selection
 from textual.geometry import Offset
 from textual.events import Key
 from textual.theme import BUILTIN_THEMES as _BUILTIN_THEMES
@@ -49,10 +50,20 @@ class QueryEditor(TextArea):
         Binding("ctrl+l", "clear_editor", "Clear", priority=True),
         Binding("ctrl+up", "history_prev", "Prev Query", priority=True),
         Binding("ctrl+down", "history_next", "Next Query", priority=True),
-        Binding("ctrl+d", "app.quit", "Exit", priority=True),
+        Binding("ctrl+d", "add_selection_to_next_find", "Select Next", show=False),
         # Word deletion shortcuts
         Binding("ctrl+delete", "delete_word_forward", "Delete Word →", show=False),
         Binding("ctrl+backspace", "delete_word_backward", "Delete Word ←", show=False),
+        # VSCode-like keybindings
+        Binding("ctrl+slash", "toggle_comment", "Comment", show=False),
+        Binding("ctrl+shift+k", "delete_line", "Delete Line", show=False),
+        Binding("ctrl+right_square_bracket", "indent_line", "Indent", show=False),
+        Binding("ctrl+left_square_bracket", "outdent_line", "Outdent", show=False),
+        Binding("ctrl+shift+d", "duplicate_line", "Duplicate", show=False),
+        Binding("ctrl+a", "select_all", "Select All", show=False),
+        # Selection with Shift+Navigation
+        Binding("shift+home", "select_to_line_start", "Select to Line Start", show=False, priority=True),
+        Binding("shift+end", "select_to_line_end", "Select to Line End", show=False, priority=True),
     ]
 
     # SQL Keywords to suggest
@@ -190,6 +201,222 @@ class QueryEditor(TextArea):
     def action_history_next(self) -> None:
         """Show next query from history."""
         self.app.action_history_next()
+
+    def action_toggle_comment(self) -> None:
+        """Toggle SQL comment on current line(s) or selection."""
+        # Check if there's a selection
+        if self.selection.end != self.selection.start:
+            # Get selection range
+            start_row = min(self.selection.start[0], self.selection.end[0])
+            end_row = max(self.selection.start[0], self.selection.end[0])
+
+            # Toggle comment for each line in selection
+            for row in range(start_row, end_row + 1):
+                line = self.document.get_line(row)
+                stripped = line.lstrip()
+
+                if stripped.startswith("--"):
+                    # Uncomment
+                    new_line = line.replace("-- ", "", 1)
+                    if new_line == line:
+                        new_line = line.replace("--", "", 1)
+                else:
+                    # Comment
+                    indent = len(line) - len(stripped)
+                    new_line = line[:indent] + "-- " + stripped
+
+                self.delete((row, 0), (row, len(line)))
+                self.insert(new_line, (row, 0))
+        else:
+            # No selection, toggle current line only
+            cursor_row, cursor_col = self.cursor_location
+            line = self.document.get_line(cursor_row)
+
+            stripped = line.lstrip()
+            if stripped.startswith("--"):
+                # Uncomment
+                new_line = line.replace("-- ", "", 1)
+                if new_line == line:
+                    new_line = line.replace("--", "", 1)
+                self.delete((cursor_row, 0), (cursor_row, len(line)))
+                self.insert(new_line, (cursor_row, 0))
+            else:
+                # Comment
+                indent = len(line) - len(stripped)
+                new_line = line[:indent] + "-- " + stripped
+                self.delete((cursor_row, 0), (cursor_row, len(line)))
+                self.insert(new_line, (cursor_row, 0))
+
+    def action_delete_line(self) -> None:
+        """Delete the current line."""
+        cursor_row, _ = self.cursor_location
+        line = self.document.get_line(cursor_row)
+        # Delete the line content
+        self.delete((cursor_row, 0), (cursor_row, len(line)))
+        # Also delete the newline if not last line
+        if cursor_row < self.document.line_count - 1:
+            self.delete((cursor_row, 0), (cursor_row + 1, 0))
+
+    def action_indent_line(self) -> None:
+        """Indent current line(s) or selection."""
+        if self.selection.end != self.selection.start:
+            # Get selection range
+            start_row = min(self.selection.start[0], self.selection.end[0])
+            end_row = max(self.selection.start[0], self.selection.end[0])
+
+            # Indent each line in selection
+            for row in range(start_row, end_row + 1):
+                line = self.document.get_line(row)
+                new_line = "    " + line  # 4 spaces
+                self.delete((row, 0), (row, len(line)))
+                self.insert(new_line, (row, 0))
+        else:
+            # Single line indent
+            cursor_row, cursor_col = self.cursor_location
+            line = self.document.get_line(cursor_row)
+            new_line = "    " + line  # 4 spaces
+            self.delete((cursor_row, 0), (cursor_row, len(line)))
+            self.insert(new_line, (cursor_row, 0))
+            # Move cursor accordingly
+            self.cursor_location = (cursor_row, cursor_col + 4)
+
+    def action_outdent_line(self) -> None:
+        """Outdent current line(s) or selection."""
+        if self.selection.end != self.selection.start:
+            # Get selection range
+            start_row = min(self.selection.start[0], self.selection.end[0])
+            end_row = max(self.selection.start[0], self.selection.end[0])
+
+            # Outdent each line in selection
+            for row in range(start_row, end_row + 1):
+                line = self.document.get_line(row)
+
+                # Remove up to 4 leading spaces
+                spaces_to_remove = 0
+                for char in line[:4]:
+                    if char == ' ':
+                        spaces_to_remove += 1
+                    else:
+                        break
+
+                if spaces_to_remove > 0:
+                    new_line = line[spaces_to_remove:]
+                    self.delete((row, 0), (row, len(line)))
+                    self.insert(new_line, (row, 0))
+        else:
+            # Single line outdent
+            cursor_row, cursor_col = self.cursor_location
+            line = self.document.get_line(cursor_row)
+
+            # Remove up to 4 leading spaces
+            spaces_to_remove = 0
+            for char in line[:4]:
+                if char == ' ':
+                    spaces_to_remove += 1
+                else:
+                    break
+
+            if spaces_to_remove > 0:
+                new_line = line[spaces_to_remove:]
+                self.delete((cursor_row, 0), (cursor_row, len(line)))
+                self.insert(new_line, (cursor_row, 0))
+                # Move cursor accordingly
+                new_col = max(0, cursor_col - spaces_to_remove)
+                self.cursor_location = (cursor_row, new_col)
+
+    def action_duplicate_line(self) -> None:
+        """Duplicate the current line."""
+        cursor_row, cursor_col = self.cursor_location
+        line = self.document.get_line(cursor_row)
+        # Insert a newline and the duplicated line
+        self.insert("\n" + line, (cursor_row, len(line)))
+        # Move cursor to the duplicated line
+        self.cursor_location = (cursor_row + 1, cursor_col)
+
+    def action_select_all(self) -> None:
+        """Select all text in the editor."""
+        self.select_all()
+
+    def action_add_selection_to_next_find(self) -> None:
+        """Add selection to next occurrence (VSCode Ctrl+D behavior)."""
+        # Get current selection or word under cursor
+        if self.selection.end != self.selection.start:
+            # Use existing selection
+            selected_text = self.get_text_range(self.selection.start, self.selection.end)
+        else:
+            # Select word under cursor
+            row, col = self.cursor_location
+            line = self.document.get_line(row)
+
+            # Find word boundaries
+            start = col
+            while start > 0 and (line[start-1].isalnum() or line[start-1] == '_'):
+                start -= 1
+
+            end = col
+            while end < len(line) and (line[end].isalnum() or line[end] == '_'):
+                end += 1
+
+            if start < end:
+                selected_text = line[start:end]
+                self.selection = Selection((row, start), (row, end))
+            else:
+                return  # No word to select
+
+        # Find next occurrence after current selection end
+        current_end_row, current_end_col = self.selection.end
+
+        # Search line by line starting from current position
+        found = False
+        search_row = current_end_row
+        search_col = current_end_col
+
+        while search_row < self.document.line_count:
+            line = self.document.get_line(search_row)
+            # For first line, search from current column
+            start_col = search_col if search_row == current_end_row else 0
+            search_line = line[start_col:]
+
+            pos = search_line.find(selected_text)
+            if pos != -1:
+                # Found it! Set selection directly
+                actual_col = start_col + pos
+                self.selection = Selection(
+                    (search_row, actual_col),
+                    (search_row, actual_col + len(selected_text))
+                )
+                found = True
+                break
+
+            search_row += 1
+
+        if not found:
+            # Wrap around to beginning
+            for row in range(0, current_end_row + 1):
+                line = self.document.get_line(row)
+                # Don't search past current position on the current line
+                search_line = line if row < current_end_row else line[:current_end_col]
+                pos = search_line.find(selected_text)
+                if pos != -1:
+                    # Set selection directly
+                    self.selection = Selection(
+                        (row, pos),
+                        (row, pos + len(selected_text))
+                    )
+                    break
+
+    def action_select_to_line_start(self) -> None:
+        """Select from cursor to start of line (Shift+Home)."""
+        row, col = self.cursor_location
+        # Select from line start to cursor
+        self.selection = Selection((row, 0), (row, col))
+
+    def action_select_to_line_end(self) -> None:
+        """Select from cursor to end of line (Shift+End)."""
+        row, col = self.cursor_location
+        line = self.document.get_line(row)
+        # Select from cursor to line end
+        self.selection = Selection((row, col), (row, len(line)))
 
     def action_delete_word_backward(self) -> None:
         """Delete word to the left of cursor (Ctrl+Backspace)."""
@@ -471,6 +698,68 @@ class ExplainDialog(ModalScreen):
             yield Label("Query Execution Plan", id="explain-title")
             with VerticalScroll(id="explain-content"):
                 yield Static(self.plan, id="explain-text")
+            yield Button("Close", variant="primary", id="close-btn")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.dismiss()
+
+
+class HelpDialog(ModalScreen):
+    """Modal dialog for showing keyboard shortcuts and help."""
+
+    def compose(self) -> ComposeResult:
+        help_text = """[bold cyan]SQLStream Interactive Shell - Keyboard Shortcuts[/bold cyan]
+
+[yellow]Query Editing:[white]
+[bold]  Ctrl+Enter / Ctrl+E    [not bold]Execute current query
+[bold]  Ctrl+L                 [not bold]Clear editor
+[bold]  Ctrl+Up / Ctrl+Down    [not bold]Navigate query history
+[bold]  Ctrl+A                 [not bold]Select all text
+[bold]  Ctrl+/                 [not bold]Toggle comment (line or selection)
+
+[yellow]Multi-Cursor & Selection:[white]
+[bold]  Ctrl+D                 [not bold]Select next occurrence
+[bold]  Shift+Home             [not bold]Select to line start
+[bold]  Shift+End              [not bold]Select to line end
+
+[yellow]Code Formatting:[white]
+[bold]  Ctrl+]                 [not bold]Indent line(s)
+[bold]  Ctrl+[                 [not bold]Outdent line(s)
+[bold]  Ctrl+Shift+D           [not bold]Duplicate line
+[bold]  Ctrl+Shift+K           [not bold]Delete line
+
+[yellow]Word Operations:[white]
+[bold]  Ctrl+Backspace         [not bold]Delete word backward
+[bold]  Ctrl+Delete            [not bold]Delete word forward
+
+[yellow]View & Layout:[white]
+[bold]  F6                     [not bold]Cycle layout (Split/Editor/Results)
+[bold]  Alt+Up / Alt+Down      [not bold]Resize editor height
+[bold]  F2                     [not bold]Toggle sidebar (Schema/Files/Config)
+[bold]  Ctrl+F                 [not bold]Toggle filter sidebar
+[bold]  Ctrl+X                 [not bold]Toggle export sidebar
+
+[yellow]Data Operations:[white]
+[bold]  Ctrl+B / F5            [not bold]Cycle backend (Auto/DuckDB/Pandas/Python)
+[bold]  [ / ]                  [not bold]Previous/Next page
+[bold]  F4                     [not bold]Show query execution plan
+
+[yellow]File Operations:[white]
+[bold]  Ctrl+O                 [not bold]Open file browser
+[bold]  Ctrl+T                 [not bold]New query tab
+[bold]  Ctrl+W                 [not bold]Close current tab
+
+[yellow]Application:[white]
+[bold]  Ctrl+S                 [not bold]Save state
+[bold]  Ctrl+Q                 [not bold]Quit
+[bold]  F1                     [not bold]Show this help
+
+[dim]Tip: Click column headers to sort results[/dim]"""
+
+        with Container(id="explain-dialog"):  # Reuse explain dialog styles
+            yield Label("Keyboard Shortcuts & Help", id="explain-title")
+            with VerticalScroll(id="explain-content"):
+                yield Static(help_text, id="explain-text")
             yield Button("Close", variant="primary", id="close-btn")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -1217,7 +1506,6 @@ class SQLShellApp(App):
         Binding("ctrl+f", "toggle_tools('filter')", "Filter", priority=True),
         Binding("ctrl+x", "toggle_tools('export')", "Export", priority=True),
         Binding("ctrl+q", "quit", "Exit", priority=True),
-        Binding("ctrl+d", "quit", "Exit", priority=True),
         Binding("ctrl+s", "save_state", "Save State"),
         Binding("ctrl+t", "new_tab", "New Tab", priority=True),
         Binding("ctrl+w", "close_tab", "Close Tab", priority=True),
@@ -1497,6 +1785,37 @@ class SQLShellApp(App):
         # Execute query
         self._execute_query(query_text)
 
+    def _strip_sql_comments(self, sql: str) -> str:
+        """Strip SQL comments (lines starting with --) from the query."""
+        lines = sql.split('\n')
+        cleaned_lines = []
+        for line in lines:
+            # Find the position of '--' (not inside strings)
+            comment_pos = -1
+            in_string = False
+            string_char = None
+
+            for i, char in enumerate(line):
+                if char in ('"', "'") and (i == 0 or line[i-1] != '\\'):
+                    if not in_string:
+                        in_string = True
+                        string_char = char
+                    elif char == string_char:
+                        in_string = False
+                        string_char = None
+                elif char == '-' and i + 1 < len(line) and line[i + 1] == '-' and not in_string:
+                    comment_pos = i
+                    break
+
+            if comment_pos >= 0:
+                # Remove comment part
+                line = line[:comment_pos].rstrip()
+
+            if line.strip():  # Only keep non-empty lines
+                cleaned_lines.append(line)
+
+        return '\n'.join(cleaned_lines)
+
     def _execute_query(self, query_text: str) -> None:
         """Execute a SQL query and display results."""
         status_bar = self.query_one(StatusBar)
@@ -1509,9 +1828,12 @@ class SQLShellApp(App):
             # Show loading status
             status_bar.update_status("Executing query...")
 
+            # Strip SQL comments before execution
+            cleaned_query = self._strip_sql_comments(query_text)
+
             # Execute query
             start_time = datetime.now()
-            result = self.query_engine.sql(query_text, backend=self.backend)
+            result = self.query_engine.sql(cleaned_query, backend=self.backend)
 
             # Safe source discovery
             try:
@@ -1615,6 +1937,41 @@ class SQLShellApp(App):
         except Exception:
             return results
 
+    def _infer_column_types(self, results: List[Dict[str, Any]], columns: List[str]) -> Dict[str, str]:
+        """Infer column datatypes from result values."""
+        from sqlstream.core.types import infer_type
+
+        # Datatype icons for compact display
+        TYPE_ICONS = {
+            "INTEGER": "#",
+            "FLOAT": "~",
+            "DECIMAL": "$",
+            "STRING": '"',
+            "JSON": "{}",
+            "BOOLEAN": "?",
+            "DATE": "📅",
+            "TIME": "⏰",
+            "DATETIME": "📆",
+            "NULL": "∅"
+        }
+
+        column_types = {}
+
+        for col in columns:
+            # Collect non-null values for type inference
+            values = [row.get(col) for row in results[:100] if row.get(col) is not None]
+
+            if not values:
+                column_types[col] = TYPE_ICONS.get("NULL", "∅")
+                continue
+
+            # Infer type from first non-null value
+            first_val = values[0]
+            dtype = infer_type(first_val)
+            column_types[col] = TYPE_ICONS.get(dtype.name, dtype.name)
+
+        return column_types
+
     def _format_value(self, value: Any) -> str:
         """Format a value for display, handling scientific notation."""
         if value is None:
@@ -1664,9 +2021,15 @@ class SQLShellApp(App):
 
         columns = list(self.filtered_results[0].keys())
 
-        # Add columns
+        # Infer column datatypes from the results
+        column_types = self._infer_column_types(self.filtered_results, columns)
+
+        # Add columns with datatype icons
         for col in columns:
-            results_viewer.add_column(col, key=col)
+            icon = column_types.get(col, '"')
+            # Format: "column_name icon"
+            col_label = f"{col} {icon}"
+            results_viewer.add_column(col_label, key=col)
 
         # Add rows (current page only)
         for row in page_results:
@@ -1817,7 +2180,7 @@ class SQLShellApp(App):
 
     def action_show_help(self) -> None:
         """Show help dialog."""
-        self._show_status("F6=Layout | Alt+Up/Down=Resize | Ctrl+Enter=Run | F2=Schema")
+        self.push_screen(HelpDialog())
 
     def action_toggle_sidebar(self) -> None:
         """Toggle sidebar panel."""

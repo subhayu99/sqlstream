@@ -3,7 +3,7 @@
   <!-- <h1>SQLStream</h1> -->
   
   <p>
-    <strong>A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations.</strong>
+    <strong>A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, Markdown, and XML files with lazy evaluation and intelligent optimizations.</strong>
   </p>
 
   <p>
@@ -51,6 +51,9 @@ $ sqlstream query "report.html#html:0" "SELECT * FROM report WHERE revenue > 100
 # Query Markdown tables
 $ sqlstream query "README.md#markdown:1" "SELECT column1, column2 FROM readme"
 
+# Query XML files
+$ sqlstream query "data.xml#xml:record" "SELECT name, age FROM data WHERE age > 25"
+
 # Query S3 files with partitions
 $ sqlstream query "SELECT * FROM 's3://my-bucket/data/year=2024/' WHERE date > '2024-01-01'"
 
@@ -67,7 +70,7 @@ $ sqlstream shell
 ## Features
 
 - 🚀 **Pure Python** - No database installation required
-- 📊 **Multiple Formats** - CSV, Parquet, JSON, JSONL, HTML, Markdown with nested path syntax, HTTP URLs, S3 buckets
+- 📊 **Multiple Formats** - CSV, Parquet, JSON, JSONL, HTML, Markdown, XML with nested path syntax, HTTP URLs, S3 buckets
 - ⚡ **100x+ Faster** - DuckDB backend for complex SQL, Pandas backend for simple queries
 - 🔗 **JOIN Support** - INNER, LEFT, RIGHT, FULL OUTER joins across different file formats
 - 📈 **Aggregations** - GROUP BY with COUNT, SUM, AVG, MIN, MAX, DISTINCT

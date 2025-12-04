@@ -85,6 +85,39 @@ results = query("README.md#markdown:1").sql("SELECT * FROM readme")
 results = query("docs/tables.md#markdown:0").sql("SELECT * FROM tables")
 ```
 
+## XML Files
+
+Extract and query structured data from XML files.
+
+```python
+# Query repeating elements (auto-detected)
+results = query("data.xml").sql("SELECT * FROM data")
+
+# Specify element path explicitly
+results = query("data.xml#xml:record").sql("SELECT * FROM data WHERE age > 25")
+
+# Works with nested elements (uses dot notation for nested paths)
+results = query("data.xml#xml:person").sql("SELECT name, address.city FROM data")
+
+# Attributes are prefixed with @ in column names
+results = query("data.xml#xml:item").sql("SELECT @id, @status, name FROM data")
+```
+
+Example XML:
+```xml
+<?xml version="1.0"?>
+<data>
+    <record id="1">
+        <name>Alice</name>
+        <age>30</age>
+    </record>
+    <record id="2">
+        <name>Bob</name>
+        <age>25</age>
+    </record>
+</data>
+```
+
 ## HTTP URLs
 
 ```bash

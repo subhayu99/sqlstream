@@ -59,10 +59,10 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Uni
         format_spec = format_part.strip() if format_part.strip() else None
 
         # Validate format if specified
-        if format_spec and format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json', 'jsonl'):
+        if format_spec and format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json', 'jsonl', 'xml'):
             raise FragmentParseError(
                 f"Unknown format '{format_spec}'. "
-                f"Supported formats: csv, parquet, html, markdown, json, jsonl"
+                f"Supported formats: csv, parquet, html, markdown, json, jsonl, xml"
             )
 
         # Parse table index (supports negative)
@@ -81,10 +81,10 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Uni
         format_spec = fragment.strip()
 
         # Validate format
-        if format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json', 'jsonl'):
+        if format_spec not in ('csv', 'parquet', 'html', 'markdown', 'json', 'jsonl', 'xml'):
             raise FragmentParseError(
                 f"Unknown format '{format_spec}'. "
-                f"Supported formats: csv, parquet, html, markdown, json, jsonl"
+                f"Supported formats: csv, parquet, html, markdown, json, jsonl, xml"
             )
 
         return (source_path, format_spec, None)

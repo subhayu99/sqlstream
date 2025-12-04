@@ -1,6 +1,6 @@
-# SQLStream
+# <div align="center"><img src="assets/logo_cropped_transparent.png" alt="SQLStream" width="280"/></div>
 
-**A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, and Markdown files with lazy evaluation and intelligent optimizations.**
+**A lightweight, pure-Python SQL query engine for CSV, Parquet, JSON, JSONL, HTML, Markdown, and XML files with lazy evaluation and intelligent optimizations.**
 
 ---
 
@@ -18,6 +18,9 @@ $ sqlstream query "report.html#html:0" "SELECT * FROM report WHERE revenue > 100
 
 # Query Markdown tables
 $ sqlstream query "README.md#markdown:1" "SELECT column1, column2 FROM readme"
+
+# Query XML files
+$ sqlstream query "data.xml#xml:record" "SELECT name, age FROM data WHERE age > 25"
 
 # Join multiple files (any format combination)
 $ sqlstream query "SELECT c.name, o.total FROM 'customers.csv' c JOIN 'orders.parquet' o ON c.id = o.customer_id"
@@ -45,7 +48,7 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
 
     ---
 
-    Support for CSV, Parquet, JSON, JSONL, HTML, Markdown files, HTTP URLs, and S3 buckets.
+    Support for CSV, Parquet, JSON, JSONL, HTML, Markdown, XML files, HTTP URLs, and S3 buckets.
 
 -   :material-lightning-bolt:{ .lg .middle } __10-100x Faster__
 

@@ -175,6 +175,12 @@ class Query:
             table = table_hint if table_hint is not None else 0
             return MarkdownReader(source_path, table=table)
 
+        elif format_hint == 'xml' or (not format_hint and suffix == '.xml'):
+            from sqlstream.readers.xml_reader import XMLReader
+            # For XML, table_hint is used as element name/path
+            element = str(table_hint) if table_hint is not None else None
+            return XMLReader(source_path, element=element)
+
         elif format_hint == 'parquet' or (not format_hint and suffix == ".parquet"):
             from sqlstream.readers.parquet_reader import ParquetReader
             return ParquetReader(source_path)
@@ -199,7 +205,7 @@ class Query:
             except Exception as e:
                 raise ValueError(
                     f"Unsupported file format: {suffix}. "
-                    f"Supported formats: .csv, .parquet, .html, .md"
+                    f"Supported formats: .csv, .parquet, .json, .jsonl, .html, .md, .xml"
                 ) from e
 
     def sql(
