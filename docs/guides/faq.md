@@ -121,7 +121,7 @@ df
 - Use iteration for large results to avoid memory issues
 - Consider DuckDB for faster notebook performance
 
-See [Jupyter Integration Guide](integrations/jupyter.md) (coming soon) for more details.
+See [Jupyter Integration Guide](../python-module/basic-usage.md) (coming soon) for more details.
 
 ---
 
@@ -237,7 +237,7 @@ pip show sqlstream
 sqlstream --version
 ```
 
-**Breaking changes?** Check [Changelog](changelog.md) (coming soon).
+**Breaking changes?** Check [Changelog](../index.md#project-status) (coming soon).
 
 ---
 
@@ -317,7 +317,7 @@ results = query().sql("""
 
 **Recommendation**: Use `--backend duckdb` for complex SQL features.
 
-See [DuckDB Backend Guide](features/duckdb-backend.md) for full details.
+See [DuckDB Backend Guide](../features/duckdb-backend.md) for full details.
 
 ---
 
@@ -530,7 +530,7 @@ pip install "sqlstream[all]"
 
 4. **Check region**: Some buckets require specific region
 
-See [S3 Support](features/s3-support.md) for details.
+See [S3 Support](../features/s3-support.md) for details.
 
 ---
 
@@ -569,8 +569,8 @@ See [Contributing Guide](contributing.md) for details.
 - Bug fixes with reproduction steps
 
 **Learning path**:
-1. Read [Architecture Guide](architecture/design.md)
-2. Read [Volcano Model](architecture/volcano-model.md)
+1. Read [Architecture Guide](../reference/architecture/design.md)
+2. Read [Volcano Model](../reference/architecture/volcano-model.md)
 3. Browse code in `sqlstream/` directory
 4. Run tests to understand behavior
 5. Pick a small issue to work on
@@ -579,7 +579,7 @@ See [Contributing Guide](contributing.md) for details.
 
 ## Next Steps
 
-- 📖 [Quick Start Guide](getting-started/quickstart.md)
+- 📖 [Quick Start Guide](../getting-started/quickstart.md)
 - 🔧 [Troubleshooting](troubleshooting.md)
-- 📚 [Full Documentation](index.md)
+- 📚 [Full Documentation](../index.md)
 - 💬 [GitHub Discussions](https://github.com/subhayu99/sqlstream/discussions)

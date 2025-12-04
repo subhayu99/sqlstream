@@ -18,7 +18,7 @@ SELECT * FROM "https://example.com/data.html";
 
 ### Multiple Tables
 
-If an HTML file contains multiple tables, you can select which one to query using the [URL Fragment Syntax](url-fragments.md):
+If an HTML file contains multiple tables, you can select which one to query using the [URL Fragment Syntax](../reference/url-fragments.md):
 
 ```sql
 -- Select the second table (index 1)

@@ -7,7 +7,7 @@ This is the main entry point for query optimization.
 
 from typing import List
 
-from sqlstream.optimizers.base import OptimizerPipeline
+from sqlstream.optimizers.base import OptimizerPipeline, Optimizer
 from sqlstream.optimizers.column_pruning import ColumnPruningOptimizer
 from sqlstream.optimizers.join_reordering import JoinReorderingOptimizer
 from sqlstream.optimizers.limit_pushdown import LimitPushdownOptimizer
@@ -106,7 +106,7 @@ class QueryPlanner:
         """
         return self.pipeline.optimizers
 
-    def add_optimizer(self, optimizer) -> None:
+    def add_optimizer(self, optimizer: Optimizer) -> None:
         """
         Add a custom optimizer to the pipeline
 

@@ -196,6 +196,6 @@ Configure AWS credentials using one of the methods described in the Authenticati
 
 ## Next Steps
 
-- [Interactive Shell](../cli/interactive-mode.md) - Query S3 interactively
+- [Interactive Shell](../interactive-shell/interface-guide.md) - Query S3 interactively
 - [Data Sources](data-sources.md) - Learn about other supported formats
 - [Performance](../getting-started/core-concepts.md) - Optimize your queries

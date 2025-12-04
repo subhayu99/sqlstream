@@ -206,5 +206,5 @@ results = query().sql("""
 
 - [DuckDB Backend Guide](../features/duckdb-backend.md) - Complete backend documentation
 - [SQL Support](../features/sql-support.md) - Supported SQL syntax
-- [Python API](../api/overview.md) - Programmatic usage
+- [Python API](../python-module/basic-usage.md) - Programmatic usage
 - [Performance Tips](../features/pandas-backend.md) - Backend comparison

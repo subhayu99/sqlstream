@@ -46,7 +46,7 @@ sqlstream shell [FILE]
 - Schema browser (`F2`)
 - Query history with multiline support
 
-See [Interactive Mode](interactive-mode.md) for full documentation.
+See [Interactive Mode](../interactive-shell/interface-guide.md) for full documentation.
 
 ## Global Options
 
@@ -69,5 +69,5 @@ sqlstream shell employees.csv
 ## Next Steps
 
 - [Query Command Reference](query-command.md) - Detailed query command options
-- [Interactive Shell Guide](interactive-mode.md) - Full interactive shell documentation
+- [Interactive Shell Guide](../interactive-shell/interface-guide.md) - Full interactive shell documentation
 - [Output Formats](output-formats.md) - Available output formats

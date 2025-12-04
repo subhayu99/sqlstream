@@ -144,7 +144,7 @@ pip install sqlstream
 
 **Solution:**
 - Use supported SQL features: SELECT, FROM, WHERE, JOIN, GROUP BY, ORDER BY, LIMIT
-- Check [SQL Support docs](features/sql-support.md) for full list
+- Check [SQL Support docs](../features/sql-support.md) for full list
 
 **Supported:**
 ```sql
@@ -968,7 +968,7 @@ result = query("data.csv").sql("SELECT * FROM source", backend="python")
 If your problem isn't covered here:
 
 1. **Check the FAQ:** [docs/faq.md](faq.md)
-2. **Check Limitations:** [docs/limitations.md](limitations.md)
+2. **Check Limitations:** [docs/../reference/limitations.md](../reference/limitations.md)
 3. **Enable verbose logging:**
    ```python
    import logging

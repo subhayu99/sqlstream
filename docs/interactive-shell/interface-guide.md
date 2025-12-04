@@ -484,7 +484,7 @@ ORDER BY name
 
 ## Next Steps
 
-- [Query Command](query-command.md) - Learn about non-interactive queries
-- [Output Formats](output-formats.md) - Formatting options
+- [Query Command](../cli-tool/query-command.md) - Learn about non-interactive queries
+- [Output Formats](../cli-tool/output-formats.md) - Formatting options
 - [S3 Support](../features/s3-support.md) - Query cloud data
 - [SQL Support](../features/sql-support.md) - Supported SQL syntax

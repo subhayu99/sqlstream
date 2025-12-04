@@ -405,4 +405,4 @@ schema = CSVReader("file.csv").get_schema(sample_size=1000)
 
 - [SQL Support](sql-support.md) - See what SQL features use the type system
 - [Data Sources](data-sources.md) - Learn about different file formats
-- [Python API](../api/overview.md) - Use the type system programmatically
+- [Python API](../python-module/basic-usage.md) - Use the type system programmatically

@@ -396,5 +396,5 @@ for row in rows:  # All rows in memory!
 
 - [SQL Support](../features/sql-support.md) - Learn supported SQL syntax
 - [Pandas Backend](../features/pandas-backend.md) - Deep dive into performance
-- [Architecture](../architecture/design.md) - Understand the internals
-- [Optimizations](../architecture/optimizations.md) - How optimizations work
+- [Architecture](../reference/architecture/design.md) - Understand the internals
+- [Optimizations](../reference/architecture/optimizations.md) - How optimizations work

@@ -21,7 +21,7 @@ SELECT * FROM "https://raw.githubusercontent.com/datasets/population/master/data
 
 ### Handling Extension-less URLs
 
-For URLs that don't end in a standard file extension (like Pastebin or API endpoints), use the [URL Fragment Syntax](url-fragments.md) to specify the format:
+For URLs that don't end in a standard file extension (like Pastebin or API endpoints), use the [URL Fragment Syntax](../reference/url-fragments.md) to specify the format:
 
 ```sql
 -- Read CSV data from Pastebin

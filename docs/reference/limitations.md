@@ -588,7 +588,7 @@ Found a bug or limitation not listed here?
 
 ## Roadmap
 
-See [Project Status](index.md#project-status) for upcoming features.
+See [Project Status](../index.md#project-status) for upcoming features.
 
 **Planned improvements**:
 - Phase 10: Better error messages
@@ -599,7 +599,7 @@ See [Project Status](index.md#project-status) for upcoming features.
 
 ## See Also
 
-- [FAQ](faq.md) - Common questions
-- [Troubleshooting](troubleshooting.md) - Error solutions
-- [SQL Support](features/sql-support.md) - Supported SQL syntax
-- [Performance Guide](performance.md) - Optimization tips (coming soon)
+- [FAQ](../guides/faq.md) - Common questions
+- [Troubleshooting](../guides/troubleshooting.md) - Error solutions
+- [SQL Support](../features/sql-support.md) - Supported SQL syntax
+- [Performance Guide](../guides/performance.md) - Optimization tips (coming soon)

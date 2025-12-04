@@ -181,7 +181,7 @@ class APIDocGenerator:
         # Replace the Python API section with updated navigation
         # We'll look for the pattern and replace what's between API Reference and Guides
 
-        pattern = r'(  - Python API:\s+- Overview: api/overview.md)(.*?)(      - Guides:)'
+        pattern = r'(  - Advanced Patterns: python-module/advanced-patterns.md)(.*?)(  - CLI Tool:)'
 
         replacement_section = f'''\\1
 {api_ref_section}

@@ -175,6 +175,9 @@ class BaseReader:
         Returns:
             pandas.DataFrame containing all data
 
+        Raises:
+            ImportError: If pandas is not installed
+
         Note:
             Default implementation iterates over read_lazy() and creates DataFrame.
             Subclasses should override this for better performance (e.g. using read_csv/read_parquet).

@@ -34,6 +34,43 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
 
 ---
 
+## Choose Your Path
+
+SQLStream can be used in **three ways**. Pick the one that fits your needs:
+
+<div class="grid cards" markdown>
+
+-   :material-language-python:{ .lg .middle } [**Python Module**](python-module/quickstart.md)
+
+    ---
+
+    Write Python code to query files programmatically.
+
+    **Best for**: Data analysis, ETL pipelines, notebooks, automation scripts
+
+-   :material-console-line:{ .lg .middle } [**CLI Tool**](cli-tool/quickstart.md)
+
+    ---
+
+    Run SQL queries from the command line or shell scripts.
+
+    **Best for**: Shell scripts, one-liners, CI/CD pipelines, cron jobs
+
+-   :material-application:{ .lg .middle } [**Interactive Shell**](interactive-shell/quickstart.md)
+
+    ---
+
+    Full-featured TUI for exploring and querying data interactively.
+
+    **Best for**: Ad-hoc analysis, data exploration, generating reports
+
+</div>
+
+!!! question "Not sure which to use?"
+    See our **[decision guide](guides/which-mode.md)** to help you choose.
+
+---
+
 ## Key Features
 
 <div class="grid cards" markdown>
@@ -54,7 +91,7 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
 
     ---
 
-    Optional pandas backend for massive performance boost.
+    Optional duckdb and pandas backends for massive performance boost.
 
 -   :material-link-variant:{ .lg .middle } __JOIN Support__
 
@@ -93,6 +130,8 @@ $ sqlstream query "SELECT * FROM 's3://my-bucket/data.parquet' WHERE date > '202
     Column pruning, predicate pushdown, lazy evaluation.
 
 </div>
+
+!!! tip "Check all features [here](features/sql-support.md)"
 
 ---
 
@@ -215,11 +254,23 @@ SQLStream offers three execution backends:
 
 <div class="grid cards" markdown>
 
--   :material-clock-fast:{ .lg .middle } [__Quick Start Guide__](getting-started/quickstart.md)
+-   :material-language-python:{ .lg .middle } [__Python Module Guide__](python-module/basic-usage.md)
 
     ---
 
-    Get up and running in 5 minutes with hands-on examples.
+    Deep dive into the programmatic Python API.
+
+-   :material-console-line:{ .lg .middle } [__CLI Tool Guide__](cli-tool/query-command.md)
+
+    ---
+
+    Complete reference for command-line usage and scripting.
+
+-   :material-application:{ .lg .middle } [__Interactive Shell Guide__](interactive-shell/interface-guide.md)
+
+    ---
+
+    Master the full-featured TUI with all its features.
 
 -   :material-code-braces:{ .lg .middle } [__SQL Reference__](features/sql-support.md)
 
@@ -227,17 +278,17 @@ SQLStream offers three execution backends:
 
     Learn about supported SQL syntax and features.
 
--   :material-console:{ .lg .middle } [__CLI Reference__](cli/overview.md)
+-   :material-file-multiple:{ .lg .middle } [__File Formats__](features/data-sources.md)
 
     ---
 
-    Complete guide to the command-line interface.
+    CSV, Parquet, JSON, HTML, Markdown, XML, S3, HTTP support.
 
--   :material-api:{ .lg .middle } [__Python API__](api/overview.md)
+-   :material-rocket-launch:{ .lg .middle } [__Performance Guide__](guides/performance.md)
 
     ---
 
-    Deep dive into the programmatic API.
+    Optimize queries with backends and best practices.
 
 </div>
 
@@ -273,4 +324,4 @@ SQLStream is licensed under the [MIT License](https://github.com/subhayu99/sqlst
 
 ## Contributing
 
-Contributions are welcome! See the [Contributing Guide](contributing.md) for details.
+Contributions are welcome! See the [Contributing Guide](guides/contributing.md) for details.

@@ -466,5 +466,5 @@ See [Examples](../examples/duckdb-backend.md) for complete use cases.
 
 - [SQL Support (Python/Pandas)](sql-support.md) - Limited SQL for Python/Pandas backends
 - [Pandas Backend](pandas-backend.md) - Fast execution for supported SQL
-- [FAQ](../faq.md#duckdb-backend) - Common questions about backends
-- [Limitations](../limitations.md) - What's not supported
+- [FAQ](../guides/faq.md) - Common questions about backends
+- [Limitations](../reference/limitations.md) - What's not supported

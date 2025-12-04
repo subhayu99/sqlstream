@@ -297,7 +297,7 @@ results = query().sql("""
 
 ## Next Steps
 
-- [Advanced Python Guides](guides/advanced.md) - In-depth Python API usage
+- [Advanced Python Guides](advanced-patterns.md) - In-depth Python API usage
 - [SQL Support](../features/sql-support.md) - Supported SQL syntax
 - [Backend Comparison](../features/duckdb-backend.md) - Choose the right backend
 - [Examples](../examples/basic-queries.md) - Real-world code examples

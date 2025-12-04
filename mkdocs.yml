@@ -89,10 +89,30 @@ nav:
       - Installation: getting-started/installation.md
       - Quick Start: getting-started/quickstart.md
       - Core Concepts: getting-started/core-concepts.md
+      - Which Mode to Use?: guides/which-mode.md
+  - Python Module:
+      - Quick Start: python-module/quickstart.md
+      - Basic Usage: python-module/basic-usage.md
+      - Example Queries: python-module/examples/simple-queries.md
+      - Advanced Patterns: python-module/advanced-patterns.md
+  - CLI Tool:
+      - Quick Start: cli-tool/quickstart.md
+      - Query Command: cli-tool/query-command.md
+      - Scripting Patterns: cli-tool/scripting-patterns.md
+      - Output Formats: cli-tool/output-formats.md
+      - Overview: cli-tool/overview.md
+      - Example Scripts: cli-tool/examples/bash-scripts.md
+  - Interactive Shell:
+      - Quick Start: interactive-shell/quickstart.md
+      - Interface Guide: interactive-shell/interface-guide.md
+      - Keyboard Shortcuts: interactive-shell/keyboard-shortcuts.md
+      - Workflows: interactive-shell/workflows.md
   - Features:
       - SQL Support: features/sql-support.md
       - Type System & Schema: features/type-system.md
       - Data Sources: features/data-sources.md
+      - XML Files: features/xml.md
+      - HTTP Reader: features/http-reader.md
       - S3 Support: features/s3-support.md
       - JOIN Operations: features/joins.md
       - Aggregations: features/aggregations.md
@@ -100,36 +120,29 @@ nav:
       - DuckDB Backend (Full SQL): features/duckdb-backend.md
       - Inline File Paths: features/inline-paths.md
       - Advanced Data Formats: features/advanced-formats.md
-  - CLI Reference:
-      - Overview: cli/overview.md
-      - Query Command: cli/query-command.md
-      - Interactive Mode: cli/interactive-mode.md
-      - Output Formats: cli/output-formats.md
-  - Python API:
-      - Overview: api/overview.md
-      - Guides:
-          - Advanced Usage: api/guides/advanced.md
   - Examples:
-    - Basic Queries: examples/basic-queries.md
-    - JOIN Operations: examples/joins.md
-    - Aggregations: examples/aggregations.md
-    - DuckDB Backend: examples/duckdb-backend.md
-    - Parquet Files: examples/parquet-files.md
-    - JSON Data: examples/json-data.md
-    - HTML Tables: examples/html-tables.md
-    - Markdown Tables: examples/markdown-tables.md
-    - Advanced / Real World: examples/real-world.md
+      - Basic Queries: examples/basic-queries.md
+      - JOIN Operations: examples/joins.md
+      - Aggregations: examples/aggregations.md
+      - DuckDB Backend: examples/duckdb-backend.md
+      - Parquet Files: examples/parquet-files.md
+      - JSON Data: examples/json-data.md
+      - HTML Tables: examples/html-tables.md
+      - Markdown Tables: examples/markdown-tables.md
+      - Advanced / Real World: examples/real-world.md
+      - XML Data: examples/xml-data.md
   - Reference:
       - URL Fragments: reference/url-fragments.md
-  - Architecture:
-      - Design Overview: architecture/design.md
-      - Volcano Model: architecture/volcano-model.md
-      - Optimizations: architecture/optimizations.md
-  - Performance: performance.md
-  - FAQ: faq.md
-  - Troubleshooting: troubleshooting.md
-  - Limitations: limitations.md
-  - Contributing: contributing.md
+      - Limitations: reference/limitations.md
+      - Architecture:
+          - Design Overview: reference/architecture/design.md
+          - Volcano Model: reference/architecture/volcano-model.md
+          - Optimizations: reference/architecture/optimizations.md
+  - Guides:
+      - Performance: guides/performance.md
+      - Troubleshooting: guides/troubleshooting.md
+      - FAQ: guides/faq.md
+      - Contributing: guides/contributing.md
 
 extra:
   social:

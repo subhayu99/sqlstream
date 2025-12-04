@@ -356,8 +356,8 @@ Now that you're familiar with the basics, explore:
 
 - [Core Concepts](core-concepts.md) - Understand how SQLStream works
 - [SQL Support](../features/sql-support.md) - Learn all supported SQL features
-- [CLI Reference](../cli/query-command.md) - Master the command-line interface
-- [Python API](../api/overview.md) - Deep dive into the programmatic API
+- [CLI Reference](../cli-tool/query-command.md) - Master the command-line interface
+- [Python API](../python-module/basic-usage.md) - Deep dive into the programmatic API
 - [Examples](../examples/basic-queries.md) - More real-world examples
 
 ---

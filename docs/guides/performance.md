@@ -493,10 +493,10 @@ sqlstream query data.csv "SELECT * FROM data" --time
 
 ## Additional Resources
 
-- [Backend Selection Guide](../features/backends.md)
+- [Backend Selection Guide](../features/pandas-backend.md)
 - [File Format Comparison](../features/data-sources.md)
 - [SQL Optimization Tips](../features/sql-support.md)
-- [Troubleshooting Guide](../troubleshooting.md)
+- [Troubleshooting Guide](troubleshooting.md)
 
 ---
 

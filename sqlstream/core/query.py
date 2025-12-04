@@ -20,6 +20,7 @@ from sqlstream.core.executor import Executor
 from sqlstream.core.fragment_parser import parse_source_fragment
 from sqlstream.readers.base import BaseReader
 from sqlstream.readers.csv_reader import CSVReader
+from sqlstream.sql.ast_nodes import SelectStatement
 from sqlstream.sql.parser import parse
 from sqlstream.core.types import Schema
 
@@ -288,7 +289,7 @@ class QueryResult:
 
     def __init__(
         self,
-        ast,
+        ast: SelectStatement,
         reader: BaseReader,
         reader_factory: Callable[[str], BaseReader],
         source: str,
