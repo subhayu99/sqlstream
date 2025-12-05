@@ -4,7 +4,8 @@ OrderBy Operator
 Sorts rows by specified columns with ASC/DESC directions.
 """
 
-from typing import Any, Dict, Iterator, List
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.operators.base import Operator
 from sqlstream.sql.ast_nodes import OrderByColumn
@@ -20,7 +21,7 @@ class OrderByOperator(Operator):
     For large datasets that don't fit in memory, consider external sorting.
     """
 
-    def __init__(self, source: Operator, order_by: List[OrderByColumn]):
+    def __init__(self, source: Operator, order_by: list[OrderByColumn]):
         """
         Initialize OrderBy operator
 
@@ -31,7 +32,7 @@ class OrderByOperator(Operator):
         super().__init__(source)
         self.order_by = order_by
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Execute ORDER BY sorting
 
@@ -47,7 +48,7 @@ class OrderByOperator(Operator):
         # Yield sorted rows
         yield from sorted_rows
 
-    def _sort_key(self, row: Dict[str, Any]) -> tuple:
+    def _sort_key(self, row: dict[str, Any]) -> tuple:
         """
         Generate sort key for a row
 
@@ -82,7 +83,7 @@ class OrderByOperator(Operator):
 
         return tuple(key_parts)
 
-    def explain(self, indent: int = 0) -> List[str]:
+    def explain(self, indent: int = 0) -> list[str]:
         """Generate execution plan explanation"""
         order_spec = ", ".join(f"{col.column} {col.direction}" for col in self.order_by)
         lines = [" " * indent + f"OrderBy({order_spec})"]

@@ -13,8 +13,9 @@ Example:
 
 import os
 import re
+from collections.abc import Callable, Iterator
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Tuple
+from typing import Any, Literal
 
 from sqlstream.core.executor import Executor
 from sqlstream.core.fragment_parser import parse_source_fragment
@@ -110,7 +111,7 @@ class Query:
     Provides a fluent API for building and executing queries.
     """
 
-    def __init__(self, source: Optional[str] = None):
+    def __init__(self, source: str | None = None):
         """
         Initialize query with an optional data source
 
@@ -218,7 +219,7 @@ class Query:
                 ) from e
 
     def sql(
-        self, query: str, backend: Optional[Literal["auto", "pandas", "python", "duckdb"]] = "auto"
+        self, query: str, backend: Literal["auto", "pandas", "python", "duckdb"] | None = "auto"
     ) -> "QueryResult":
         """
         Execute SQL query on the data source
@@ -276,7 +277,7 @@ class Query:
             raw_sql=query,
         )
 
-    def schema(self) -> Optional[Schema]:
+    def schema(self) -> Schema | None:
         """
         Get schema information for the data source
 
@@ -439,7 +440,7 @@ class QueryResult:
             self.use_pandas = False
             self.use_duckdb = False
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Execute query and yield results lazily
 
@@ -470,7 +471,7 @@ class QueryResult:
             yield from self.executor.execute(self.ast, reader, self.reader_factory)
 
     @staticmethod
-    def _get_sanitized_name_and_table_hint(source: str) -> Tuple[str, Optional[int]]:
+    def _get_sanitized_name_and_table_hint(source: str) -> tuple[str, int | None]:
         # Parse fragment if present to get base path
         clean_path, format_hint, table_hint = parse_source_fragment(source)
 
@@ -495,7 +496,7 @@ class QueryResult:
             table_name = sanitized_name
         return table_name
 
-    def _discover_sources(self) -> Dict[str, str]:
+    def _discover_sources(self) -> dict[str, str]:
         """
         Discover all table sources from raw SQL or AST
 
@@ -503,7 +504,7 @@ class QueryResult:
         Handles multiple files in JOINs, subqueries, CTEs, etc.
         Properly handles URL fragments like #html:0
         """
-        sources: Dict[str, str] = {}
+        sources: dict[str, str] = {}
 
         if self.raw_sql:
             # Extract file paths from raw SQL for DuckDB
@@ -536,7 +537,7 @@ class QueryResult:
             # Pattern: FROM /path/to/file.ext or FROM file.ext
             # This is tricky because we need to stop at keywords or whitespace
             unquoted_pattern = r"(?:FROM|JOIN)\s+([/\w.#:-]+?)(?:\s+(?:ON|WHERE|GROUP|ORDER|LIMIT|INNER|LEFT|RIGHT|JOIN|,|\))|$)"
-            unquoted_matches: List[str] = re.findall(unquoted_pattern, self.raw_sql, re.IGNORECASE)
+            unquoted_matches: list[str] = re.findall(unquoted_pattern, self.raw_sql, re.IGNORECASE)
 
             for file_path in unquoted_matches:
                 # Skip if already found as quoted
@@ -584,7 +585,7 @@ class QueryResult:
 
         return sources
 
-    def to_list(self) -> List[Dict[str, Any]]:
+    def to_list(self) -> list[dict[str, Any]]:
         """
         Materialize all results into a list
 
@@ -628,7 +629,7 @@ class QueryResult:
 
 
 # Convenience function for top-level API
-def query(source: Optional[str] = None) -> Query:
+def query(source: str | None = None) -> Query:
     """
     Create a query for a data source
 

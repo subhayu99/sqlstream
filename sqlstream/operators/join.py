@@ -9,7 +9,8 @@ Hash Join Algorithm:
 3. Output joined rows
 """
 
-from typing import Any, Dict, Iterator, List
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.operators.base import Operator
 
@@ -62,7 +63,7 @@ class HashJoinOperator(Operator):
         if self.join_type not in ("INNER", "LEFT", "RIGHT"):
             raise ValueError(f"Unsupported join type: {join_type}")
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Execute hash join
 
@@ -76,7 +77,7 @@ class HashJoinOperator(Operator):
         elif self.join_type == "RIGHT":
             yield from self._right_join()
 
-    def _inner_join(self) -> Iterator[Dict[str, Any]]:
+    def _inner_join(self) -> Iterator[dict[str, Any]]:
         """
         Execute INNER JOIN
 
@@ -99,7 +100,7 @@ class HashJoinOperator(Operator):
                 for right_row in hash_table[join_key]:
                     yield self._merge_rows(left_row, right_row)
 
-    def _left_join(self) -> Iterator[Dict[str, Any]]:
+    def _left_join(self) -> Iterator[dict[str, Any]]:
         """
         Execute LEFT JOIN
 
@@ -122,7 +123,7 @@ class HashJoinOperator(Operator):
                 # No match - output left row with NULL for right columns
                 yield self._merge_rows(left_row, None)
 
-    def _right_join(self) -> Iterator[Dict[str, Any]]:
+    def _right_join(self) -> Iterator[dict[str, Any]]:
         """
         Execute RIGHT JOIN
 
@@ -151,14 +152,14 @@ class HashJoinOperator(Operator):
                 if (join_key, idx) not in matched_right_rows:
                     yield self._merge_rows(None, right_row)
 
-    def _build_hash_table(self) -> Dict[Any, List[Dict[str, Any]]]:
+    def _build_hash_table(self) -> dict[Any, list[dict[str, Any]]]:
         """
         Build hash table from right table
 
         Returns:
             Hash table mapping join key values to lists of matching rows
         """
-        hash_table: Dict[Any, List[Dict[str, Any]]] = {}
+        hash_table: dict[Any, list[dict[str, Any]]] = {}
 
         for row in self.right:
             join_key = row.get(self.right_key)
@@ -179,8 +180,8 @@ class HashJoinOperator(Operator):
         return hash_table
 
     def _merge_rows(
-        self, left_row: Dict[str, Any] | None, right_row: Dict[str, Any] | None
-    ) -> Dict[str, Any]:
+        self, left_row: dict[str, Any] | None, right_row: dict[str, Any] | None
+    ) -> dict[str, Any]:
         """
         Merge left and right rows into a single output row
 
@@ -218,7 +219,7 @@ class HashJoinOperator(Operator):
 
         return result
 
-    def explain(self, indent: int = 0) -> List[str]:
+    def explain(self, indent: int = 0) -> list[str]:
         """Generate execution plan explanation"""
         lines = [" " * indent + f"HashJoin({self.join_type}, {self.left_key} = {self.right_key})"]
         lines.append(" " * (indent + 2) + "Left:")

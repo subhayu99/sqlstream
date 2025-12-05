@@ -12,8 +12,6 @@ Example:
     Result: Much smaller intermediate results
 """
 
-from typing import List, Tuple
-
 from sqlstream.optimizers.base import Optimizer
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import SelectStatement
@@ -104,7 +102,7 @@ class JoinReorderingOptimizer(Optimizer):
         self.applied = True
         self.description = "placeholder (not yet implemented)"
 
-    def _analyze_join_graph(self, ast: SelectStatement) -> List[Tuple[str, str]]:
+    def _analyze_join_graph(self, ast: SelectStatement) -> list[tuple[str, str]]:
         """
         Analyze join graph to understand table relationships
 
@@ -149,8 +147,8 @@ class JoinReorderingOptimizer(Optimizer):
         return 0.0
 
     def _find_optimal_join_order(
-        self, tables: List[str], join_graph: List[Tuple[str, str]]
-    ) -> List[str]:
+        self, tables: list[str], join_graph: list[tuple[str, str]]
+    ) -> list[str]:
         """
         Find optimal order to join tables
 

@@ -6,8 +6,9 @@ Uses Python's built-in csv module for simplicity and zero dependencies.
 
 import csv
 import warnings
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any
 
 from sqlstream.core.types import Schema
 from sqlstream.readers.base import BaseReader
@@ -45,9 +46,9 @@ class CSVReader(BaseReader):
         self.delimiter = delimiter
 
         # For optimization (set by query optimizer)
-        self.filter_conditions: List[Condition] = []
-        self.required_columns: List[str] = []
-        self.limit: Optional[int] = None
+        self.filter_conditions: list[Condition] = []
+        self.required_columns: list[str] = []
+        self.limit: int | None = None
 
         if not self.is_s3 and not self.path.exists():
             raise FileNotFoundError(f"CSV file not found: {path}")
@@ -64,11 +65,11 @@ class CSVReader(BaseReader):
         """CSV reader supports limit pushdown"""
         return True
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         """Set filter conditions for pushdown"""
         self.filter_conditions = conditions
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         """Set required columns for pruning"""
         self.required_columns = columns
 
@@ -91,7 +92,7 @@ class CSVReader(BaseReader):
         else:
             return open(self.path, encoding=self.encoding, newline="")
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """
         Lazy iterator over CSV rows
 
@@ -138,7 +139,7 @@ class CSVReader(BaseReader):
                     )
                     continue
 
-    def _infer_types(self, row: Dict[str, str]) -> Dict[str, Any]:
+    def _infer_types(self, row: dict[str, str]) -> dict[str, Any]:
         """
         Infer types for all values in a row
 
@@ -176,7 +177,7 @@ class CSVReader(BaseReader):
 
         return infer_type_from_string(value)
 
-    def _matches_filter(self, row: Dict[str, Any]) -> bool:
+    def _matches_filter(self, row: dict[str, Any]) -> bool:
         """
         Check if row matches all filter conditions
 
@@ -191,7 +192,7 @@ class CSVReader(BaseReader):
                 return False
         return True
 
-    def _evaluate_condition(self, row: Dict[str, Any], condition: Condition) -> bool:
+    def _evaluate_condition(self, row: dict[str, Any], condition: Condition) -> bool:
         """
         Evaluate a single condition against a row
 
@@ -239,7 +240,7 @@ class CSVReader(BaseReader):
             # This is fine - row just doesn't match
             return False
 
-    def get_schema(self, sample_size: int = 100) -> Optional[Schema]:
+    def get_schema(self, sample_size: int = 100) -> Schema | None:
         """
         Infer schema by sampling rows from the CSV file
 

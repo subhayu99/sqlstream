@@ -5,7 +5,8 @@ All readers implement this interface to provide a consistent API
 for the query engine.
 """
 
-from typing import Any, Dict, Iterator, List, Optional
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.core.types import Schema
 from sqlstream.sql.ast_nodes import Condition
@@ -22,7 +23,7 @@ class BaseReader:
     4. Optionally supporting column pruning
     """
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """
         Yield rows as dictionaries
 
@@ -50,7 +51,7 @@ class BaseReader:
         """
         return False
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         """
         Set filter conditions for predicate pushdown
 
@@ -75,7 +76,7 @@ class BaseReader:
         """
         return False
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         """
         Set which columns to read (column pruning)
 
@@ -138,7 +139,7 @@ class BaseReader:
         """
         return set()
 
-    def set_partition_filters(self, conditions: List[Condition]) -> None:
+    def set_partition_filters(self, conditions: list[Condition]) -> None:
         """
         Set filter conditions for partition pruning
 
@@ -151,7 +152,7 @@ class BaseReader:
         """
         pass
 
-    def get_schema(self) -> Optional[Schema]:
+    def get_schema(self) -> Schema | None:
         """
         Get schema information (column names and types)
 

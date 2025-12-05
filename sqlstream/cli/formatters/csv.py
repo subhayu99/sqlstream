@@ -4,7 +4,7 @@ CSV formatter for Unix-friendly output
 
 import csv
 import io
-from typing import Any, Dict, List
+from typing import Any
 
 from sqlstream.cli.formatters.base import BaseFormatter
 
@@ -12,7 +12,7 @@ from sqlstream.cli.formatters.base import BaseFormatter
 class CSVFormatter(BaseFormatter):
     """Format results as CSV"""
 
-    def format(self, results: List[Dict[str, Any]], **kwargs) -> str:
+    def format(self, results: list[dict[str, Any]], **kwargs) -> str:
         """
         Format results as CSV
 

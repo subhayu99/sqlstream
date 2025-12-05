@@ -5,7 +5,8 @@ Takes a parsed SQL AST and constructs a tree of operators
 that implement the query using the Volcano pull-based model.
 """
 
-from typing import Any, Callable, Dict, Iterator, Optional
+from collections.abc import Callable, Iterator
+from typing import Any
 
 from sqlstream.operators.filter import Filter
 from sqlstream.operators.groupby import GroupByOperator
@@ -48,8 +49,8 @@ class Executor:
         self,
         ast: SelectStatement,
         reader: BaseReader,
-        reader_factory: Optional[Callable[[str], BaseReader]] = None,
-    ) -> Iterator[Dict[str, Any]]:
+        reader_factory: Callable[[str], BaseReader] | None = None,
+    ) -> Iterator[dict[str, Any]]:
         """
         Execute query and return iterator over results
 
@@ -81,7 +82,7 @@ class Executor:
         self,
         ast: SelectStatement,
         reader: BaseReader,
-        reader_factory: Optional[Callable[[str], BaseReader]] = None,
+        reader_factory: Callable[[str], BaseReader] | None = None,
     ):
         """
         Build operator tree from AST
@@ -158,7 +159,7 @@ class Executor:
         self,
         ast: SelectStatement,
         reader: BaseReader,
-        reader_factory: Optional[Callable[[str], BaseReader]] = None,
+        reader_factory: Callable[[str], BaseReader] | None = None,
     ) -> str:
         """
         Explain query execution plan (for debugging)

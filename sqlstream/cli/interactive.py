@@ -6,7 +6,7 @@ This module provides an interactive table viewer with scrolling for wide data.
 
 import shutil
 import sys
-from typing import Any, Dict, List
+from typing import Any
 
 try:
     from textual.app import App, ComposeResult
@@ -25,7 +25,7 @@ except ImportError:
 
 
 def should_use_interactive(
-    results: List[Dict[str, Any]],
+    results: list[dict[str, Any]],
     force: bool = False,
     no_interactive: bool = False,
     output_file: str = None,
@@ -116,7 +116,7 @@ if TEXTUAL_AVAILABLE:
             ("l", "cursor_right", "Right"),
         ]
 
-        def __init__(self, results: List[Dict[str, Any]], **kwargs):
+        def __init__(self, results: list[dict[str, Any]], **kwargs):
             super().__init__(**kwargs)
             self.results = results
 
@@ -159,7 +159,7 @@ else:
     TableApp = None
 
 
-def launch_interactive(results: List[Dict[str, Any]]) -> None:
+def launch_interactive(results: list[dict[str, Any]]) -> None:
     """
     Launch interactive table viewer.
 

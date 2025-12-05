@@ -5,7 +5,7 @@ Provides COUNT, SUM, AVG, MIN, MAX aggregations.
 Each aggregator maintains state and can be updated incrementally.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 
 class Aggregator:
@@ -48,7 +48,7 @@ class SumAggregator(Aggregator):
     """SUM aggregator - sums numeric values"""
 
     def __init__(self):
-        self.sum: Optional[float] = None
+        self.sum: float | None = None
 
     def update(self, value: Any) -> None:
         """Add value to sum"""
@@ -64,7 +64,7 @@ class SumAggregator(Aggregator):
             # Skip non-numeric values
             pass
 
-    def result(self) -> Optional[float]:
+    def result(self) -> float | None:
         """Return sum, or None if no valid values"""
         return self.sum
 
@@ -88,7 +88,7 @@ class AvgAggregator(Aggregator):
             # Skip non-numeric values
             pass
 
-    def result(self) -> Optional[float]:
+    def result(self) -> float | None:
         """Return average, or None if no valid values"""
         if self.count == 0:
             return None
@@ -99,7 +99,7 @@ class MinAggregator(Aggregator):
     """MIN aggregator - finds minimum value"""
 
     def __init__(self):
-        self.min: Optional[Any] = None
+        self.min: Any | None = None
 
     def update(self, value: Any) -> None:
         """Update minimum"""
@@ -109,7 +109,7 @@ class MinAggregator(Aggregator):
         if self.min is None or value < self.min:
             self.min = value
 
-    def result(self) -> Optional[Any]:
+    def result(self) -> Any | None:
         """Return minimum value, or None if no valid values"""
         return self.min
 
@@ -118,7 +118,7 @@ class MaxAggregator(Aggregator):
     """MAX aggregator - finds maximum value"""
 
     def __init__(self):
-        self.max: Optional[Any] = None
+        self.max: Any | None = None
 
     def update(self, value: Any) -> None:
         """Update maximum"""
@@ -128,7 +128,7 @@ class MaxAggregator(Aggregator):
         if self.max is None or value > self.max:
             self.max = value
 
-    def result(self) -> Optional[Any]:
+    def result(self) -> Any | None:
         """Return maximum value, or None if no valid values"""
         return self.max
 

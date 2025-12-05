@@ -4,13 +4,13 @@ Base formatter interface for CLI output
 All formatters must implement the format() method.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 
 class BaseFormatter:
     """Base class for all output formatters"""
 
-    def format(self, results: List[Dict[str, Any]], **kwargs) -> str:
+    def format(self, results: list[dict[str, Any]], **kwargs) -> str:
         """
         Format query results for output
 

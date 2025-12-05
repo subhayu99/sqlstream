@@ -7,7 +7,8 @@ Parses GitHub Flavored Markdown tables and makes them queryable.
 from __future__ import annotations
 
 import re
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader

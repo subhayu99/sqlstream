@@ -13,7 +13,6 @@ import ast
 import os
 import re
 from pathlib import Path
-from typing import Dict, List
 
 
 class APIDocGenerator:
@@ -51,7 +50,7 @@ class APIDocGenerator:
             "utils": "Utility functions and helpers.",
         }
 
-    def discover_modules(self) -> Dict[str, List[str]]:
+    def discover_modules(self) -> dict[str, list[str]]:
         """Automatically discover all Python modules in the source directory"""
         modules_by_category = {}
 
@@ -87,7 +86,7 @@ class APIDocGenerator:
 
         return modules_by_category
 
-    def get_classes_and_functions(self, module_path: str) -> Dict[str, List[str]]:
+    def get_classes_and_functions(self, module_path: str) -> dict[str, list[str]]:
         """Extract classes and functions from a Python module"""
         # Convert module path to file path
         relative_path = module_path.replace("sqlstream.", "").replace(".", "/")
@@ -131,7 +130,7 @@ class APIDocGenerator:
       show_source: true
 """
 
-    def generate_category_doc(self, category_name: str, modules: List[str]) -> str:
+    def generate_category_doc(self, category_name: str, modules: list[str]) -> str:
         """Generate markdown file for a category"""
         title = self.category_titles.get(category_name, f"{category_name.title()} Reference")
         description = self.category_descriptions.get(
@@ -160,7 +159,7 @@ class APIDocGenerator:
         return "\n".join(lines)
 
     def update_mkdocs_nav(
-        self, modules_by_category: Dict[str, List[str]], mkdocs_file: str = "mkdocs.yml"
+        self, modules_by_category: dict[str, list[str]], mkdocs_file: str = "mkdocs.yml"
     ):
         """Update mkdocs.yml navigation with generated API reference pages using text manipulation"""
         mkdocs_path = Path(mkdocs_file)

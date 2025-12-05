@@ -2,7 +2,7 @@
 Rich table formatter for beautiful terminal output
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 try:
     from rich import box
@@ -22,7 +22,7 @@ from sqlstream.cli.formatters.base import BaseFormatter
 class TableFormatter(BaseFormatter):
     """Format results as a beautiful Rich table"""
 
-    def format(self, results: List[Dict[str, Any]], **kwargs) -> str:
+    def format(self, results: list[dict[str, Any]], **kwargs) -> str:
         """
         Format results as a Rich table
 

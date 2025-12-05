@@ -7,8 +7,6 @@ allowing it to skip reading unused columns.
 This is especially effective for columnar formats like Parquet.
 """
 
-from typing import List, Set
-
 from sqlstream.optimizers.base import Optimizer
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import SelectStatement
@@ -78,7 +76,7 @@ class ColumnPruningOptimizer(Optimizer):
         self.applied = True
         self.description = f"{len(needed_columns)} column(s) selected"
 
-    def _analyze_column_dependencies(self, ast: SelectStatement) -> List[str]:
+    def _analyze_column_dependencies(self, ast: SelectStatement) -> list[str]:
         """
         Determine which columns are needed for the query
 
@@ -96,7 +94,7 @@ class ColumnPruningOptimizer(Optimizer):
         Returns:
             List of required column names (or ['*'] for all)
         """
-        needed: Set[str] = set()
+        needed: set[str] = set()
 
         # Columns from SELECT clause
         if "*" in ast.columns:

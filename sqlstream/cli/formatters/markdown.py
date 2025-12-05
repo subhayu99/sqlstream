@@ -2,7 +2,7 @@
 Markdown formatter for documentation and sharing
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 from sqlstream.cli.formatters.base import BaseFormatter
 
@@ -10,7 +10,7 @@ from sqlstream.cli.formatters.base import BaseFormatter
 class MarkdownFormatter(BaseFormatter):
     """Format results as a Markdown table"""
 
-    def format(self, results: List[Dict[str, Any]], **kwargs) -> str:
+    def format(self, results: list[dict[str, Any]], **kwargs) -> str:
         """
         Format results as a Markdown table
 

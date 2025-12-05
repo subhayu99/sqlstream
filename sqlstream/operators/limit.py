@@ -4,7 +4,8 @@ Limit operator - implements LIMIT clause
 Yields only the first N rows, then stops.
 """
 
-from typing import Any, Dict, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.operators.base import Operator
 
@@ -29,7 +30,7 @@ class Limit(Operator):
         super().__init__(child)
         self.limit = limit
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Yield at most limit rows
 

@@ -4,7 +4,8 @@ Project operator - implements SELECT column list
 Selects specific columns from rows (or all columns with *).
 """
 
-from typing import Any, Dict, Iterator, List
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.operators.base import Operator
 
@@ -18,7 +19,7 @@ class Project(Operator):
     For efficiency, we use dict views rather than copying data.
     """
 
-    def __init__(self, child: Operator, columns: List[str]):
+    def __init__(self, child: Operator, columns: list[str]):
         """
         Initialize project operator
 
@@ -29,7 +30,7 @@ class Project(Operator):
         super().__init__(child)
         self.columns = columns
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Yield rows with only selected columns
 

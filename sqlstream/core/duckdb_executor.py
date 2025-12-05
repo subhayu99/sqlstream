@@ -7,7 +7,8 @@ This backend bypasses SQLStream's parser and uses DuckDB's native SQL engine.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Iterator
+from collections.abc import Callable, Iterator
+from typing import Any
 
 from sqlstream.readers.base import BaseReader
 

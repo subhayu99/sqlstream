@@ -11,7 +11,7 @@ actual data characteristics rather than just heuristics.
 """
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any
 
 from sqlstream.optimizers.base import Optimizer
 from sqlstream.readers.base import BaseReader
@@ -30,7 +30,7 @@ class TableStatistics:
     """
 
     row_count: int = 0
-    column_stats: Dict[str, "ColumnStatistics"] = None
+    column_stats: dict[str, "ColumnStatistics"] = None
     size_bytes: int = 0
 
     def __post_init__(self):
@@ -153,7 +153,7 @@ class CostModel:
 
     @classmethod
     def estimate_selectivity(
-        cls, condition: Condition, stats: Optional[ColumnStatistics] = None
+        cls, condition: Condition, stats: ColumnStatistics | None = None
     ) -> float:
         """
         Estimate selectivity of a filter condition
@@ -217,7 +217,7 @@ class CostBasedOptimizer(Optimizer):
 
     def __init__(self):
         super().__init__()
-        self.statistics_cache: Dict[str, TableStatistics] = {}
+        self.statistics_cache: dict[str, TableStatistics] = {}
 
     def get_name(self) -> str:
         return "Cost-based optimization"
@@ -283,7 +283,7 @@ class CostBasedOptimizer(Optimizer):
 
         # Sample rows
         rows_sampled = 0
-        column_values: Dict[str, set] = {}
+        column_values: dict[str, set] = {}
 
         for row in reader.read_lazy():
             rows_sampled += 1

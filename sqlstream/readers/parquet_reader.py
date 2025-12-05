@@ -7,8 +7,9 @@ entire row groups without reading them - a massive performance win!
 The magic happens in row group selection using min/max statistics.
 """
 
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any
 
 import pyarrow.parquet as pq
 
@@ -70,14 +71,14 @@ class ParquetReader(BaseReader):
         self.parquet_file = pq.ParquetFile(path_to_open, filesystem=filesystem)
 
         # Optimization state (set by planner)
-        self.filter_conditions: List[Condition] = []
-        self.required_columns: List[str] = []
-        self.limit: Optional[int] = None
-        self.partition_filters: List[Condition] = []
+        self.filter_conditions: list[Condition] = []
+        self.required_columns: list[str] = []
+        self.limit: int | None = None
+        self.partition_filters: list[Condition] = []
 
         # Parse partition information from path
         self.partition_columns: set = set()
-        self.partition_values: Dict[str, Any] = {}
+        self.partition_values: dict[str, Any] = {}
         self._parse_partition_info()
 
         # Check if file should be skipped based on partition filters
@@ -99,11 +100,11 @@ class ParquetReader(BaseReader):
         """Parquet reader supports limit pushdown"""
         return True
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         """Set filter conditions for pushdown"""
         self.filter_conditions = conditions
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         """Set required columns for pruning"""
         self.required_columns = columns
 
@@ -119,7 +120,7 @@ class ParquetReader(BaseReader):
         """Get partition column names detected from file path"""
         return self.partition_columns
 
-    def set_partition_filters(self, conditions: List[Condition]) -> None:
+    def set_partition_filters(self, conditions: list[Condition]) -> None:
         """
         Set partition filters and check if this file should be skipped
 
@@ -133,7 +134,7 @@ class ParquetReader(BaseReader):
         if not self._partition_matches_filters():
             self.partition_pruned = True
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """
         Lazy iterator over Parquet rows with intelligent row group pruning
 
@@ -174,7 +175,7 @@ class ParquetReader(BaseReader):
                 if self.limit is not None and rows_yielded >= self.limit:
                     return
 
-    def _select_row_groups_with_statistics(self) -> List[int]:
+    def _select_row_groups_with_statistics(self) -> list[int]:
         """
         Use row group statistics to select which ones to read
 
@@ -313,7 +314,7 @@ class ParquetReader(BaseReader):
             # Comparison failed (type mismatch), keep row group
             return True
 
-    def _read_row_group(self, rg_idx: int) -> Iterator[Dict[str, Any]]:
+    def _read_row_group(self, rg_idx: int) -> Iterator[dict[str, Any]]:
         """
         Read a specific row group
 
@@ -367,7 +368,7 @@ class ParquetReader(BaseReader):
 
             yield row
 
-    def _matches_filter(self, row: Dict[str, Any]) -> bool:
+    def _matches_filter(self, row: dict[str, Any]) -> bool:
         """
         Check if row matches all filter conditions
 
@@ -382,7 +383,7 @@ class ParquetReader(BaseReader):
                 return False
         return True
 
-    def _evaluate_condition(self, row: Dict[str, Any], condition: Condition) -> bool:
+    def _evaluate_condition(self, row: dict[str, Any], condition: Condition) -> bool:
         """
         Evaluate a single condition against a row
 
@@ -436,7 +437,7 @@ class ParquetReader(BaseReader):
         Returns:
             Dictionary mapping column names to types
         """
-        schema: Dict[str, DataType] = {}
+        schema: dict[str, DataType] = {}
         arrow_schema = self.parquet_file.schema_arrow
 
         for i in range(len(arrow_schema)):
@@ -626,7 +627,7 @@ class ParquetReader(BaseReader):
             # Type mismatch, conservatively match
             return True
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         """
         Get statistics about row group pruning
 

@@ -5,8 +5,6 @@ The planner applies multiple optimization rules to improve query performance.
 This is the main entry point for query optimization.
 """
 
-from typing import List
-
 from sqlstream.optimizers.base import Optimizer, OptimizerPipeline
 from sqlstream.optimizers.column_pruning import ColumnPruningOptimizer
 from sqlstream.optimizers.join_reordering import JoinReorderingOptimizer
@@ -63,7 +61,7 @@ class QueryPlanner:
             ]
         )
         # For backward compatibility with old API
-        self.optimizations_applied: List[str] = []
+        self.optimizations_applied: list[str] = []
 
     def optimize(self, ast: SelectStatement, reader: BaseReader) -> None:
         """
@@ -97,7 +95,7 @@ class QueryPlanner:
         """
         return self.pipeline.get_summary()
 
-    def get_optimizers(self) -> List:
+    def get_optimizers(self) -> list:
         """
         Get list of all optimizers in the pipeline
 

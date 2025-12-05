@@ -4,7 +4,7 @@ JSON formatter for machine-readable output
 
 import json
 import math
-from typing import Any, Dict, List
+from typing import Any
 
 from sqlstream.cli.formatters.base import BaseFormatter
 
@@ -12,7 +12,7 @@ from sqlstream.cli.formatters.base import BaseFormatter
 class JSONFormatter(BaseFormatter):
     """Format results as JSON"""
 
-    def format(self, results: List[Dict[str, Any]], **kwargs) -> str:
+    def format(self, results: list[dict[str, Any]], **kwargs) -> str:
         """
         Format results as JSON
 

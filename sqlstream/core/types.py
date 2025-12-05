@@ -7,7 +7,7 @@ import json
 from datetime import date, datetime, time
 from decimal import Decimal, InvalidOperation
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class DataType(Enum):
@@ -105,7 +105,7 @@ class DataType(Enum):
         return DataType.STRING
 
 
-def parse_datetime(value: str) -> Optional[datetime]:
+def parse_datetime(value: str) -> datetime | None:
     """Try to parse datetime from string using multiple formats.
 
     Args:
@@ -147,7 +147,7 @@ def parse_datetime(value: str) -> Optional[datetime]:
     return None
 
 
-def parse_date(value: str) -> Optional[date]:
+def parse_date(value: str) -> date | None:
     """Try to parse date from string using multiple formats.
 
     Args:
@@ -179,7 +179,7 @@ def parse_date(value: str) -> Optional[date]:
     return None
 
 
-def parse_time(value: str) -> Optional[time]:
+def parse_time(value: str) -> time | None:
     """Try to parse time from string using multiple formats.
 
     Args:
@@ -419,7 +419,7 @@ def infer_type_from_string(value: str) -> Any:
     return value
 
 
-def infer_common_type(values: List[Any]) -> DataType:
+def infer_common_type(values: list[Any]) -> DataType:
     """Infer a common type from a list of values.
 
     This is useful for schema inference when reading data files.
@@ -464,7 +464,7 @@ class Schema:
     Holds column names and their corresponding data types.
     """
 
-    def __init__(self, columns: Dict[str, DataType]):
+    def __init__(self, columns: dict[str, DataType]):
         """Initialize schema.
 
         Args:
@@ -488,11 +488,11 @@ class Schema:
         cols = ", ".join(f"{name}: {dtype}" for name, dtype in self.columns.items())
         return f"Schema({cols})"
 
-    def get_column_names(self) -> List[str]:
+    def get_column_names(self) -> list[str]:
         """Get list of column names."""
         return list(self.columns.keys())
 
-    def get_column_type(self, column: str) -> Optional[DataType]:
+    def get_column_type(self, column: str) -> DataType | None:
         """Get type of a column, or None if column doesn't exist."""
         return self.columns.get(column)
 
@@ -512,7 +512,7 @@ class Schema:
             )
 
     @staticmethod
-    def from_row(row: Dict[str, Any]) -> "Schema":
+    def from_row(row: dict[str, Any]) -> "Schema":
         """Infer schema from a single row.
 
         Args:
@@ -525,7 +525,7 @@ class Schema:
         return Schema(columns)
 
     @staticmethod
-    def from_rows(rows: List[Dict[str, Any]]) -> "Schema":
+    def from_rows(rows: list[dict[str, Any]]) -> "Schema":
         """Infer schema from multiple rows.
 
         This provides more accurate type inference by looking at multiple values.
@@ -579,6 +579,6 @@ class Schema:
 
         return Schema(merged)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert schema to dictionary."""
         return {name: dtype.value for name, dtype in self.columns.items()}

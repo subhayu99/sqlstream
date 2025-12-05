@@ -5,7 +5,8 @@ The Volcano model uses pull-based execution where each operator
 pulls data from its child operator(s) on demand.
 """
 
-from typing import Any, Dict, Iterator, Optional
+from collections.abc import Iterator
+from typing import Any, Optional
 
 
 class Operator:
@@ -32,7 +33,7 @@ class Operator:
         """
         self.child = child
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Execute operator and yield results
 

@@ -3,8 +3,9 @@ JSON Reader for reading standard JSON files
 """
 
 import json
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any
 
 from sqlstream.core.types import Schema
 from sqlstream.readers.base import BaseReader
@@ -23,7 +24,7 @@ class JSONReader(BaseReader):
     - Column pruning
     """
 
-    def __init__(self, path: str, records_key: Optional[str] = None, encoding: str = "utf-8"):
+    def __init__(self, path: str, records_key: str | None = None, encoding: str = "utf-8"):
         """
         Initialize JSON reader
 
@@ -44,9 +45,9 @@ class JSONReader(BaseReader):
         self.encoding = encoding
 
         # Optimization flags
-        self.filter_conditions: List[Condition] = []
-        self.required_columns: List[str] = []
-        self.limit: Optional[int] = None
+        self.filter_conditions: list[Condition] = []
+        self.required_columns: list[str] = []
+        self.limit: int | None = None
 
         if not self.is_s3 and not self.path.exists():
             raise FileNotFoundError(f"JSON file not found: {path}")
@@ -60,10 +61,10 @@ class JSONReader(BaseReader):
     def supports_limit(self) -> bool:
         return True
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         self.filter_conditions = conditions
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         self.required_columns = columns
 
     def set_limit(self, limit: int) -> None:
@@ -84,7 +85,7 @@ class JSONReader(BaseReader):
         else:
             return open(self.path, encoding=self.encoding)
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """
         Read JSON file and yield records.
 
@@ -120,7 +121,7 @@ class JSONReader(BaseReader):
             if self.limit is not None and rows_yielded >= self.limit:
                 break
 
-    def _locate_records(self, data: Any) -> List[Dict[str, Any]]:
+    def _locate_records(self, data: Any) -> list[dict[str, Any]]:
         """
         Find the list of records in the JSON data.
 
@@ -146,7 +147,7 @@ class JSONReader(BaseReader):
         else:
             raise ValueError(f"Path '{self.records_key}' did not resolve to a list or object")
 
-    def _auto_detect_records(self, data: Any) -> List[Dict[str, Any]]:
+    def _auto_detect_records(self, data: Any) -> list[dict[str, Any]]:
         """Auto-detect records when no path is specified"""
         # If root is a list, that's our data
         if isinstance(data, list):
@@ -222,7 +223,7 @@ class JSONReader(BaseReader):
 
         return current
 
-    def _flatten_path(self, data: Any, path: str) -> List[Any]:
+    def _flatten_path(self, data: Any, path: str) -> list[Any]:
         """
         Handle flattening for paths with [].
 
@@ -298,14 +299,14 @@ class JSONReader(BaseReader):
 
         return current
 
-    def _matches_filter(self, row: Dict[str, Any]) -> bool:
+    def _matches_filter(self, row: dict[str, Any]) -> bool:
         """Check if row matches filter conditions"""
         for condition in self.filter_conditions:
             if not self._evaluate_condition(row, condition):
                 return False
         return True
 
-    def _evaluate_condition(self, row: Dict[str, Any], condition: Condition) -> bool:
+    def _evaluate_condition(self, row: dict[str, Any], condition: Condition) -> bool:
         """Evaluate single condition"""
         if condition.column not in row:
             return False
@@ -335,7 +336,7 @@ class JSONReader(BaseReader):
         except TypeError:
             return False
 
-    def get_schema(self) -> Optional[Schema]:
+    def get_schema(self) -> Schema | None:
         """Infer schema from data"""
         # We have to load the file to get schema
         try:

@@ -16,7 +16,8 @@ Works by:
 
 import queue
 import threading
-from typing import Any, Dict, Iterator, Optional
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.readers.base import BaseReader
 
@@ -66,10 +67,10 @@ class ParallelReader:
 
         # Coordination
         self.stop_event = threading.Event()
-        self.error: Optional[Exception] = None
+        self.error: Exception | None = None
         self.workers: list[threading.Thread] = []
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """
         Yield rows from parallel reader
 
@@ -194,7 +195,7 @@ class ParallelCSVReader:
         self.reader = CSVReader(path)
         self.parallel_reader = ParallelReader(self.reader, num_threads=num_threads)
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """Yield rows"""
         return self.parallel_reader.read_lazy()
 
@@ -235,7 +236,7 @@ class ParallelParquetReader:
         self.reader = ParquetReader(path)
         self.parallel_reader = ParallelReader(self.reader, num_threads=num_threads)
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """Yield rows"""
         return self.parallel_reader.read_lazy()
 

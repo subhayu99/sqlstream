@@ -7,8 +7,6 @@ allowing filtering to happen during data reading rather than after.
 This is one of the most important optimizations for reducing I/O and memory usage.
 """
 
-from typing import List
-
 from sqlstream.optimizers.base import Optimizer
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import Condition, SelectStatement
@@ -81,7 +79,7 @@ class PredicatePushdownOptimizer(Optimizer):
             self.applied = True
             self.description = f"{len(pushable)} condition(s)"
 
-    def _extract_pushable_conditions(self, conditions: List[Condition]) -> List[Condition]:
+    def _extract_pushable_conditions(self, conditions: list[Condition]) -> list[Condition]:
         """
         Determine which conditions can be safely pushed to readers
 

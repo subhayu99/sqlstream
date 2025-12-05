@@ -8,7 +8,8 @@ Supports XPath-like selection for specific elements.
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader

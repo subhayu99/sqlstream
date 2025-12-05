@@ -12,8 +12,9 @@ from __future__ import annotations
 
 import hashlib
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 from urllib.parse import urlparse
 
 try:

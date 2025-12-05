@@ -4,8 +4,9 @@ JSONL Reader for reading line-delimited JSON files
 
 import json
 import warnings
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any
 
 from sqlstream.core.types import Schema
 from sqlstream.readers.base import BaseReader
@@ -45,9 +46,9 @@ class JSONLReader(BaseReader):
         self.encoding = encoding
 
         # Optimization flags
-        self.filter_conditions: List[Condition] = []
-        self.required_columns: List[str] = []
-        self.limit: Optional[int] = None
+        self.filter_conditions: list[Condition] = []
+        self.required_columns: list[str] = []
+        self.limit: int | None = None
 
         if not self.is_s3 and not self.path.exists():
             raise FileNotFoundError(f"JSONL file not found: {path}")
@@ -61,10 +62,10 @@ class JSONLReader(BaseReader):
     def supports_limit(self) -> bool:
         return True
 
-    def set_filter(self, conditions: List[Condition]) -> None:
+    def set_filter(self, conditions: list[Condition]) -> None:
         self.filter_conditions = conditions
 
-    def set_columns(self, columns: List[str]) -> None:
+    def set_columns(self, columns: list[str]) -> None:
         self.required_columns = columns
 
     def set_limit(self, limit: int) -> None:
@@ -85,7 +86,7 @@ class JSONLReader(BaseReader):
         else:
             return open(self.path, encoding=self.encoding)
 
-    def read_lazy(self) -> Iterator[Dict[str, Any]]:
+    def read_lazy(self) -> Iterator[dict[str, Any]]:
         """
         Yield rows from JSONL file line by line
         """
@@ -127,14 +128,14 @@ class JSONLReader(BaseReader):
                     )
                     continue
 
-    def _matches_filter(self, row: Dict[str, Any]) -> bool:
+    def _matches_filter(self, row: dict[str, Any]) -> bool:
         """Check if row matches filter conditions"""
         for condition in self.filter_conditions:
             if not self._evaluate_condition(row, condition):
                 return False
         return True
 
-    def _evaluate_condition(self, row: Dict[str, Any], condition: Condition) -> bool:
+    def _evaluate_condition(self, row: dict[str, Any], condition: Condition) -> bool:
         """Evaluate single condition"""
         if condition.column not in row:
             return False
@@ -164,7 +165,7 @@ class JSONLReader(BaseReader):
         except TypeError:
             return False
 
-    def get_schema(self, sample_size: int = 100) -> Optional[Schema]:
+    def get_schema(self, sample_size: int = 100) -> Schema | None:
         """Infer schema by sampling first N lines"""
         sample_rows = []
 

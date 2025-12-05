@@ -5,7 +5,8 @@ This is a leaf operator (has no child).
 It wraps a reader and yields rows from it.
 """
 
-from typing import Any, Dict, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.operators.base import Operator
 from sqlstream.readers.base import BaseReader
@@ -29,7 +30,7 @@ class Scan(Operator):
         super().__init__(child=None)  # Scan has no child
         self.reader = reader
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Yield all rows from the reader
 

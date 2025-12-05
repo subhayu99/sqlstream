@@ -4,7 +4,8 @@ Filter operator - implements WHERE clause
 Evaluates conditions and only yields rows that match.
 """
 
-from typing import Any, Dict, Iterator, List
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.operators.base import Operator
 from sqlstream.sql.ast_nodes import Condition
@@ -18,7 +19,7 @@ class Filter(Operator):
     all conditions (AND logic).
     """
 
-    def __init__(self, child: Operator, conditions: List[Condition]):
+    def __init__(self, child: Operator, conditions: list[Condition]):
         """
         Initialize filter operator
 
@@ -29,7 +30,7 @@ class Filter(Operator):
         super().__init__(child)
         self.conditions = conditions
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Yield only rows that match all conditions
 
@@ -42,7 +43,7 @@ class Filter(Operator):
             if self._matches(row):
                 yield row
 
-    def _matches(self, row: Dict[str, Any]) -> bool:
+    def _matches(self, row: dict[str, Any]) -> bool:
         """
         Check if row matches all conditions
 
@@ -57,7 +58,7 @@ class Filter(Operator):
                 return False
         return True
 
-    def _evaluate_condition(self, row: Dict[str, Any], condition: Condition) -> bool:
+    def _evaluate_condition(self, row: dict[str, Any], condition: Condition) -> bool:
         """
         Evaluate a single condition against a row
 

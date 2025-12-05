@@ -6,7 +6,6 @@ Each optimizer implements a specific optimization rule.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
 
 from sqlstream.readers.base import BaseReader
 from sqlstream.sql.ast_nodes import SelectStatement
@@ -92,7 +91,7 @@ class OptimizerPipeline:
     the previous optimizations.
     """
 
-    def __init__(self, optimizers: List[Optimizer]):
+    def __init__(self, optimizers: list[Optimizer]):
         """
         Initialize pipeline
 
@@ -113,7 +112,7 @@ class OptimizerPipeline:
             if optimizer.can_optimize(ast, reader):
                 optimizer.optimize(ast, reader)
 
-    def get_applied_optimizations(self) -> List[str]:
+    def get_applied_optimizations(self) -> list[str]:
         """
         Get list of optimizations that were applied
 

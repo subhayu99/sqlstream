@@ -6,6 +6,7 @@ Example demonstrating JSON nested path syntax in SQLStream
 import json
 import tempfile
 from pathlib import Path
+
 from sqlstream import query
 
 # Create example data
@@ -18,30 +19,28 @@ data = {
                 "name": "Alice",
                 "transactions": [
                     {"id": "t1", "amount": 50, "status": "completed"},
-                    {"id": "t2", "amount": 75, "status": "pending"}
-                ]
+                    {"id": "t2", "amount": 75, "status": "pending"},
+                ],
             },
             {
                 "id": 2,
                 "name": "Bob",
                 "transactions": [
                     {"id": "t3", "amount": 100, "status": "completed"},
-                    {"id": "t4", "amount": 125, "status": "completed"}
-                ]
+                    {"id": "t4", "amount": 125, "status": "completed"},
+                ],
             },
             {
                 "id": 3,
                 "name": "Charlie",
-                "transactions": [
-                    {"id": "t5", "amount": 200, "status": "failed"}
-                ]
-            }
+                "transactions": [{"id": "t5", "amount": 200, "status": "failed"}],
+            },
         ]
-    }
+    },
 }
 
 # Save to temporary file
-with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
     json.dump(data, f)
     json_file = f.name
 
@@ -58,7 +57,9 @@ for row in query(f"{json_file}#json:result.users").sql("SELECT * FROM users"):
 # Example 2: Array indexing
 print("\n2. Get first user's transactions: result.users[0].transactions")
 print("   Query: SELECT * FROM transactions")
-for row in query(f"{json_file}#json:result.users[0].transactions").sql("SELECT * FROM transactions"):
+for row in query(f"{json_file}#json:result.users[0].transactions").sql(
+    "SELECT * FROM transactions"
+):
     print(f"   {row}")
 
 # Example 3: Array flattening
@@ -72,10 +73,12 @@ for row in query(f"{json_file}#json:result.users[].transactions").sql(
 # Example 4: Aggregation on flattened data
 print("\n4. Total amount of completed transactions")
 print("   Query: SELECT amount FROM transactions WHERE status = 'completed'")
-completed = list(query(f"{json_file}#json:result.users[].transactions").sql(
-    "SELECT amount FROM transactions WHERE status = 'completed'"
-))
-total = sum(row['amount'] for row in completed)
+completed = list(
+    query(f"{json_file}#json:result.users[].transactions").sql(
+        "SELECT amount FROM transactions WHERE status = 'completed'"
+    )
+)
+total = sum(row["amount"] for row in completed)
 print(f"   Total: ${total} from {len(completed)} transactions")
 
 # Clean up

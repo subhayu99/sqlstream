@@ -4,8 +4,6 @@ URL Fragment Parser - Parse source#format:table syntax
 Provides utilities to parse SQLstream URL fragments for format and table specification.
 """
 
-from typing import Optional, Tuple, Union
-
 
 class FragmentParseError(Exception):
     """Raised when fragment parsing fails"""
@@ -13,7 +11,7 @@ class FragmentParseError(Exception):
     pass
 
 
-def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Union[int, str]]]:
+def parse_source_fragment(source: str) -> tuple[str, str | None, int | str | None]:
     """
     Parse source URL with optional fragment
 
@@ -99,9 +97,7 @@ def parse_source_fragment(source: str) -> Tuple[str, Optional[str], Optional[Uni
         return (source_path, format_spec, None)
 
 
-def build_source_fragment(
-    source: str, format: Optional[str] = None, table: Optional[int] = None
-) -> str:
+def build_source_fragment(source: str, format: str | None = None, table: int | None = None) -> str:
     """
     Build a source string with fragment from components
 

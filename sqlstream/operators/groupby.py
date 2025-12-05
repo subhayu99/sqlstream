@@ -5,7 +5,8 @@ Performs hash-based aggregation with GROUP BY support.
 Groups rows by specified columns and computes aggregate functions.
 """
 
-from typing import Any, Dict, Iterator, List, Tuple
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.operators.base import Operator
 from sqlstream.sql.ast_nodes import AggregateFunction
@@ -29,9 +30,9 @@ class GroupByOperator(Operator):
     def __init__(
         self,
         source: Operator,
-        group_by_columns: List[str],
-        aggregates: List[AggregateFunction],
-        select_columns: List[str],
+        group_by_columns: list[str],
+        aggregates: list[AggregateFunction],
+        select_columns: list[str],
     ):
         """
         Initialize GroupBy operator
@@ -47,7 +48,7 @@ class GroupByOperator(Operator):
         self.aggregates = aggregates
         self.select_columns = select_columns
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[dict[str, Any]]:
         """
         Execute GROUP BY aggregation
 
@@ -55,7 +56,7 @@ class GroupByOperator(Operator):
             One row per group with group columns and aggregated values
         """
         # Hash map: group_key -> aggregators
-        groups: Dict[Tuple, List] = {}
+        groups: dict[tuple, list] = {}
 
         # Scan all input rows and build groups
         for row in self.child:
@@ -77,7 +78,7 @@ class GroupByOperator(Operator):
             row = self._build_output_row(group_key, aggregators)
             yield row
 
-    def _extract_group_key(self, row: Dict[str, Any]) -> Tuple:
+    def _extract_group_key(self, row: dict[str, Any]) -> tuple:
         """
         Extract group key from row
 
@@ -98,7 +99,7 @@ class GroupByOperator(Operator):
 
         return tuple(key_values)
 
-    def _create_aggregators(self) -> List:
+    def _create_aggregators(self) -> list:
         """
         Create fresh aggregators for a new group
 
@@ -111,7 +112,7 @@ class GroupByOperator(Operator):
             aggregators.append(aggregator)
         return aggregators
 
-    def _build_output_row(self, group_key: Tuple, aggregators: List) -> Dict[str, Any]:
+    def _build_output_row(self, group_key: tuple, aggregators: list) -> dict[str, Any]:
         """
         Build output row from group key and aggregated values
 
@@ -140,7 +141,7 @@ class GroupByOperator(Operator):
 
         return row
 
-    def explain(self, indent: int = 0) -> List[str]:
+    def explain(self, indent: int = 0) -> list[str]:
         """Generate execution plan explanation"""
         lines = [" " * indent + f"GroupBy(keys={self.group_by_columns})"]
 

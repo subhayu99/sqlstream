@@ -14,7 +14,6 @@ Design: Keep it simple for the 90% case. No complex expressions initially.
 """
 
 import re
-from typing import List, Optional
 
 from sqlstream.sql.ast_nodes import (
     AggregateFunction,
@@ -49,7 +48,7 @@ class SQLParser:
         self.tokens = self._tokenize(sql)
         self.pos = 0
 
-    def _tokenize(self, sql: str) -> List[str]:
+    def _tokenize(self, sql: str) -> list[str]:
         """
         Simple tokenization by splitting on whitespace and special characters
 
@@ -66,20 +65,20 @@ class SQLParser:
 
         return tokens
 
-    def current(self) -> Optional[str]:
+    def current(self) -> str | None:
         """Get current token without advancing"""
         if self.pos < len(self.tokens):
             return self.tokens[self.pos]
         return None
 
-    def peek(self, offset: int = 1) -> Optional[str]:
+    def peek(self, offset: int = 1) -> str | None:
         """Look ahead at token"""
         pos = self.pos + offset
         if pos < len(self.tokens):
             return self.tokens[pos]
         return None
 
-    def consume(self, expected: Optional[str] = None) -> str:
+    def consume(self, expected: str | None = None) -> str:
         """
         Consume and return current token, optionally checking it matches expected
 
@@ -349,7 +348,7 @@ class SQLParser:
 
         return token
 
-    def _parse_group_by(self) -> List[str]:
+    def _parse_group_by(self) -> list[str]:
         """
         Parse GROUP BY clause
 
@@ -373,7 +372,7 @@ class SQLParser:
 
         return columns
 
-    def _parse_order_by(self) -> List[OrderByColumn]:
+    def _parse_order_by(self) -> list[OrderByColumn]:
         """
         Parse ORDER BY clause
 

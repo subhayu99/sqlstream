@@ -6,7 +6,7 @@ Start with a minimal subset supporting SELECT, WHERE, and LIMIT.
 """
 
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from typing import Any
 
 
 @dataclass
@@ -25,7 +25,7 @@ class Condition:
 class WhereClause:
     """WHERE clause containing multiple conditions"""
 
-    conditions: List[Condition]
+    conditions: list[Condition]
 
     def __repr__(self) -> str:
         return " AND ".join(str(c) for c in self.conditions)
@@ -42,7 +42,7 @@ class AggregateFunction:
 
     function: str  # 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX'
     column: str  # Column name, or '*' for COUNT(*)
-    alias: Optional[str] = None  # AS alias
+    alias: str | None = None  # AS alias
 
     def __repr__(self) -> str:
         result = f"{self.function}({self.column})"
@@ -100,14 +100,14 @@ class SelectStatement:
         SELECT * FROM customers INNER JOIN orders ON customers.id = orders.customer_id
     """
 
-    columns: List[str]  # ['*'] for all columns, or specific column names
+    columns: list[str]  # ['*'] for all columns, or specific column names
     source: str  # Table/file name (FROM clause)
-    where: Optional[WhereClause] = None
-    group_by: Optional[List[str]] = None
-    order_by: Optional[List[OrderByColumn]] = None
-    limit: Optional[int] = None
-    aggregates: Optional[List[AggregateFunction]] = None  # Aggregate functions in SELECT
-    join: Optional[JoinClause] = None  # JOIN clause
+    where: WhereClause | None = None
+    group_by: list[str] | None = None
+    order_by: list[OrderByColumn] | None = None
+    limit: int | None = None
+    aggregates: list[AggregateFunction] | None = None  # Aggregate functions in SELECT
+    join: JoinClause | None = None  # JOIN clause
 
     def __repr__(self) -> str:
         parts = [f"SELECT {', '.join(self.columns)}"]

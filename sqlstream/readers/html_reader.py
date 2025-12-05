@@ -7,7 +7,8 @@ Supports multiple tables per file with table selection.
 
 from __future__ import annotations
 
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from sqlstream.core.types import DataType, Schema
 from sqlstream.readers.base import BaseReader
