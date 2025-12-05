@@ -34,8 +34,11 @@ See [Query Command](query-command.md) for full documentation.
 Launch the interactive shell with full TUI (Terminal User Interface).
 
 ```bash
-sqlstream shell [FILE]
+sqlstream shell [FILE] [OPTIONS]
 ```
+
+**Options:**
+- `-i, --incognito` - Start fresh without loading previous session or saving on exit
 
 **Features:**
 - Modal dialogs for filtering, export, file selection
@@ -45,6 +48,17 @@ sqlstream shell [FILE]
 - Live filtering (`Ctrl+F`)
 - Schema browser (`F2`)
 - Query history with multiline support
+- Session state persistence (tabs and queries saved on exit, unless in incognito mode)
+
+**Examples:**
+```bash
+# Launch with a file
+sqlstream shell employees.csv
+
+# Launch in incognito mode (fresh start, no state saving)
+sqlstream shell -i
+sqlstream shell --incognito employees.csv
+```
 
 See [Interactive Mode](../interactive-shell/interface-guide.md) for full documentation.
 

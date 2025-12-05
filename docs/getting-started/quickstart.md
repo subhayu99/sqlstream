@@ -281,6 +281,12 @@ This launches a powerful TUI (Terminal User Interface) with:
 - **Export**: Press `Ctrl+X` to export results to CSV/JSON/Parquet.
 - **History**: Use `Ctrl+Up`/`Down` to navigate previous queries.
 - **State Persistence**: Your open tabs and queries are saved automatically on exit.
+- **Incognito Mode**: Start fresh without loading previous session or saving on exit:
+
+    ```bash
+    $ sqlstream shell -i
+    $ sqlstream shell --incognito
+    ```
 
 ---
 

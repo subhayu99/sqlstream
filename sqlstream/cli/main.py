@@ -8,7 +8,6 @@ Usage:
 
 import sys
 import time
-from typing import Optional
 
 try:
     import click
@@ -102,13 +101,13 @@ def cli():
     help="Disable auto-detection of interactive mode",
 )
 def query(
-    file_or_sql: Optional[str],
-    sql: Optional[str],
-    sql_file: Optional[str],
+    file_or_sql: str | None,
+    sql: str | None,
+    sql_file: str | None,
     format: str,
     backend: str,
-    limit: Optional[int],
-    output: Optional[str],
+    limit: int | None,
+    output: str | None,
     no_color: bool,
     explain: bool,
     show_time: bool,
@@ -284,7 +283,14 @@ def query(
     default=None,
     help="Path to query history file (default: ~/.sqlstream_history)",
 )
-def shell(file: Optional[str], history_file: Optional[str]):
+@click.option(
+    "-i",
+    "--incognito",
+    is_flag=True,
+    default=False,
+    help="Launch in incognito mode (don't load previous session or history)",
+)
+def shell(file: str | None, history_file: str | None, incognito: bool):
     """
     Launch interactive SQL shell
 
@@ -304,11 +310,16 @@ def shell(file: Optional[str], history_file: Optional[str]):
         \b
         # Use custom history file
         $ sqlstream shell --history-file ~/.my_history
+
+        \b
+        # Launch in incognito mode (fresh start, no previous tabs/history)
+        $ sqlstream shell -i
+        $ sqlstream shell --incognito
     """
     try:
         from sqlstream.cli.shell import launch_shell
 
-        launch_shell(initial_file=file, history_file=history_file)
+        launch_shell(initial_file=file, history_file=history_file, incognito=incognito)
     except ImportError as e:
         click.echo(
             f"Error: {e}\n"

@@ -9,7 +9,7 @@ and export data - all from a beautiful terminal interface.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from textual import work
 from textual._text_area_theme import _BUILTIN_THEMES as _TEXT_AREA_BUILTIN_THEMES
@@ -538,14 +538,14 @@ class StatusBar(Static):
 
     def __init__(self, **kwargs) -> None:
         super().__init__("", **kwargs)
-        self.last_execution_time: Optional[float] = None
-        self.row_count: Optional[int] = None
+        self.last_execution_time: float | None = None
+        self.row_count: int | None = None
 
     def update_status(
         self,
         message: str,
-        execution_time: Optional[float] = None,
-        row_count: Optional[int] = None,
+        execution_time: float | None = None,
+        row_count: int | None = None,
         filter_info: str = "",
         backend_info: str = "",
     ) -> None:
@@ -584,7 +584,7 @@ class SchemaBrowser(Tree):
         self.border_title = "Schema"
         self.show_root = False
 
-    def show_schemas(self, schemas: Dict[str, Dict[str, str]]) -> None:
+    def show_schemas(self, schemas: dict[str, dict[str, str]]) -> None:
         """Update the schema tree with files and columns."""
         self.clear()
         self.root.expand()
@@ -631,7 +631,7 @@ class FilterSidebar(Container):
             yield Button("Clear", variant="error", id="fs-clear")
             yield Button("Apply", variant="primary", id="fs-apply")
 
-    def update_columns(self, columns: List[str]) -> None:
+    def update_columns(self, columns: list[str]) -> None:
         """Called by App when results change."""
         select = self.query_one("#fs-column", Select)
         # Preserve "Global Search" as first option
@@ -1555,20 +1555,22 @@ class SQLShellApp(App):
 
     def __init__(
         self,
-        initial_file: Optional[str] = None,
-        history_file: Optional[str] = None,
+        initial_file: str | None = None,
+        history_file: str | None = None,
+        incognito: bool = False,
         **kwargs,
     ):
         super().__init__(**kwargs)
         self.initial_file = initial_file
         self.history_file = history_file or str(Path.home() / ".sqlstream_history")
+        self.incognito = incognito
         self.query_engine = Query()
         self.backend = "auto"
-        self.query_history: List[str] = []
+        self.query_history: list[str] = []
         self.history_index = -1
-        self.last_results: List[Dict[str, Any]] = []
+        self.last_results: list[dict[str, Any]] = []
         self.last_query = ""
-        self.loaded_files: List[str] = []
+        self.loaded_files: list[str] = []
         self.config_file = str(Path.home() / ".sqlstream_config")
 
         # Configuration Defaults
@@ -1591,7 +1593,7 @@ class SQLShellApp(App):
         self.filter_column = None
         self.filter_mode = "contains"
         self.filter_active = False
-        self.filtered_results: List[Dict[str, Any]] = []
+        self.filtered_results: list[dict[str, Any]] = []
         self.sort_column = None
         self.sort_reverse = False
 
@@ -1907,7 +1909,7 @@ class SQLShellApp(App):
         except Exception as e:
             self._show_error(str(e))
 
-    def _display_results(self, results: List[Dict[str, Any]], execution_time: float) -> None:
+    def _display_results(self, results: list[dict[str, Any]], execution_time: float) -> None:
         """Display query results in the DataTable with pagination."""
         # Get column names from first row
         if not results:
@@ -1926,7 +1928,7 @@ class SQLShellApp(App):
         # Display current page
         self._refresh_displayed_results(execution_time)
 
-    def _apply_filter(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _apply_filter(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Apply filter text to results with specific modes."""
         if not self.filter_text:
             return results
@@ -1967,7 +1969,7 @@ class SQLShellApp(App):
 
         return filtered
 
-    def _apply_sort(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _apply_sort(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Sort results by column."""
         if not self.sort_column or not results:
             return results
@@ -1980,8 +1982,8 @@ class SQLShellApp(App):
             return results
 
     def _infer_column_types(
-        self, results: List[Dict[str, Any]], columns: List[str]
-    ) -> Dict[str, str]:
+        self, results: list[dict[str, Any]], columns: list[str]
+    ) -> dict[str, str]:
         """Infer column datatypes from result values."""
         from sqlstream.core.types import infer_type
 
@@ -2045,7 +2047,7 @@ class SQLShellApp(App):
         else:
             return value
 
-    def _refresh_displayed_results(self, execution_time: Optional[float] = None) -> None:
+    def _refresh_displayed_results(self, execution_time: float | None = None) -> None:
         """Refresh the displayed results with current page."""
         results_viewer = self.query_one(ResultsViewer)
         status_bar = self.query_one(StatusBar)
@@ -2682,6 +2684,10 @@ class SQLShellApp(App):
 
     def _save_state(self) -> None:
         """Save editor state to file."""
+        # Skip saving in incognito mode
+        if self.incognito:
+            return
+
         try:
             tabs = self.query_one("#query-tabs", TabbedContent)
             state = []
@@ -2717,6 +2723,13 @@ class SQLShellApp(App):
 
     async def _load_state(self) -> None:
         """Load editor state from file."""
+        # Skip loading in incognito mode
+        if self.incognito:
+            # Create default tab with incognito indicator
+            await self.action_new_tab()
+            self.notify("🕵️ Incognito mode - Starting fresh session", timeout=3)
+            return
+
         # Load history first
         self._load_history()
 
@@ -2741,15 +2754,20 @@ class SQLShellApp(App):
             await self.action_new_tab()
 
 
-def launch_shell(initial_file: Optional[str] = None, history_file: Optional[str] = None) -> None:
+def launch_shell(
+    initial_file: str | None = None,
+    history_file: str | None = None,
+    incognito: bool = False,
+) -> None:
     """
     Launch the interactive SQL shell.
 
     Args:
         initial_file: Optional file to load on startup
         history_file: Path to query history file
+        incognito: If True, don't load previous session or history
     """
-    app = SQLShellApp(initial_file=initial_file, history_file=history_file)
+    app = SQLShellApp(initial_file=initial_file, history_file=history_file, incognito=incognito)
     app.run()
 
 

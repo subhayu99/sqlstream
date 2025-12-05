@@ -247,6 +247,33 @@ class TestCLIRegistration:
         assert "shell" in commands
 
 
+class TestIncognitoMode:
+    """Test incognito mode functionality."""
+
+    def test_incognito_initialization(self):
+        """Test shell app initialization with incognito flag."""
+        from sqlstream.cli.shell import SQLShellApp
+
+        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history", incognito=True)
+        assert app is not None
+        assert app.incognito is True
+
+    def test_normal_mode_initialization(self):
+        """Test shell app initialization without incognito flag."""
+        from sqlstream.cli.shell import SQLShellApp
+
+        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history", incognito=False)
+        assert app is not None
+        assert app.incognito is False
+
+    def test_default_incognito_false(self):
+        """Test that incognito defaults to False."""
+        from sqlstream.cli.shell import SQLShellApp
+
+        app = SQLShellApp(initial_file=None, history_file="/tmp/test_history")
+        assert app.incognito is False
+
+
 class TestFiltering:
     """Test advanced filtering functionality."""
 

@@ -54,6 +54,10 @@ sqlstream shell employees.csv
 
 # Custom history location
 sqlstream shell --history-file ~/.my_sqlstream_history
+
+# Incognito mode (no state loading or saving)
+sqlstream shell -i
+sqlstream shell --incognito employees.csv
 ```
 
 ### Basic Usage
@@ -202,10 +206,17 @@ Your work is automatically saved and restored between sessions.
 - State loads automatically on startup
 - If no saved state, starts with one empty tab
 
+**Incognito Mode** (`-i` or `--incognito`):
+- Launches without loading previous session state
+- Starts with a fresh empty tab
+- Does not save state on exit
+- Useful for temporary queries or privacy
+
 **Benefits**:
 - Resume work exactly where you left off
 - Never lose in-progress queries
 - Maintain context across sessions
+- Use incognito mode for one-off queries without cluttering your saved state
 
 ### 4. Tabbed Sidebar
 
@@ -448,15 +459,16 @@ ORDER BY name
 
 1. **Multiple Tabs**: Use tabs to work on different queries simultaneously - one for exploration, one for final analysis
 2. **State Persistence**: Your tabs are automatically saved - feel confident closing the shell anytime
-3. **Large Datasets**: Use `LIMIT` to preview data quickly in a dedicated tab
-4. **S3 Performance**: Use partitioned Parquet files for best performance
-5. **History**: Use `Ctrl+Up` to quickly re-run previous queries in any tab
-6. **File Browser**: Use `Ctrl+O` to quickly add files to your query without typing paths
-7. **Sorting**: Click column headers to explore data patterns
-8. **Export**: Export to Parquet for best compression
-9. **Sidebar**: Toggle with `F2` to maximize editor space when needed
-10. **Manual Save**: Use `Ctrl+S` if you want to save state before experimenting
-11. **Backend Toggle**: Use `F5` to test complex SQL features - start with `auto`, switch to `duckdb` for window functions/CTEs
+3. **Incognito Mode**: Use `-i` or `--incognito` for quick one-off queries without affecting your saved session state
+4. **Large Datasets**: Use `LIMIT` to preview data quickly in a dedicated tab
+5. **S3 Performance**: Use partitioned Parquet files for best performance
+6. **History**: Use `Ctrl+Up` to quickly re-run previous queries in any tab
+7. **File Browser**: Use `Ctrl+O` to quickly add files to your query without typing paths
+8. **Sorting**: Click column headers to explore data patterns
+9. **Export**: Export to Parquet for best compression
+10. **Sidebar**: Toggle with `F2` to maximize editor space when needed
+11. **Manual Save**: Use `Ctrl+S` if you want to save state before experimenting
+12. **Backend Toggle**: Use `F5` to test complex SQL features - start with `auto`, switch to `duckdb` for window functions/CTEs
 
 ---
 

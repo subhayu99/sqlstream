@@ -152,3 +152,35 @@ class TestCLIVersion:
 
         assert result.exit_code == 0
         assert "0.1.0" in result.output
+
+
+@pytest.mark.skipif(not CLICK_AVAILABLE, reason="Click not installed")
+class TestShellCommand:
+    """Test shell command and its options"""
+
+    def test_shell_command_help(self):
+        """Test shell command help text"""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["shell", "--help"])
+
+        assert result.exit_code == 0
+        assert "Launch interactive SQL shell" in result.output
+        assert "--incognito" in result.output or "-i" in result.output
+
+    def test_shell_incognito_short_flag(self):
+        """Test shell command accepts -i flag"""
+        runner = CliRunner()
+        # We can't actually run the shell in tests (it's interactive),
+        # but we can verify the flag is accepted by checking help
+        result = runner.invoke(cli, ["shell", "--help"])
+
+        assert result.exit_code == 0
+        assert "-i" in result.output
+
+    def test_shell_incognito_long_flag(self):
+        """Test shell command accepts --incognito flag"""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["shell", "--help"])
+
+        assert result.exit_code == 0
+        assert "--incognito" in result.output
