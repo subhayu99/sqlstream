@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<sales>
+    <record>
+        <product>Laptop</product>
+        <price>999.99</price>
+        <quantity>5</quantity>
+        <available>true</available>
+    </record>
+    <record>
+        <product>Mouse</product>
+        <price>29.99</price>
+        <quantity>50</quantity>
+        <available>true</available>
+    </record>
+    <record>
+        <product>Keyboard</product>
+        <price>79.99</price>
+        <quantity>30</quantity>
+        <available>false</available>
+    </record>
+    <record>
+        <product>Monitor</product>
+        <price>299.99</price>
+        <quantity>15</quantity>
+        <available>true</available>
+    </record>
+</sales>

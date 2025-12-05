@@ -1,5 +1,13 @@
 dept_id,dept_name,manager_id,budget
-1,Engineering,101,500000
-2,Sales,102,300000
-3,Marketing,105,200000
-4,HR,108,150000
+1,Accounting,908,484463
+2,Business Development,932,386059
+3,Engineering,542,162411
+4,Human Resources,284,374680
+5,Legal,426,416847
+6,Marketing,514,564395
+7,Product Management,137,320780
+8,Research and Development,889,430419
+9,Sales,570,201891
+10,Services,795,280900
+11,Support,179,344329
+12,Training,614,579624
