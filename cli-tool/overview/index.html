@@ -2933,8 +2933,10 @@
 <p>See <a href="../query-command/">Query Command</a> for full documentation.</p>
 <h3 id="shell-interactive-sql-shell"><code>shell</code> - Interactive SQL Shell</h3>
 <p>Launch the interactive shell with full TUI (Terminal User Interface).</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span><span class="o">[</span>FILE<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span><span class="o">[</span>FILE<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </span></code></pre></div>
+<p><strong>Options:</strong>
+- <code>-i, --incognito</code> - Start fresh without loading previous session or saving on exit</p>
 <p><strong>Features:</strong>
 - Modal dialogs for filtering, export, file selection
 - File browser (<code>Ctrl+O</code>) to select files
@@ -2942,7 +2944,16 @@
 - Multi-format export (<code>Ctrl+X</code>)
 - Live filtering (<code>Ctrl+F</code>)
 - Schema browser (<code>F2</code>)
-- Query history with multiline support</p>
+- Query history with multiline support
+- Session state persistence (tabs and queries saved on exit, unless in incognito mode)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Launch with a file</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>employees.csv
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Launch in incognito mode (fresh start, no state saving)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>-i
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>--incognito<span class="w"> </span>employees.csv
+</span></code></pre></div></p>
 <p>See <a href="../../interactive-shell/interface-guide/">Interactive Mode</a> for full documentation.</p>
 <h2 id="global-options">Global Options</h2>
 <ul>
@@ -2950,14 +2961,14 @@
 <li><code>--help</code> - Show help message</li>
 </ul>
 <h2 id="quick-start">Quick Start</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Simple query</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>employees.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM employees WHERE salary &gt; 80000&quot;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># With pandas backend for performance</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>large.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM large&quot;</span><span class="w"> </span>--backend<span class="w"> </span>pandas
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Launch interactive shell</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>employees.csv
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Simple query</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>employees.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM employees WHERE salary &gt; 80000&quot;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># With pandas backend for performance</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>sqlstream<span class="w"> </span>query<span class="w"> </span>large.csv<span class="w"> </span><span class="s2">&quot;SELECT * FROM large&quot;</span><span class="w"> </span>--backend<span class="w"> </span>pandas
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Launch interactive shell</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>employees.csv
 </span></code></pre></div>
 <h2 id="next-steps">Next Steps</h2>
 <ul>

@@ -3596,6 +3596,10 @@
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Custom history location</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>--history-file<span class="w"> </span>~/.my_sqlstream_history
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Incognito mode (no state loading or saving)</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>-i
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>sqlstream<span class="w"> </span>shell<span class="w"> </span>--incognito<span class="w"> </span>employees.csv
 </span></code></pre></div>
 <h3 id="basic-usage">Basic Usage</h3>
 <ol>
@@ -3810,10 +3814,16 @@
 - Manual save available with <code>Ctrl+S</code>
 - State loads automatically on startup
 - If no saved state, starts with one empty tab</p>
+<p><strong>Incognito Mode</strong> (<code>-i</code> or <code>--incognito</code>):
+- Launches without loading previous session state
+- Starts with a fresh empty tab
+- Does not save state on exit
+- Useful for temporary queries or privacy</p>
 <p><strong>Benefits</strong>:
 - Resume work exactly where you left off
 - Never lose in-progress queries
-- Maintain context across sessions</p>
+- Maintain context across sessions
+- Use incognito mode for one-off queries without cluttering your saved state</p>
 <h3 id="4-tabbed-sidebar">4. Tabbed Sidebar</h3>
 <p>The sidebar now has two tabs: Schema and Files.</p>
 <p><strong>Schema Tab</strong>:
@@ -4012,6 +4022,7 @@
 <ol>
 <li><strong>Multiple Tabs</strong>: Use tabs to work on different queries simultaneously - one for exploration, one for final analysis</li>
 <li><strong>State Persistence</strong>: Your tabs are automatically saved - feel confident closing the shell anytime</li>
+<li><strong>Incognito Mode</strong>: Use <code>-i</code> or <code>--incognito</code> for quick one-off queries without affecting your saved session state</li>
 <li><strong>Large Datasets</strong>: Use <code>LIMIT</code> to preview data quickly in a dedicated tab</li>
 <li><strong>S3 Performance</strong>: Use partitioned Parquet files for best performance</li>
 <li><strong>History</strong>: Use <code>Ctrl+Up</code> to quickly re-run previous queries in any tab</li>
