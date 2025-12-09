@@ -19,6 +19,9 @@
     <a href="LICENSE">
       <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License">
     </a>
+    <a href="https://pepy.tech/project/sqlstream">
+      <img src="https://pepy.tech/badge/sqlstream" alt="Downloads">
+    </a>
   </p>
   
   <p>
