@@ -8,16 +8,16 @@
 
   <p>
     <a href="https://github.com/subhayu99/sqlstream/actions">
-      <img src="https://img.shields.io/github/actions/workflow/status/subhayu99/sqlstream/tests.yml?branch=main&label=Tests&style=flat-square" alt="Tests">
+      <img src="https://img.shields.io/github/actions/workflow/status/subhayu99/sqlstream/tests.yml?branch=main&label=Tests" alt="Tests">
     </a>
     <a href="https://codecov.io/gh/subhayu99/sqlstream">
-      <img src="https://img.shields.io/codecov/c/github/subhayu99/sqlstream?style=flat-square&token=YOUR_CODECOV_TOKEN" alt="Coverage">
+      <img src="https://codecov.io/gh/subhayu99/sqlstream/branch/main/graph/badge.svg?token=X2MN1KPDGQ" alt="Coverage">
     </a>
     <a href="https://subhayu99.github.io/sqlstream">
-      <img src="https://img.shields.io/github/actions/workflow/status/subhayu99/sqlstream/docs.yml?branch=main&label=Documentation&style=flat-square" alt="Documentation">
+      <img src="https://img.shields.io/github/actions/workflow/status/subhayu99/sqlstream/docs.yml?branch=main&label=Documentation" alt="Documentation">
     </a>
     <a href="LICENSE">
-      <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License">
+      <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
     </a>
     <a href="https://pepy.tech/project/sqlstream">
       <img src="https://pepy.tech/badge/sqlstream" alt="Downloads">
